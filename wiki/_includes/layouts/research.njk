@@ -1,0 +1,19 @@
+---
+layout: layouts/base.njk
+---
+<article class="research-card" data-research-turn="{{ rkey | escape }}">
+  <header class="research-heading">
+    <div class="research-kicker">
+      <span>Research turn</span>
+      {% if date %}<time datetime="{{ date | machineDate | escape }}">{{ date | displayDate | escape }}</time>{% endif %}
+    </div>
+    <h1>{{ title | escape }}</h1>
+  </header>
+  <div class="prose research-body">
+    {{ content | safe }}
+  </div>
+  <footer class="turn-footer">
+    <span>Turn {{ rkey | escape }}</span>
+    {% if turn_url %}<a href="{{ turn_url | escape }}" rel="external">Original Bluesky post</a>{% endif %}
+  </footer>
+</article>
