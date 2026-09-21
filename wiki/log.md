@@ -9,4 +9,4 @@ templateEngineOverride: md
 
 ## 2026-09-21
 
-- `SOURCE_BRIEF` — [Jev trades generative freedom for typed decisions](../typesafe-system-one-jev/)
+- `SOURCE_BRIEF` — [Jev trades generative freedom for typed decisions](../research/typesafe-system-one-jev/)

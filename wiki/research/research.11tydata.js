@@ -10,7 +10,7 @@ module.exports = {
       if (!RKEY_PATTERN.test(rkey) || rkey === "." || rkey === "..") {
         throw new Error(`Research page has an invalid rkey: ${rkey || "<missing>"}`);
       }
-      return `/${rkey}/index.html`;
+      return `/research/${rkey}/index.html`;
     },
   },
 };
