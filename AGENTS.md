@@ -46,7 +46,6 @@
 3. Put each durable source note in `wiki/sources/`. Record the original URL, retrieval time, content digest, and local raw path; the raw capture itself stays outside Git.
 4. Update relevant pages in `wiki/entities/` and `wiki/concepts/` only when the turn adds reusable knowledge. Create or improve a page in `wiki/notes/` when the evidence supports a durable claim, distinction, relationship, or implication. Prefer improving an existing page over creating a near-duplicate.
 5. Add the turn to `wiki/log.md` and keep `wiki/index.md` useful as the first navigation surface.
-6. Run focused checks for changed links and cited sources. Confirm the rendered turn marker contains the exact `rkey` before publication.
 
 ## Maintenance workflow
 
@@ -55,12 +54,10 @@ When asked to lint or maintain the wiki:
 1. Find broken links, orphan pages, near-duplicates, unsupported claims, unresolved contradictions, stale syntheses, and concepts that lack an addressable page.
 2. Repair the published layer from preserved evidence. Merge duplication into the strongest page, update all affected links, and remove the superseded published page.
 3. Improve `wiki/index.md` only where the change helps a reader enter or traverse the knowledge network; do not turn the index into an exhaustive file listing.
-4. Finish with focused link and citation checks for every changed page.
 
 ## Verification and delivery
 
-- GitHub Actions is the sole Node and Eleventy execution environment. Do not search the workstation for Node or npm, install JavaScript tooling locally, or attempt a local site build.
-- Before opening a pull request, run focused non-Node checks for the raw content digest, exact research front matter, word limit, citations, relative links, and the research marker contract.
+- GitHub Actions is the sole automated verification environment. For versioned work, commit and push the issue branch, then inspect the pull-request checks. Do not search the workstation for Node or npm, install JavaScript tooling locally, attempt a local site build, or recreate CI checks with ad hoc local scripts.
 - Format every commit subject as Conventional Commits 1.0.0: `<type>[optional scope]: <description>`.
 - For versioned work, follow `.github/pull_request_template.md`, commit all task changes, push the issue branch, and open an English-language pull request containing `Closes #<number>`.
 - Merge a pull request only after its CI checks pass and the user explicitly authorizes that merge in the current conversation; merging to `main` closes the issue and triggers the deployment workflow.
