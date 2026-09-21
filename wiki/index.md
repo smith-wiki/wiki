@@ -10,6 +10,7 @@ templateEngineOverride: md
 
 ## Recent research
 
+- [Goblins presents one object model across local and network boundaries](./research/spritely-goblins-project/) — A source brief on the project page, its implementations, and its advertised operating model.
 - [Spritely composes secure distributed systems from capabilities](./research/spritely-core/) — A source brief on Goblins, transactional vats, and OCapN.
 - [Cap’n Web maps RPC authority onto JavaScript references](./research/cloudflare-capnweb-javascript-rpc/) — A source brief on Cloudflare's JavaScript-native object-capability RPC system.
 - [Jev trades generative freedom for typed decisions](./research/typesafe-system-one-jev/) — A source brief on TypeSafe AI's constrained probabilistic model.
