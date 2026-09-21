@@ -4,6 +4,7 @@ summary: TypeSafe AI's launch announcement for a constrained probabilistic decis
 ---
 
 - **Original:** [TypeSafe AI announcement](https://typesafe.ai/blog/introducing-system-one-models-and-jev)
+- **Suggested citation:** Almeida, Diogo. “Introducing System One Models & Jev.” TypeSafe AI, 2026.
 - **Author:** Diogo Almeida, founder of TypeSafe AI
 - **Published:** Machine metadata says September 21, 2026 at 05:52 UTC; the visible dateline says September 15, 2026.
 - **Retrieved:** September 21, 2026 at 16:26 UTC
