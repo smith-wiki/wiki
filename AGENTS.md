@@ -4,7 +4,7 @@
 
 - **Compile, do not rediscover.** Turn durable source findings and useful answers into a persistent wiki that later work can reuse. A research turn should improve the shared artifact, not end as disposable chat.
 - **Evidence before synthesis.** Preserve the source locally in the Git-ignored `raw/` directory before drawing conclusions. Keep provenance reachable from every factual synthesis so the published layer can be checked and rebuilt.
-- **One address, one subject.** Give each source, entity, concept, or research question one stable page concerned with one coherent subject. Write it to remain intelligible outside the turn that created it.
+- **One address, one subject.** Give each source, entity, concept, permanent note, or research question one stable page concerned with one coherent subject. Write it to remain intelligible outside the turn that created it.
 - **Promote, do not copy.** `raw/` may preserve rough captures and source language; `wiki/` contains permanent notes rewritten in the writer's own words. Use complete sentences, disclose sources, and quote only when the wording itself matters.
 - **Select for use, not collection.** Promote material that advances a question, argument, concept, entity, or meaningful connection. Leave incidental excerpts in the evidence layer instead of turning every captured fragment into a page.
 - **Stable addresses, evolving content.** Treat published paths as permanent addresses. Improve pages in place; when a merge or rename is necessary, update every inbound link in the same change and remove the obsolete page.
@@ -22,12 +22,20 @@
 - Write English in source files, front matter, labels, alt text, and visible pages. Do not migrate material from an older wiki.
 - Write published content as Markdown only. Template syntax and raw HTML are outside the content contract.
 
+## Published page roles
+
+- `wiki/research/` contains the compact, request-bound artifact for one research turn. It answers or explores the turn; it is not the canonical home of every idea it mentions.
+- `wiki/sources/` contains one page per original source, including provenance, supported claims, and source-specific limits.
+- `wiki/entities/` contains named people, organizations, projects, products, and places. Entity pages answer “what is this?” and accumulate sourced facts over time.
+- `wiki/concepts/` contains recurring terms or model categories that need a stable definition. Use a noun phrase as the title.
+- `wiki/notes/` contains atomic permanent notes written in the wiki's voice. Each page states one reusable claim, distinction, relationship, or implication; use a declarative title and support it with source links.
+
 ## Research turn workflow
 
 1. Preserve fetched evidence under the local `raw/` directory before interpreting it. Existing evidence remains byte-for-byte unchanged; compute a content digest for provenance.
 2. Create exactly one compact page at `wiki/research/<rkey>.md`. Its front matter must contain exactly `title`, `rkey`, `date`, `brief`, `turn_url`, and `mode`; no other keys are allowed. `mode` must be exactly `SOURCE_BRIEF`, `QUESTION_ANSWER`, or `NOTE_EXPLORE`. The folder data file owns the `/<rkey>/` route and research layout.
 3. Put each durable source note in `wiki/sources/`. Record the original URL, retrieval time, content digest, and local raw path; the raw capture itself stays outside Git.
-4. Update relevant pages in `wiki/entities/` and `wiki/concepts/` only when the turn adds reusable knowledge. Prefer improving an existing page over creating a near-duplicate.
+4. Update relevant pages in `wiki/entities/` and `wiki/concepts/` only when the turn adds reusable knowledge. Create or improve a page in `wiki/notes/` when the evidence supports a durable claim, distinction, relationship, or implication. Prefer improving an existing page over creating a near-duplicate.
 5. Add the turn to `wiki/log.md` and keep `wiki/index.md` useful as the first navigation surface.
 6. Run focused checks for changed links and cited sources. Confirm the rendered turn marker contains the exact `rkey` before publication.
 
