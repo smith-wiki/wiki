@@ -5,4 +5,4 @@ permalink: /notes/index.html
 eleventyExcludeFromCollections: true
 ---
 
-No permanent notes have been published yet.
+- [Schema validity does not imply semantic correctness](./schema-validity-does-not-imply-semantic-correctness/) — A type-correct model response can still make the wrong judgment.
