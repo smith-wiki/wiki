@@ -6,7 +6,7 @@ permalink: /index.html
 templateEngineOverride: md
 ---
 
-[Research log](./log/) · [Sources](./sources/) · [Entities](./entities/) · [Concepts](./concepts/)
+[Research log](./log/) · [Sources](./sources/) · [Entities](./entities/) · [Concepts](./concepts/) · [Notes](./notes/)
 
 ## Recent research
 
