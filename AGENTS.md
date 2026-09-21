@@ -30,6 +30,15 @@
 - `wiki/concepts/` contains recurring terms or model categories that need a stable definition. Use a noun phrase as the title.
 - `wiki/notes/` contains atomic permanent notes written in the wiki's voice. Each page states one reusable claim, distinction, relationship, or implication; use a declarative title and support it with source links.
 
+## Issue intake
+
+- Every user request that would change tracked files, change repository settings, or publish research must have a GitHub issue before implementation begins. If the user supplies an existing issue, use it and do not create a duplicate.
+- Write every issue in English and make it self-contained for an agent without access to the originating conversation. Use the fields and order in `.github/ISSUE_TEMPLATE/task.yml`: task type, request, inputs and sources, context, acceptance criteria, constraints and non-goals, execution mode, and handoff readiness.
+- **Queue only:** create the issue with `Execution mode` set to `Queue only`, return its URL, and stop. Do not create a branch or begin implementation.
+- **Implement now:** create or adopt the issue first, set `Execution mode` to `Implement now`, then execute the task in the same session.
+- For changes to versioned files, use one `issue/<number>-<slug>` branch and pull request per issue. The pull request must contain `Closes #<number>` so merge closes the issue.
+- For repository-setting changes that cannot have a pull request, execute only after creating the issue, then add a result comment with verification and close the issue.
+
 ## Research turn workflow
 
 1. Preserve fetched evidence under the local `raw/` directory before interpreting it. Existing evidence remains byte-for-byte unchanged; compute a content digest for provenance.
@@ -52,8 +61,8 @@ When asked to lint or maintain the wiki:
 
 - GitHub Actions is the sole Node and Eleventy execution environment. Do not search the workstation for Node or npm, install JavaScript tooling locally, or attempt a local site build.
 - Before opening a pull request, run focused non-Node checks for the raw content digest, exact research front matter, word limit, citations, relative links, and the research marker contract.
-- Keep one research ingest per `ingest/<rkey>` branch and pull request. After focused checks, commit all ingest changes, push the branch, and open an English-language pull request.
-- Never merge the pull request. Its CI build must pass before a human merges it; merging to `main` triggers the deployment workflow.
+- For versioned work, follow `.github/pull_request_template.md`, commit all task changes, push the issue branch, and open an English-language pull request containing `Closes #<number>`.
+- Never merge the pull request. Its CI checks must pass before a human merges it; merging to `main` closes the issue and triggers the deployment workflow.
 
 ## Page contract
 

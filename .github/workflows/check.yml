@@ -12,6 +12,19 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  issue-link:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require a closing issue reference
+        env:
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          if [[ ! "$PR_BODY" =~ ([Cc]loses|[Ff]ixes|[Rr]esolves)[[:space:]]+#[0-9]+ ]]; then
+            echo "Pull request body must contain Closes #N, Fixes #N, or Resolves #N."
+            exit 1
+          fi
+
   build:
     runs-on: ubuntu-latest
     steps:
