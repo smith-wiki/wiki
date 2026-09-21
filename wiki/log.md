@@ -9,6 +9,7 @@ templateEngineOverride: md
 
 ## 2026-09-22
 
+- `SOURCE_BRIEF` — [Spritely composes secure distributed systems from capabilities](../research/spritely-core/)
 - `SOURCE_BRIEF` — [Cap’n Web maps RPC authority onto JavaScript references](../research/cloudflare-capnweb-javascript-rpc/)
 
 ## 2026-09-21

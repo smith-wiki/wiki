@@ -9,4 +9,10 @@ Object-capability RPC lets a program send references to callable functions or ob
 
 In [Cap'n Web](../../entities/capn-web/), authentication can return a new session object whose methods represent the operations available to that identity. A peer cannot synthesize that reference within the protocol; it must receive it from an authorized operation. This keeps authority attached to objects rather than mutable connection-wide state or credentials repeated with every call. ([Varda and Faulkner, 2025](../../sources/cloudflare-capnweb-javascript-rpc/))
 
+## From local references to network references
+
+[Spritely Goblins](../../entities/spritely-goblins/) applies the same authority model inside and across vats: a reference permits invocation, near objects may be called synchronously, and far objects receive asynchronous messages. [OCapN](../../entities/ocapn/) carries those reference relationships between machines through CapTP while separating transport details into netlayers. ([Lemmer-Webber, Farmer, and Sims, 2025](../../sources/the-heart-of-spritely/))
+
+## Boundaries
+
 Capability possession does not make the whole application secure. Transport authentication, resource limits, revocation policy, and runtime validation of values remain separate responsibilities. TypeScript alone cannot validate data from an untrusted peer because its types do not exist at runtime. ([Varda and Faulkner, 2025](../../sources/cloudflare-capnweb-javascript-rpc/))
