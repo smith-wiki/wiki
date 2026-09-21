@@ -1,10 +1,19 @@
 ---
 layout: layouts/base.njk
 ---
-<article class="research-card" data-research-turn="{{ rkey | escape }}">
+{% if mode == "SOURCE_BRIEF" %}
+  {% set mode_label = "Source brief" %}
+{% elif mode == "QUESTION_ANSWER" %}
+  {% set mode_label = "Question answer" %}
+{% elif mode == "NOTE_EXPLORE" %}
+  {% set mode_label = "Note exploration" %}
+{% else %}
+  {% set mode_label = "Research" %}
+{% endif %}
+<article class="research-card" data-research-turn="{{ rkey | escape }}" data-research-mode="{{ mode | escape }}">
   <header class="research-heading">
     <div class="research-kicker">
-      <span>Research turn</span>
+      <span class="research-mode-label"><span>Research mode</span> {{ mode_label }}</span>
       {% if date %}<time datetime="{{ date | machineDate | escape }}">{{ date | displayDate | escape }}</time>{% endif %}
     </div>
     <h1>{{ title | escape }}</h1>
