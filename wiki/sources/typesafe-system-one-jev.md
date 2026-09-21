@@ -25,4 +25,4 @@ The guarantee against type errors concerns the allowed output schema. A valid ch
 
 ## Connections
 
-[Research brief](../../typesafe-system-one-jev/) · [TypeSafe AI](../../entities/typesafe-ai/) · [Jev](../../entities/jev/) · [System One Models](../../concepts/system-one-models/)
+[Research brief](../../research/typesafe-system-one-jev/) · [TypeSafe AI](../../entities/typesafe-ai/) · [Jev](../../entities/jev/) · [System One Models](../../concepts/system-one-models/)
