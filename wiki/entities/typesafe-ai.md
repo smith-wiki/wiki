@@ -1,0 +1,12 @@
+---
+title: TypeSafe AI
+summary: An AI lab developing constrained probabilistic models for software automation.
+---
+
+TypeSafe AI describes itself as an AI lab building machine-native decision infrastructure for automation. Founder Diogo Almeida announced its first public model, [Jev](../jev/), after two years of development. [S1](../../sources/typesafe-system-one-jev/)
+
+## Position
+
+The company argues that generative language models are optimized for human-readable strings, while automation needs fast, typed, calibrated decisions that software can consume directly. Its proposed [System One Models](../../concepts/system-one-models/) move bounded judgments into a model and leave composition and final control flow in code. [S1](../../sources/typesafe-system-one-jev/)
+
+The launch evidence is company-authored. Its benchmark workflows, reference-answer method, and reported speed and cost gains have not been independently validated. [S1](../../sources/typesafe-system-one-jev/)

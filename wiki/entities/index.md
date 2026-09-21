@@ -5,4 +5,5 @@ permalink: /entities/index.html
 eleventyExcludeFromCollections: true
 ---
 
-No entity notes have been published yet.
+- [TypeSafe AI](./typesafe-ai/) — The lab developing constrained probabilistic models for software automation.
+- [Jev](./jev/) — TypeSafe AI's first public System One Model.

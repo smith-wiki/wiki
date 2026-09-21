@@ -5,4 +5,4 @@ permalink: /sources/index.html
 eleventyExcludeFromCollections: true
 ---
 
-No source notes have been published yet.
+- [Introducing System One Models & Jev](./typesafe-system-one-jev/) — TypeSafe AI's launch announcement for Jev and its constrained decision-model architecture.

@@ -10,4 +10,9 @@ templateEngineOverride: md
 
 ## Recent research
 
-No research has been published yet.
+- [Jev trades generative freedom for typed decisions](./typesafe-system-one-jev/) — A source brief on TypeSafe AI's constrained probabilistic model.
+
+## Starting points
+
+- [TypeSafe AI](./entities/typesafe-ai/) and its first public model, [Jev](./entities/jev/)
+- [System One Models](./concepts/system-one-models/)
