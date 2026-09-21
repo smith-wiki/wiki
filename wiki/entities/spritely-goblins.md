@@ -14,3 +14,7 @@ Each vat handles one queued message per turn. State changes, newly spawned objec
 ## Persistence and status
 
 Goblins serializes an object graph from designated roots while limiting each object’s self-description to authority it already possesses. Restoration can apply upgrade logic. The paper also describes time-travel debugging as planned and says Goblins does not itself implement the proposed portable encrypted storage system. ([Lemmer-Webber, Farmer, and Sims, 2025](../../sources/the-heart-of-spritely/))
+
+## Implementations
+
+At capture time, Spritely’s project page listed Goblins 0.18.0 implementations for Guile and Racket and said objects written in the two supported languages could interact. It also linked application articles about Mandy, Brassica Chat, GoblinShare, and Shepherd. These are first-party project claims rather than independent evidence of implementation completeness or interoperability. ([Spritely Institute, undated](../../sources/spritely-goblins-project/))
