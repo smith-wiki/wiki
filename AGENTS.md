@@ -62,7 +62,7 @@ When asked to lint or maintain the wiki:
 - GitHub Actions is the sole Node and Eleventy execution environment. Do not search the workstation for Node or npm, install JavaScript tooling locally, or attempt a local site build.
 - Before opening a pull request, run focused non-Node checks for the raw content digest, exact research front matter, word limit, citations, relative links, and the research marker contract.
 - For versioned work, follow `.github/pull_request_template.md`, commit all task changes, push the issue branch, and open an English-language pull request containing `Closes #<number>`.
-- Never merge the pull request. Its CI checks must pass before a human merges it; merging to `main` closes the issue and triggers the deployment workflow.
+- Merge a pull request only after its CI checks pass and the user explicitly authorizes that merge in the current conversation; merging to `main` closes the issue and triggers the deployment workflow.
 
 ## Page contract
 
