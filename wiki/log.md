@@ -7,4 +7,6 @@ permalink: /log/index.html
 templateEngineOverride: md
 ---
 
-No research has been published yet.
+## 2026-09-21
+
+- `SOURCE_BRIEF` — [Jev trades generative freedom for typed decisions](../typesafe-system-one-jev/)

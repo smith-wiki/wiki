@@ -5,4 +5,5 @@ permalink: /concepts/index.html
 eleventyExcludeFromCollections: true
 ---
 
-No concept notes have been published yet.
+- [System One Models](./system-one-models/) — TypeSafe AI's proposed model class for fast, typed probabilistic decisions.
+- [Schema validity versus semantic truth](./schema-validity-vs-semantic-truth/) — Why a type-correct model response can still be wrong.
