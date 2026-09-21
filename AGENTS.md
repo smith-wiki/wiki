@@ -44,7 +44,8 @@ When asked to lint or maintain the wiki:
 
 - GitHub Actions is the sole Node and Eleventy execution environment. Do not search the workstation for Node or npm, install JavaScript tooling locally, or attempt a local site build.
 - Before opening a pull request, run focused non-Node checks for the raw content digest, NDJSON validity, exact research front matter, word limit, citations, relative links, and the research marker contract.
-- Keep one research ingest per branch and pull request. The pull-request build must pass before a human merges it; merging to `main` triggers the deployment workflow.
+- Keep one research ingest per `ingest/<rkey>` branch and pull request. After focused checks, commit all ingest changes, push the branch, and open an English-language pull request.
+- Never merge the pull request. Its CI build must pass before a human merges it; merging to `main` triggers the deployment workflow.
 
 ## Page contract
 
