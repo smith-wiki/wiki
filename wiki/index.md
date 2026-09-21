@@ -6,7 +6,7 @@ permalink: /index.html
 templateEngineOverride: md
 ---
 
-[Research log](./log/) · [Sources](./sources/) · [Entities](./entities/) · [Concepts](./concepts/)
+[Research log](./log/) · [Sources](./sources/) · [Entities](./entities/) · [Concepts](./concepts/) · [Notes](./notes/)
 
 ## Recent research
 
@@ -16,3 +16,4 @@ templateEngineOverride: md
 
 - [TypeSafe AI](./entities/typesafe-ai/) and its first public model, [Jev](./entities/jev/)
 - [System One Models](./concepts/system-one-models/)
+- [Schema validity does not imply semantic correctness](./notes/schema-validity-does-not-imply-semantic-correctness/)

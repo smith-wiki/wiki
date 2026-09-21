@@ -9,4 +9,4 @@ summary: TypeSafe AI's proposed model class for fast, typed probabilistic decisi
 
 The model handles small independent judgments; code retains domain policy, weighting, invariants, and final branching. This division can make interfaces more predictable than free-form generation and allows applications to route uncertain cases differently. It also narrows the model's role: explanations, open-ended generation, multi-step reasoning, and correctness guarantees remain outside the typed response contract. [S1](../../sources/typesafe-system-one-jev/)
 
-Constraining possible outputs prevents malformed values, not valid-but-wrong decisions; correctness remains an empirical property of the model and its operating context. [S1](../../sources/typesafe-system-one-jev/)
+[Schema validity does not imply semantic correctness](../../notes/schema-validity-does-not-imply-semantic-correctness/): constraining possible outputs prevents malformed values, not valid-but-wrong decisions; correctness remains an empirical property of the model and its operating context. [S1](../../sources/typesafe-system-one-jev/)

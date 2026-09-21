@@ -20,7 +20,7 @@ The post reports 70–500 ms end-to-end latency, $0.042 per million input tokens
 
 The benchmark is first-party evidence, not an independent replication. TypeSafe says its model-capabilities team authored the workflows, external frontier-model probabilities serve as reference answers rather than ground truth, the headline gains may be near the high end of real-world results, and sustainable pricing remains unproved.
 
-The guarantee against type errors concerns the allowed output schema. A valid choice can still be factually or operationally wrong, so schema conformance does not by itself support the broader “can’t hallucinate” wording.
+The guarantee against type errors concerns the allowed output schema. A valid choice can still be factually or operationally wrong, so schema conformance does not by itself support the broader “can’t hallucinate” wording. See [Schema validity does not imply semantic correctness](../../notes/schema-validity-does-not-imply-semantic-correctness/).
 
 ## Connections
 
