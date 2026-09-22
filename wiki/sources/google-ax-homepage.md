@@ -25,4 +25,4 @@ This is promotional first-party material. Claims of billions of concurrent sessi
 
 ## Connections
 
-[Research brief](../../research/google-ax-agent-substrate/) · [AX](../../entities/google-ax/) · [AX repository](../google-ax/) · [Agent Substrate](../../entities/agent-substrate/)
+[Research brief](../../research/google-ax-agent-substrate/) · [Practical answer](../../research/ax-isolated-repository-maintenance/) · [AX](../../entities/google-ax/) · [AX repository](../google-ax/) · [Agent Substrate](../../entities/agent-substrate/)

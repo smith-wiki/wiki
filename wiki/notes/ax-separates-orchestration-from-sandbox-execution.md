@@ -12,3 +12,7 @@ The split lets AX remain opinionated about developer-facing agent workload compo
 ## Boundary of the claim
 
 This is an architectural separation, not proof that the stack reaches its advertised scale, latency, density, or security goals. Both repositories mark the projects as early or unstable, and Substrate’s architecture and threat model explicitly distinguish aspirations and required security invariants from implemented guarantees. ([Google, 2026](../../sources/google-ax/); [Agent Substrate contributors, 2026](../../sources/agent-substrate/))
+
+## Practical example
+
+[An isolated Go dependency upgrade](../../research/ax-isolated-repository-maintenance/) applies this separation: AX configures and supervises the environment, while the supplied coding agent changes the repository and runs its tests. ([Google, 2026](../../sources/google-ax/); [Agent Substrate contributors, 2026](../../sources/agent-substrate/))
