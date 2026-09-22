@@ -9,7 +9,7 @@ Read this file for evidence-backed knowledge about a subject, source, entity, co
 
 ## Research orientation
 
-- When `sw` is available, start topical research and published-wiki discovery with its bounded page, evidence, research-milestone, Issue, and pull-request summaries.
+- Start topical research and published-wiki discovery with bare `sw` and scan its bounded page, evidence, research-milestone, Issue, and pull-request summaries.
 - Apply [Integrate before expanding](#integrate-before-expanding) before creating or revising a page.
 - Treat `sw` as discovery and workflow context, not evidence. Preserve and assess original sources through the research workflow below.
 
@@ -45,7 +45,7 @@ Directories express page roles, not a fixed subject taxonomy. Build lines of tho
 
 ### Integrate before expanding
 
-Search the published wiki before creating or revising a page. When `sw` is available, use `sw search PATTERN`; otherwise search the tracked published Markdown directly. Read relevant pages and connections, then prefer revising an existing page, recording a contradiction, or adding a connection over producing a parallel summary.
+Search the published wiki before creating or revising a page with `sw search PATTERN`. Read relevant pages and connections, then prefer revising an existing page, recording a contradiction, or adding a connection over producing a parallel summary.
 
 ### Connectivity creates value
 
@@ -84,7 +84,7 @@ These roles apply [One address, one subject](#one-address-one-subject).
 
 ## Research threads and turns
 
-When available, use `sw issue research MODE SLUG TITLE BRIEF_FILE [THREAD]` for turn intake. It creates a new thread when `THREAD` is omitted, continues only the explicitly supplied thread, and stacks on that thread's open pull request. Use `sw sync` after a stacked base merges. Use `sw thread retire` or `sw thread merge` only on the user's explicit direction.
+Use `sw issue research MODE SLUG TITLE BRIEF_FILE [THREAD]` for turn intake. It creates a new thread when `THREAD` is omitted, continues only the explicitly supplied thread, and stacks on that thread's open pull request. Use `sw sync` after a stacked base merges. Use `sw thread retire` or `sw thread merge` only on the user's explicit direction.
 
 - A topical research turn may contain multiple related sources in one message; they form one source bundle and one turn. A later message that adds a source starts a new turn even when it continues the same topic. Delivery instructions such as merge approval do not start a research turn.
 - Give every topical research turn its own task Issue, `issue/<number>-<slug>` branch, pull request, and exactly one created or revised request-bound page in `wiki/research/`. Do not enlarge an earlier turn's Issue or pull request with research input from a later message.
