@@ -43,10 +43,7 @@
         let p = packagesFor system;
         in {
           default = p.pkgs.mkShellNoCC {
-            packages = [
-              p.sw
-              p.pkgs.nodejs_22
-            ];
+            packages = [ p.sw ];
           };
         });
     };

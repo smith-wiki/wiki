@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Reject non-ASCII Git metadata and newly added repository content."""
+"""Reject non-ASCII Git metadata, added content, and binary files."""
 
 from __future__ import annotations
 
@@ -44,6 +44,13 @@ def check_diff(staged: bool, revision_range: str | None) -> list[str]:
     names = git(*base, "--name-only", "-z", "--diff-filter=ACMR", "--")
     for name in names.rstrip(b"\0").split(b"\0") if names else []:
         errors.extend(check_value(f"path {name!r}", name))
+
+    numstat = git(*base, "--numstat", "--diff-filter=ACMR", "--")
+    for line in numstat.splitlines():
+        added, deleted, path = line.split(b"\t", 2)
+        if added == b"-" and deleted == b"-":
+            display_path = path.decode("ascii", "backslashreplace")
+            errors.append(f"{display_path}: binary files are not allowed")
 
     patch = git(
         *base,
