@@ -40,7 +40,7 @@
 - A **topical research turn** is one user message whose requested deliverable is evidence-backed knowledge about a subject, source, entity, concept, claim, or question. Source briefs, question answers, and note explorations are topical research.
 - Discussion, design, evaluation, or implementation of the research process itself is **operational process work**, not a topical research turn. This includes intake design, search or tool configuration, evidence handling, publication rules, Issue/PR/Milestone mechanics, and workflows for processing supplied writing.
 - Classify by the requested outcome, not by whether the message uses the word “research.” Knowledge about a product such as Kagi is topical research; deciding how Smith Wiki should use that product is process work.
-- Process work may remain a chat discussion. When it changes tracked files or repository settings, give it a normal task Issue, branch, and pull request. It may use a dedicated process-development milestone, but never a topical research milestone.
+- Process work may remain a chat discussion. When it changes tracked files or repository settings, use one normal task Issue, branch, and pull request for the coherent setup task, including its explicit follow-ups while that work remains open. Group process tasks in one dedicated process-development milestone or leave them unassigned; never create per-turn process milestones or use a topical research milestone.
 - Do not create or update `wiki/research/`, `wiki/sources/`, `wiki/entities/`, `wiki/concepts/`, `wiki/notes/`, `wiki/log.md`, or `wiki/index.md` merely to record process work. Process artifacts belong in GitHub Issues, pull requests, and the repository files that implement the workflow.
 
 ## Research threads and turns
@@ -54,7 +54,7 @@
 
 ## Issue intake
 
-- Every user request that would change tracked files, change repository settings, or publish research must have a GitHub issue before implementation begins. If the user supplies an existing issue, use it and do not create a duplicate.
+- Every topical research turn and every new independently scoped process, maintenance, site, or repository task must have a GitHub issue before implementation begins. A later message that explicitly continues open process work stays in that work's existing Issue, branch, and pull request; the per-turn split applies only to topical research. If the user supplies an existing issue, use it and do not create a duplicate.
 - Write every issue in English and make it self-contained for an agent without access to the originating conversation. Use the fields and order in `.github/ISSUE_TEMPLATE/task.yml`: task type, research milestone, process milestone, dependency, request, inputs and sources, context, acceptance criteria, constraints and non-goals, execution mode, and handoff readiness.
 - **Queue only:** create the issue with `Execution mode` set to `Queue only`, return its URL, and stop. Do not create a branch or begin implementation.
 - **Implement now:** create or adopt the issue first, set `Execution mode` to `Implement now`, then execute the task in the same session.
