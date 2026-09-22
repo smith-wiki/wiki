@@ -5,6 +5,12 @@ permalink: /sources/index.html
 eleventyExcludeFromCollections: true
 ---
 
+- [Kagi API pricing](./kagi-api-pricing/) — Public Search and Extract prices and advertised capabilities.
+- [Kagi API OpenAPI specification](./kagi-openapi-specification/) — Search request controls, result schemas, pagination, and extraction semantics.
+- [Your Privacy and Kagi](./kagi-privacy/) — Query logging, billing metadata, and debugging retention.
+- [Brave Search API announcement](./brave-search-api-announcement/) — Brave's 2026 Search pricing and Zero Data Retention claim.
+- [Tavily credits and pricing](./tavily-api-credits/) — Credit prices and Search credit consumption.
+- [Exa pricing](./exa-pricing/) — Search request, additional-result, and page-content prices.
 - [Google AX repository](./google-ax/) — Primary documentation for AX's declarative agent-workload control plane.
 - [AX homepage](./google-ax-homepage/) — AX's public positioning, worked lifecycle example, and Agent Substrate relationship.
 - [Agent Substrate repository](./agent-substrate/) — Primary documentation for stateful actor lifecycle, sandboxing, and worker multiplexing.

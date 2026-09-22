@@ -10,6 +10,7 @@ templateEngineOverride: md
 
 ## Recent research
 
+- [Is Kagi Search API worth $12 per 1,000 requests?](./research/kagi-ai-value-assessment/) — A costed comparison of Kagi's configurable search results against lower-priced APIs.
 - [Can AX orchestrate an isolated Go dependency upgrade?](./research/ax-isolated-repository-maintenance/) — A concrete answer mapping one coding-agent maintenance job onto AX primitives.
 - [AX and kagent layer declarative agents over Agent Substrate](./research/google-ax-agent-substrate/) — A source brief on two agent-facing systems and their shared sandbox lifecycle foundation.
 - [Goblins presents one object model across local and network boundaries](./research/spritely-goblins-project/) — A source brief on the project page, its implementations, and its advertised operating model.
