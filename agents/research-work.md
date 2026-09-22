@@ -1,17 +1,16 @@
 # Research work
 
-Read this file for evidence-backed knowledge about a subject, source, entity, concept, claim, or question, and for maintenance of the published knowledge network. Apply [Repository work](repository-work.md) for Issue intake, branches, pull requests, verification, and merge authorization.
+Read this file for evidence-backed knowledge about a subject, source, entity, concept, claim, or question, and for maintenance of the published knowledge network. Also apply repository [Issue intake](repository-work.md#issue-intake) and [Verification and delivery](repository-work.md#verification-and-delivery).
 
 ## Scope
 
 - A **topical research turn** is one user message whose requested deliverable is evidence-backed knowledge. Source briefs, question answers, and note explorations are topical research.
 - Discussion, design, evaluation, or implementation of the research process itself is repository work, not a topical research turn. This includes intake design, search or tool configuration, evidence handling, publication rules, Issue, pull-request, and milestone mechanics, and workflows for supplied writing.
-- Classify by the requested outcome, not by whether the message uses the word "research." Knowledge about a product is topical research; deciding how Smith Wiki should use that product is repository work.
 
 ## Research orientation
 
-- Start with bare `sw` and scan its bounded page, evidence, research-milestone, Issue, and pull-request summaries.
-- Run `sw search PATTERN` before creating or revising a page, then read the relevant existing pages and connections.
+- When `sw` is available, start topical research and published-wiki discovery with its bounded page, evidence, research-milestone, Issue, and pull-request summaries.
+- Apply [Integrate before expanding](#integrate-before-expanding) before creating or revising a page.
 - Treat `sw` as discovery and workflow context, not evidence. Preserve and assess original sources through the research workflow below.
 
 ## Named methods
@@ -46,7 +45,7 @@ Directories express page roles, not a fixed subject taxonomy. Build lines of tho
 
 ### Integrate before expanding
 
-When `sw` is available, use `sw search PATTERN` before creating a page, then read the matching pages. Prefer revising an existing page, recording a contradiction, or adding a connection over producing a parallel summary.
+Search the published wiki before creating or revising a page. When `sw` is available, use `sw search PATTERN`; otherwise search the tracked published Markdown directly. Read relevant pages and connections, then prefer revising an existing page, recording a contradiction, or adding a connection over producing a parallel summary.
 
 ### Connectivity creates value
 
@@ -85,6 +84,8 @@ These roles apply [One address, one subject](#one-address-one-subject).
 
 ## Research threads and turns
 
+When available, use `sw issue research MODE SLUG TITLE BRIEF_FILE [THREAD]` for turn intake. It creates a new thread when `THREAD` is omitted, continues only the explicitly supplied thread, and stacks on that thread's open pull request. Use `sw sync` after a stacked base merges. Use `sw thread retire` or `sw thread merge` only on the user's explicit direction.
+
 - A topical research turn may contain multiple related sources in one message; they form one source bundle and one turn. A later message that adds a source starts a new turn even when it continues the same topic. Delivery instructions such as merge approval do not start a research turn.
 - Give every topical research turn its own task Issue, `issue/<number>-<slug>` branch, pull request, and exactly one created or revised request-bound page in `wiki/research/`. Do not enlarge an earlier turn's Issue or pull request with research input from a later message.
 - A **research thread** is a GitHub Milestone that starts with its first topical research turn and may span multiple sessions. Assign every turn Issue and pull request to that milestone. Research milestones are workflow metadata and do not appear on the published wiki.
@@ -96,6 +97,8 @@ This per-turn granularity belongs only to topical research. Repository setup fol
 
 ## Research turn workflow
 
+Apply [Compile, do not rediscover](#compile-do-not-rediscover) to the turn as a whole, and preserve the human-agent boundary in [Separate roles](#separate-roles) while executing it.
+
 1. Apply [Evidence before synthesis](#evidence-before-synthesis): preserve fetched evidence under `raw/` before interpreting it. Existing evidence remains byte-for-byte unchanged; compute a content digest for provenance.
 2. Apply [One address, one subject](#one-address-one-subject): create or revise exactly one compact page at `wiki/research/<rkey>.md`. Its front matter contains exactly `title`, `rkey`, `date`, `brief`, `turn_url`, and `mode`; no other keys are allowed. Set `turn_url` to the turn Issue URL. `mode` is exactly `SOURCE_BRIEF`, `QUESTION_ANSWER`, or `NOTE_EXPLORE`. The folder data file owns the `/<rkey>/` route and research layout.
 3. Apply [Promote, do not copy](#promote-do-not-copy): put each durable source note in `wiki/sources/`. Record the original URL, retrieval time, content digest, and local raw path; raw capture stays outside Git.
@@ -104,7 +107,7 @@ This per-turn granularity belongs only to topical research. Repository setup fol
 
 ## Maintenance workflow
 
-When asked to lint or maintain the wiki, apply both this file and [Repository work](repository-work.md):
+When asked to lint or maintain the wiki, apply this file with repository [Issue intake](repository-work.md#issue-intake) and [Verification and delivery](repository-work.md#verification-and-delivery):
 
 1. Find broken links, orphan pages, near-duplicates, unsupported claims, unresolved contradictions, stale syntheses, and concepts without an addressable page.
 2. Apply [Stable addresses, evolving content](#stable-addresses-evolving-content) and [Integrate before expanding](#integrate-before-expanding): repair the published layer from preserved evidence, merge duplication into the strongest page, update affected links, and remove the superseded page.

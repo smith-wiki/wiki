@@ -2,15 +2,15 @@
 
 Repository setup and its explicit follow-ups form one coherent task: keep them in the same Issue, branch, and pull request. Per-turn research rules never apply to repository work.
 
-When the repository exposes `sw`, start every Smith Wiki task with it. Its bounded overview is the shared map of research pages, evidence, threads, Issues, and pull requests; use that map before choosing the route below.
+When `sw` is available, use its bare overview for topical research and published-wiki discovery. Repository work does not require bare `sw`; use named workflow commands only as described in the repository guide.
 
 ## Route before acting
 
 The linked files are mandatory parts of this contract when their trigger matches:
 
 - **Repository work:** before changing tracked files, repository settings, tooling, automation, site behavior, or GitHub workflow, read [Repository work](agents/repository-work.md).
-- **Topical research:** before producing evidence-backed knowledge about a subject, source, entity, concept, claim, or question, read [Research work](agents/research-work.md) and [Repository work](agents/repository-work.md). Research work adds evidence, publication, per-turn, and research-thread requirements to the repository delivery workflow.
-- **Wiki maintenance:** before repairing or reorganizing published knowledge, read both [Research work](agents/research-work.md#maintenance-workflow) and [Repository work](agents/repository-work.md).
+- **Topical research:** before producing evidence-backed knowledge about a subject, source, entity, concept, claim, or question, read [Research work](agents/research-work.md), [Issue intake](agents/repository-work.md#issue-intake), and [Verification and delivery](agents/repository-work.md#verification-and-delivery).
+- **Published wiki content and maintenance:** before changing any tracked file under `wiki/`, read [Research work](agents/research-work.md). For repair or reorganization, apply its [Maintenance workflow](agents/research-work.md#maintenance-workflow). Also apply [Issue intake](agents/repository-work.md#issue-intake) and [Verification and delivery](agents/repository-work.md#verification-and-delivery).
 
 ## Classification test
 
