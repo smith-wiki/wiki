@@ -25,6 +25,24 @@ jobs:
             exit 1
           fi
 
+  ascii:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Reject new non-ASCII content
+        env:
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_BODY: ${{ github.event.pull_request.body }}
+        run: |
+          python3 scripts/check_ascii.py --env PR_TITLE --env PR_BODY
+          python3 scripts/check_ascii.py --commits "$BASE_SHA..$HEAD_SHA"
+          python3 scripts/check_ascii.py --range "$BASE_SHA...$HEAD_SHA"
+
   build:
     runs-on: ubuntu-latest
     steps:
