@@ -27,7 +27,7 @@ Usage:
   sw gh GH_ARGUMENTS...
 
 Commands:
-  info         Show bounded pages, evidence, research threads, and GitHub work.
+  info         Show bounded titled pages, research threads, and GitHub work.
   status       Show the current branch and concise working-tree state.
   start        Adopt an existing Issue on a branch from BASE.
   diff         Show a working-tree or staged diff using Git arguments.
@@ -48,7 +48,7 @@ THREAD is an explicitly supplied research milestone number, title, or URL.
 Without THREAD, sw creates a new research milestone. Open thread PRs stack automatically.
 BRIEF_FILE contains Request, Inputs and sources, Context, Acceptance criteria,
 and Constraints and non-goals headings. sw owns all workflow metadata.
-LIMIT defaults to 3 and applies independently to every list (maximum 10).
+LIMIT defaults to 5 and applies independently to every list (maximum 20).
 EOF
 }
 
@@ -211,7 +211,7 @@ print_limited() {
   shown=$total
   (( shown <= limit )) || shown=$limit
 
-  printf '%-14s (%d): ' "$label" "$total"
+  printf '%-14s: ' "$label"
   if (( total == 0 )); then
     printf 'none\n'
     return
@@ -228,10 +228,10 @@ print_limited() {
 
 command_info() {
   (( $# <= 1 )) || die "usage: sw info [LIMIT]"
-  local limit=${1:-3}
-  local branch dirty role repo index
+  local limit=${1:-5}
+  local branch dirty role repo index path slug title line frontmatter
   local -a items
-  [[ "$limit" =~ ^[1-9]$|^10$ ]] || die "LIMIT must be between 1 and 10"
+  [[ "$limit" =~ ^([1-9]|1[0-9]|20)$ ]] || die "LIMIT must be between 1 and 20"
 
   branch=$(git branch --show-current)
   [[ -n "$branch" ]] || branch="detached"
@@ -246,23 +246,34 @@ command_info() {
       mapfile -t items < <(printf '%s\n' "${items[@]}" | sort)
     fi
     for index in "${!items[@]}"; do
-      items[index]=${items[index]##*/}
-      items[index]=${items[index]%.md}
+      path=${items[index]}
+      slug=${path##*/}
+      slug=${slug%.md}
+      title=""
+      frontmatter=false
+      while IFS= read -r line; do
+        if [[ "$line" == --- ]]; then
+          [[ "$frontmatter" == false ]] || break
+          frontmatter=true
+          continue
+        fi
+        [[ "$frontmatter" == true && "$line" == title:* ]] || continue
+        title=${line#title:}
+        title=${title#"${title%%[![:space:]]*}"}
+        title=${title%"${title##*[![:space:]]}"}
+        if [[ "$title" == \"*\" && "$title" == *\" ]]; then
+          title=${title:1:${#title}-2}
+        elif [[ "$title" == \'*\' && "$title" == *\' ]]; then
+          title=${title:1:${#title}-2}
+        fi
+        break
+      done <"$path"
+      [[ -n "$title" ]] || title=$slug
+      items[index]="$title [$slug]"
     done
     print_limited "$limit" "  $role" "${items[@]}"
   done
 
-  items=()
-  if [[ -d raw ]]; then
-    load_lines items "could not list raw evidence" find raw -type f
-    if (( ${#items[@]} > 0 )); then
-      mapfile -t items < <(printf '%s\n' "${items[@]}" | sort)
-    fi
-    for index in "${!items[@]}"; do
-      items[index]=${items[index]#raw/}
-    done
-  fi
-  print_limited "$limit" Evidence "${items[@]}"
 
   if ! gh auth status >/dev/null 2>&1; then
     printf 'GitHub: unavailable; run gh auth login\n'

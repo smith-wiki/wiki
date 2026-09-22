@@ -19,7 +19,6 @@
             name = "sw";
             runtimeInputs = with pkgs; [
               coreutils
-              findutils
               gh
               git
               gnugrep
