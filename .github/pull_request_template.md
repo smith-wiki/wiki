@@ -5,8 +5,8 @@ Closes #N
 
 ## Research lineage
 
-<!-- Optional. Delete lines that do not apply. -->
-Part of #N
+<!-- Required for research pull requests. Delete lines that do not apply. -->
+Research milestone: <URL or title>
 Depends on #N
 
 ## Summary
