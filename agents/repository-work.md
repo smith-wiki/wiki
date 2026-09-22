@@ -4,9 +4,8 @@ Read this file for repository setup, tooling, automation, site changes, workflow
 
 ## Repository interface
 
-When the repository exposes `sw`, it is the mandatory interface for repository and GitHub workflow actions:
+Bare `sw` already orients every Smith Wiki task. For repository and GitHub workflow actions, `sw` is also the mandatory mutation interface:
 
-- Start every repository task with `sw`; its default output provides bounded state and copyable examples.
 - Prefer named `sw` commands. When no named command fits, keep the action inside the interface with `sw git ...` or `sw gh ...`.
 
 ## Coherent task
