@@ -9,7 +9,7 @@ Read this file for evidence-backed knowledge about a subject, source, entity, co
 
 ## Research orientation
 
-- Start topical research and published-wiki discovery with bare `sw` and scan its bounded page, evidence, research-milestone, Issue, and pull-request summaries.
+- Start topical research and published-wiki discovery with bare `sw` and scan its bounded titled-page, research-milestone, Issue, and pull-request summaries.
 - Apply [Integrate before expanding](#integrate-before-expanding) before creating or revising a page.
 - Treat `sw` as discovery and workflow context, not evidence. Preserve and assess original sources through the research workflow below.
 
