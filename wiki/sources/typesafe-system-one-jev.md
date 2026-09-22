@@ -1,28 +1,57 @@
 ---
 title: Introducing System One Models & Jev
-summary: TypeSafe AI's launch announcement for a constrained probabilistic decision model.
+summary: TypeSafe AI's launch article for Jev, a model for fast typed probabilistic decisions inside software workflows.
 ---
 
-- **Original:** [TypeSafe AI announcement](https://typesafe.ai/blog/introducing-system-one-models-and-jev)
-- **Suggested citation:** Almeida, Diogo. “Introducing System One Models & Jev.” TypeSafe AI, 2026.
-- **Author:** Diogo Almeida, founder of TypeSafe AI
-- **Published:** Machine metadata says September 21, 2026 at 05:52 UTC; the visible dateline says September 15, 2026.
-- **Retrieved:** September 21, 2026 at 16:26 UTC
-- **Preserved evidence:** `raw/sources/typesafe-ai-introducing-system-one-models-and-jev-2026-09-21.html`
-- **Content ID:** `sha256:8af0f9569aa95e8e217bf571fdff9adb79c45f7a03778234afb563e1c438f8f6`
+## Source
 
-## Claims and evidence
+- **Type:** Mutable company launch article
+- **Author:** Diogo Almeida
+- **Responsible organization:** TypeSafe AI
+- **Original:** [Introducing System One Models & Jev](https://typesafe.ai/blog/introducing-system-one-models-and-jev)
+- **Publication status:** Visible date September 15, 2026; machine-readable metadata reported September 21, 2026
+- **Suggested citation:** Almeida, Diogo. “Introducing System One Models & Jev.” TypeSafe AI, September 15, 2026.
+- **Assessment:** `recorded`
 
-TypeSafe AI introduces [Jev](../../entities/jev/) as the first [System One Model](../../concepts/system-one-models/). The model accepts unstructured state and predefined questions, then emits typed values, probabilities, and confidence information rather than free-form text. The announced primitives cover binary judgments, choices, and scores; independent questions can be sampled in parallel and composed by ordinary code.
+## Representation
 
-The post reports 70–500 ms end-to-end latency, $0.042 per million input tokens, unmetered output, and large gains on four company-designed workflow evaluations. It attributes these properties to a new architecture, a parallel sampler, and “Reinforcement Learning for Calibrated Decisions,” but does not publish their implementation.
+- **ID:** `typesafe-system-one-jev-2026-09-21`
+- **Retrieved:** 2026-09-21T16:26:00Z
+- **Preserved representation:** `raw/sources/typesafe-ai-introducing-system-one-models-and-jev-2026-09-21.html`
+- **Format:** HTML
+- **Fixity:** `sha256:8af0f9569aa95e8e217bf571fdff9adb79c45f7a03778234afb563e1c438f8f6`
 
-## Limits
+## Description
 
-The benchmark is first-party evidence, not an independent replication. TypeSafe says its model-capabilities team authored the workflows, external frontier-model probabilities serve as reference answers rather than ground truth, the headline gains may be near the high end of real-world results, and sustainable pricing remains unproved.
+First-party launch article describing TypeSafe AI's “System One Model” category, the Jev model's typed probabilistic interface, and company-reported latency, pricing, and workflow evaluations.
 
-The guarantee against type errors concerns the allowed output schema. A valid choice can still be factually or operationally wrong, so schema conformance does not by itself support the broader “can’t hallucinate” wording. See [Schema validity does not imply semantic correctness](../../notes/schema-validity-does-not-imply-semantic-correctness/).
+## Evidence
+
+### `typed-probabilistic-interface`
+
+- **Source states:** Jev accepts unstructured program state and predefined questions, then returns type-constrained values with probabilities and confidence scores rather than generated prose.
+- **Representation:** `typesafe-system-one-jev-2026-09-21`
+- **Locator:** Opening product description; `Frontiers, Old and New` → `Inputs`, `Outputs`, and `Confidence`
+
+### `performance-and-pricing`
+
+- **Source reports:** End-to-end response times of 70–500 milliseconds, input pricing of $0.042 per million tokens, and unmetered output.
+- **Representation:** `typesafe-system-one-jev-2026-09-21`
+- **Locator:** `Frontiers, Old and New` → `Cost` and `Speed`; `Evidence / Technical Results` opening verification list
+
+### `workflow-evaluations`
+
+- **Source reports:** Four company-created workflows compare Jev with external models using the latter's averaged probability outputs as reference answers.
+- **Representation:** `typesafe-system-one-jev-2026-09-21`
+- **Locator:** `Evidence / Technical Results` → `Workflow evals` and its `Nuance` list
+
+## Source criticism
+
+The article is a first-party launch source. Its workflow content was produced by the model-capabilities team, its references are model outputs rather than independent ground truth, and it publishes no architecture, sampler, training, or independent replication details. Schema conformance establishes output shape, not semantic correctness, while the pricing and latency claims remain company-reported.
 
 ## Connections
 
-[Research brief](../../research/typesafe-system-one-jev/) · [TypeSafe AI](../../entities/typesafe-ai/) · [Jev](../../entities/jev/) · [System One Models](../../concepts/system-one-models/)
+- [System One models](../../concepts/system-one-models/) defines the category in the wiki.
+- [TypeSafe AI](../../entities/typesafe-ai/) and [Jev](../../entities/jev/) accumulate cross-source facts.
+- [Research brief](../../research/typesafe-system-one-jev/) answers the originating question.
+- [Schema validity does not imply semantic correctness](../../notes/schema-validity-does-not-imply-semantic-correctness/) records the relevant output-safety limit.

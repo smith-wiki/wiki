@@ -1,28 +1,55 @@
 ---
-title: "Goblins: Distributed Programming"
-summary: Spritely Institute's project page for its distributed object programming environment.
+title: Spritely Goblins project page
+summary: Official project page for Spritely Goblins and its Guile and Racket implementations.
 ---
 
-- **Original:** [Spritely Institute project page](https://spritely.institute/goblins/)
-- **Suggested citation:** Spritely Institute. “Goblins: Distributed Programming.” Undated project page. Accessed September 21, 2026.
+## Source
+
+- **Type:** Mutable project webpage
 - **Responsible organization:** Spritely Institute
-- **Status:** Undated first-party project overview; captured September 2026
-- **Retrieved:** September 21, 2026 at 19:36:40 UTC
-- **Preserved evidence:** `raw/sources/spritely-goblins.html`
-- **Content ID:** `sha256:35e19c830faad24eaf9c59bb49ff8a980ee3bad4e8accbec71b550209fed8080`
+- **Original:** [Spritely Goblins](https://spritely.institute/goblins/)
+- **Publication or version status:** No publication date or page version stated
+- **Suggested citation:** Spritely Institute. “Spritely Goblins.” Accessed September 21, 2026.
+- **Assessment:** `recorded`
 
-## Claims and evidence
+## Representation
 
-The page describes [Spritely Goblins](../../entities/spritely-goblins/) as Spritely’s distributed object programming environment. It advertises automatic local transactions for synchronous operations and asynchronous interaction with encapsulated objects anywhere on the network, with networking details hidden behind an object-programming interface.
+- **ID:** `spritely-goblins-page-2026-09-21`
+- **Retrieved:** 2026-09-21T19:36:40Z
+- **Preserved representation:** `raw/sources/spritely-goblins.html`
+- **Format:** HTML
+- **Fixity:** `sha256:35e19c830faad24eaf9c59bb49ff8a980ee3bad4e8accbec71b550209fed8080`
 
-It also says Goblins integrates distributed debugging, process persistence, and upgrades while preserving its security model. The download section lists Guile and Racket implementations at version 0.18.0 and claims that objects written in different supported languages can interact.
+## Description
 
-The page points readers to the separate [Heart of Spritely paper](../the-heart-of-spritely/) for design details and links recent application articles about Mandy, Brassica Chat, GoblinShare, and Shepherd.
+Official overview of the Spritely Goblins distributed programming environment, with links to design material, implementation releases, and recent project writing.
 
-## Limits
+## Evidence
 
-This is an undated first-party landing page, not an independent security, performance, or interoperability evaluation. Its concise feature statements do not identify which debugging capabilities are available now, define the scope of the security guarantees, or demonstrate cross-language interoperability. Version and “recent” labels reflect the page at retrieval time and may become stale.
+### `project-positioning`
+
+- **Source states:** Goblins is a distributed object programming environment for building peer-to-peer applications with transactional local interactions, asynchronous remote interactions, debugging, persistence, and upgrade support.
+- **Representation:** `spritely-goblins-page-2026-09-21`
+- **Locator:** Opening description
+
+### `implementations`
+
+- **Source lists:** Guile and Racket implementations, both shown at version 0.18.0 in the captured page.
+- **Representation:** `spritely-goblins-page-2026-09-21`
+- **Locator:** `Get Goblins!`
+
+### `design-material`
+
+- **Source links:** The project page points readers to the Goblins design documentation and recent explanatory articles.
+- **Representation:** `spritely-goblins-page-2026-09-21`
+- **Locator:** `Read about Goblins' design` and `Recent articles`
+
+## Source criticism
+
+This first-party overview establishes project terminology and published implementation versions, not independent evidence of reliability, adoption, security, or performance. Its mutable page does not expose a revision history.
 
 ## Connections
 
-[Research brief](../../research/spritely-goblins-project/) · [Spritely Goblins](../../entities/spritely-goblins/) · [The Heart of Spritely](../the-heart-of-spritely/)
+- [Spritely Goblins](../../entities/spritely-goblins/) accumulates cross-source project facts.
+- [The Heart of Spritely](../the-heart-of-spritely/) supplies the deeper architecture and capability-security model.
+- [Research brief](../../research/spritely-goblins-project/) synthesizes the preserved project-page evidence.
