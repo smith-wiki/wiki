@@ -18,3 +18,7 @@ AX delegates atespace provisioning, actor lifecycle, worker assignment, sandboxi
 The repository warns that AX’s core concepts, protocols, and specifications are still changing and may break before a stable release. Its claims about running billions of tasks are not benchmarked in the preserved repository documentation. ([Google, 2026](../../sources/google-ax/))
 
 **Contradiction:** The public homepage says AX was “built for production,” while the repository warns of likely pre-stable breaking changes and Agent Substrate says its underlying runtime is not production-ready. The homepage’s scale and sub-second-resumption claims are promotional and unverified in the preserved evidence. ([AX project, undated](../../sources/google-ax-homepage/); [Agent Substrate contributors, 2026](../../sources/agent-substrate/))
+
+## Practical example
+
+[AX can orchestrate an isolated Go dependency upgrade](../../research/ax-isolated-repository-maintenance/) by preparing the repository and toolchain, limiting the supplied coding agent’s network and compute access, exposing its progress for inspection, and preserving task state during human review. ([Google, 2026](../../sources/google-ax/); [Agent Substrate contributors, 2026](../../sources/agent-substrate/))
