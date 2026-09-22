@@ -51,6 +51,5 @@ This is a first-party launch article and design explanation. It calls the librar
 
 ## Connections
 
-- [Cap’n Web](../../entities/capnweb/) accumulates cross-source project facts.
-- [Promise pipelining collapses dependent remote round trips](../../notes/promise-pipelining-collapses-dependent-remote-round-trips/) derives the latency implication.
-- [Promise-pipelined RPC can preserve capability discipline](../../notes/promise-pipelined-rpc-can-preserve-capability-discipline/) compares the security model with Goblins.
+- [Cap’n Web](../../entities/capn-web/) accumulates cross-source project facts.
+- [Promise pipelining collapses dependent RPC round trips](../../notes/promise-pipelining-collapses-dependent-rpc-round-trips/) derives the latency implication.

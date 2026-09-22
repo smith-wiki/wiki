@@ -52,5 +52,4 @@ This first-party overview establishes project terminology and published implemen
 
 - [Spritely Goblins](../../entities/spritely-goblins/) accumulates cross-source project facts.
 - [The Heart of Spritely](../the-heart-of-spritely/) supplies the deeper architecture and capability-security model.
-- [Research brief](../../research/spritely-goblins/) synthesizes the preserved project and paper evidence.
-- [Goblins combines transactional turns with promise pipelining](../../notes/goblins-combines-transactional-turns-with-promise-pipelining/) records a reusable architectural implication.
+- [Research brief](../../research/spritely-goblins-project/) synthesizes the preserved project-page evidence.

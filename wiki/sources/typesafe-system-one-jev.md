@@ -54,4 +54,4 @@ The article is a first-party launch source. Its workflow content was produced by
 - [System One models](../../concepts/system-one-models/) defines the category in the wiki.
 - [TypeSafe AI](../../entities/typesafe-ai/) and [Jev](../../entities/jev/) accumulate cross-source facts.
 - [Research brief](../../research/typesafe-system-one-jev/) answers the originating question.
-- [System One models trade generative breadth for structured decision control](../../notes/system-one-models-trade-generative-breadth-for-structured-decision-control/) records the reusable architectural tradeoff.
+- [Schema validity does not imply semantic correctness](../../notes/schema-validity-does-not-imply-semantic-correctness/) records the relevant output-safety limit.

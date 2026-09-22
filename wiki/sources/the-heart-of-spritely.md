@@ -59,6 +59,6 @@ The paper is authoritative for the authors' design but labels itself an early dr
 
 - [Spritely Goblins](../../entities/spritely-goblins/) accumulates cross-source project facts.
 - [Spritely Goblins project page](../spritely-goblins-project/) records the public implementation overview.
-- [Research brief](../../research/spritely-goblins/) synthesizes the paper and project page.
-- [Goblins combines transactional turns with promise pipelining](../../notes/goblins-combines-transactional-turns-with-promise-pipelining/) derives the model's fault and latency implications.
-- [Promise-pipelined RPC can preserve capability discipline](../../notes/promise-pipelined-rpc-can-preserve-capability-discipline/) connects the paper's model to Cap’n Web.
+- [Research brief](../../research/spritely-core/) synthesizes the paper's architecture and limits.
+- [Transactional vat turns contain failed state and messages](../../notes/transactional-vat-turns-contain-failed-state-and-messages/) derives the turn model's fault-containment implication.
+- [Promise pipelining collapses dependent RPC round trips](../../notes/promise-pipelining-collapses-dependent-rpc-round-trips/) derives the latency implication.
