@@ -24,11 +24,11 @@ body:
       required: true
 
   - type: input
-    id: research_session
+    id: research_milestone
     attributes:
-      label: Research session
-      description: Optional parent session Issue URL. Leave blank for the first or only turn; backfill it when a second turn creates the tracker.
-      placeholder: https://github.com/owner/repository/issues/N
+      label: Research milestone
+      description: Required for a research turn. Use the existing milestone name or URL explicitly supplied by the user, or the new milestone created for this turn. Leave blank for non-research work.
+      placeholder: https://github.com/owner/repository/milestone/N
 
   - type: input
     id: depends_on
