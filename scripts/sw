@@ -13,7 +13,6 @@ Usage:
   sw diff [GIT_DIFF_ARGS...]
   sw stage PATH...
   sw search PATTERN
-  sw issue
   sw issue TITLE BODY_FILE [MILESTONE]
   sw commit MESSAGE [PATH...]
   sw pr ISSUE TITLE SUMMARY VERIFICATION [BASE]
@@ -29,12 +28,12 @@ Commands:
   diff         Show a working-tree or staged diff using Git arguments.
   stage        Stage explicit paths and show the resulting status.
   search       Search published Markdown pages with git grep.
-  issue        Open the task form, or create an issue from an ASCII body file.
+  issue        Validate an ASCII title/body file, then create the task Issue.
   commit       Optionally stage paths, validate them, and create a commit.
   pr           Validate the branch, push it, and create a pull request.
   checks       Watch GitHub checks for the current or selected pull request.
   check-ascii  Run the repository ASCII policy checker directly.
-  git, gh      Run an uncommon Git or GitHub command through this interface.
+  git, gh      Run an uncommon operation only when no named command fits.
 
 PR creation generates the repository body from ISSUE, SUMMARY, and VERIFICATION.
 New non-ASCII content is rejected; existing published history is not rewritten.
@@ -46,7 +45,7 @@ quickstart() {
   cat <<'EOF'
 Examples
   sw search 'schema validity'
-  sw issue
+  sw issue 'Task title' /tmp/issue-body.txt
   sw start 123 short-slug
   sw status
   sw diff
@@ -188,15 +187,12 @@ command_search() {
 }
 
 command_issue() {
-  if (( $# == 0 )); then
-    gh issue create --web --template task.yml
-    return
-  fi
   (( $# == 2 || $# == 3 )) || die "usage: sw issue TITLE BODY_FILE [MILESTONE]"
   local title=$1 body_file=$2 milestone=${3:-} heading
   [[ -f "$body_file" ]] || die "issue body file not found: $body_file"
   check_text issue-title "$title"
   python3 "$ascii_checker" --file "$body_file"
+  [[ -z "$milestone" ]] || check_text issue-milestone "$milestone"
   for heading in \
     '## Task type' \
     '## Research milestone' \
@@ -246,6 +242,7 @@ command_pr() {
   [[ -z $(git status --porcelain) ]] || die "commit all tracked changes before creating a PR"
   branch=$(git branch --show-current)
   [[ -n "$branch" && "$branch" != "$base" ]] || die "create the PR from an issue branch"
+  check_text branch-name "$branch"
 
   git fetch --quiet origin "$base"
   range="origin/$base...HEAD"
