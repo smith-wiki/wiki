@@ -50,8 +50,7 @@ Examples
   sw start 123 short-slug
   sw status
   sw diff
-  sw stage AGENTS.md scripts/sw
-  sw commit 'docs(workflow): require sw'
+  sw commit 'docs(workflow): require sw' AGENTS.md scripts/sw
   sw pr 123 'Require sw workflow' 'Make sw mandatory.' 'Smoke-tested sw commands.'
   sw checks
   sw help
