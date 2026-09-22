@@ -30,19 +30,27 @@
 - `wiki/concepts/` contains recurring terms or model categories that need a stable definition. Use a noun phrase as the title.
 - `wiki/notes/` contains atomic permanent notes written in the wiki's voice. Each page states one reusable claim, distinction, relationship, or implication; use a declarative title and support it with source links.
 
+## Research and process boundary
+
+- A **topical research turn** is one user message whose requested deliverable is evidence-backed knowledge about a subject, source, entity, concept, claim, or question. Source briefs, question answers, and note explorations are topical research.
+- Discussion, design, evaluation, or implementation of the research process itself is **operational process work**, not a topical research turn. This includes intake design, search or tool configuration, evidence handling, publication rules, Issue/PR/Milestone mechanics, and workflows for processing supplied writing.
+- Classify by the requested outcome, not by whether the message uses the word “research.” Knowledge about a product such as Kagi is topical research; deciding how Smith Wiki should use that product is process work.
+- Process work may remain a chat discussion. When it changes tracked files or repository settings, give it a normal task Issue, branch, and pull request. It may use a dedicated process-development milestone, but never a topical research milestone.
+- Do not create or update `wiki/research/`, `wiki/sources/`, `wiki/entities/`, `wiki/concepts/`, `wiki/notes/`, `wiki/log.md`, or `wiki/index.md` merely to record process work. Process artifacts belong in GitHub Issues, pull requests, and the repository files that implement the workflow.
+
 ## Research threads and turns
 
-- A **research turn** is one user message that adds evidence, asks a research question, or requests a note exploration. Multiple related sources in the same message form one source bundle and one turn. A later message that adds a source starts a new turn even when it continues the same topic. Delivery instructions such as merge approval do not start a research turn.
-- Give every research turn its own task Issue, `issue/<number>-<slug>` branch, pull request, and exactly one created or revised request-bound page in `wiki/research/`. Do not enlarge an earlier turn's Issue or pull request with research input from a later message.
-- A **research thread** is a GitHub Milestone that starts with its first turn and may span multiple OMP sessions. Assign every turn Issue and its pull request to that milestone. Milestones are workflow metadata and do not appear on the published wiki.
-- Continue an existing thread only when the user explicitly asks to continue it and supplies its milestone name or URL. If the request omits the identifier, ask for it rather than enumerating milestones. Never infer a thread from topic similarity, shared sources or entities, labels, recent activity, or conversation history. Without an explicit continuation request, create a new milestone for the turn.
+- A topical research turn may contain multiple related sources in one message; they form one source bundle and one turn. A later message that adds a source starts a new turn even when it continues the same topic. Delivery instructions such as merge approval do not start a research turn.
+- Give every topical research turn its own task Issue, `issue/<number>-<slug>` branch, pull request, and exactly one created or revised request-bound page in `wiki/research/`. Do not enlarge an earlier turn's Issue or pull request with research input from a later message.
+- A **research thread** is a GitHub Milestone that starts with its first topical research turn and may span multiple OMP sessions. Assign every turn Issue and its pull request to that milestone. Research milestones are workflow metadata and do not appear on the published wiki.
+- Continue an existing research thread only when the user explicitly asks to continue it and supplies its milestone name or URL. If the request omits the identifier, ask for it rather than enumerating milestones. Never infer a thread from topic similarity, shared sources or entities, labels, recent activity, or conversation history. Without an explicit continuation request, create a new research milestone for the turn.
 - A research milestone may remain open indefinitely. Close it only when the user explicitly retires the thread or directs that it be superseded or merged into another milestone.
-- If a new turn starts while the preceding turn's pull request is open, stack the new pull request on the preceding branch, assign it to the same explicitly named milestone, and declare `Depends on #<pull-request>`. After the base merges, retarget the stacked pull request to `main`, rebase its branch onto `origin/main`, push with `--force-with-lease`, and require fresh passing CI before merge.
+- If a new topical turn starts while the preceding turn's pull request is open, stack the new pull request on the preceding branch, assign it to the same explicitly named research milestone, and declare `Depends on #<pull-request>`. After the base merges, retarget the stacked pull request to `main`, rebase its branch onto `origin/main`, push with `--force-with-lease`, and require fresh passing CI before merge.
 
 ## Issue intake
 
 - Every user request that would change tracked files, change repository settings, or publish research must have a GitHub issue before implementation begins. If the user supplies an existing issue, use it and do not create a duplicate.
-- Write every issue in English and make it self-contained for an agent without access to the originating conversation. Use the fields and order in `.github/ISSUE_TEMPLATE/task.yml`: task type, research milestone, dependency, request, inputs and sources, context, acceptance criteria, constraints and non-goals, execution mode, and handoff readiness.
+- Write every issue in English and make it self-contained for an agent without access to the originating conversation. Use the fields and order in `.github/ISSUE_TEMPLATE/task.yml`: task type, research milestone, process milestone, dependency, request, inputs and sources, context, acceptance criteria, constraints and non-goals, execution mode, and handoff readiness.
 - **Queue only:** create the issue with `Execution mode` set to `Queue only`, return its URL, and stop. Do not create a branch or begin implementation.
 - **Implement now:** create or adopt the issue first, set `Execution mode` to `Implement now`, then execute the task in the same session.
 - For changes to versioned files, use one `issue/<number>-<slug>` branch and pull request per issue. The pull request must contain `Closes #<number>` so merge closes the issue.
