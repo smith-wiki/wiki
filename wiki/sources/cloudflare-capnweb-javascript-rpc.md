@@ -1,28 +1,56 @@
 ---
-title: "Cap'n Web: A new RPC system for browsers and web servers"
-summary: Cloudflare's launch article for a JavaScript-native object-capability RPC protocol.
+title: Cap’n Web — a new RPC system for browsers and web servers
+summary: Cloudflare's technical introduction to Cap’n Web, its promise-pipelined RPC model, capability security, and wire format.
 ---
 
-- **Original:** [Cloudflare announcement](https://blog.cloudflare.com/capnweb-javascript-rpc-library/)
-- **Suggested citation:** Varda, Kenton, and Steve Faulkner. “Cap'n Web: A new RPC system for browsers and web servers.” Cloudflare, 2025.
+## Source
+
+- **Type:** Mutable technical article
 - **Authors:** Kenton Varda and Steve Faulkner
-- **Published:** September 22, 2025; machine metadata says the article was modified July 15, 2026.
-- **Retrieved:** September 21, 2026 at 17:59:09 UTC
-- **Preserved evidence:** `raw/sources/cloudflare-capnweb-javascript-rpc-2026-09-22.md`
-- **Content ID:** `sha256:504f51b74400e2804f20ffacd2a43e75fcd3aff63daafee79dece07c8871aa4c`
+- **Responsible organization:** Cloudflare
+- **Original:** [Cap’n Web — a new RPC system for browsers and web servers](https://blog.cloudflare.com/capnweb-javascript-rpc-library/)
+- **Publication status:** Published September 22, 2025; page metadata says modified July 15, 2026
+- **Suggested citation:** Varda, Kenton, and Steve Faulkner. “Cap’n Web — a new RPC system for browsers and web servers.” Cloudflare Blog, September 22, 2025.
+- **Assessment:** `recorded`
 
-## Claims and evidence
+## Representation
 
-Cloudflare introduces [Cap'n Web](../../entities/capn-web/) as a schema-free RPC protocol and pure TypeScript implementation for browsers, servers, Workers, and other modern JavaScript runtimes. Its JSON-based encoding carries structured-clone-compatible values and remote object or function references over HTTP batch requests, WebSockets, `postMessage()`, or custom transports.
+- **ID:** `cloudflare-capnweb-2026-09-21`
+- **Retrieved:** 2026-09-21T17:59:09Z
+- **Preserved representation:** `raw/sources/cloudflare-capnweb-javascript-rpc-2026-09-22.md`
+- **Format:** Markdown capture of the article
+- **Fixity:** `sha256:504f51b74400e2804f20ffacd2a43e75fcd3aff63daafee79dece07c8871aa4c`
 
-Its [object-capability RPC](../../concepts/object-capability-rpc/) model supports calls in both directions and treats possession of an unforgeable remote reference as authority to invoke it. The article's authentication example returns a restricted session object rather than changing connection-wide state or repeatedly transmitting credentials.
+## Description
 
-[Promise pipelining collapses dependent RPC round trips](../../notes/promise-pipelining-collapses-dependent-rpc-round-trips/) by allowing later calls to refer to unresolved earlier results. Cap'n Web also records synchronous `map()` callbacks against placeholder values and replays the resulting restricted RPC expression remotely, so per-item work can remain in the same round trip.
+First-party technical article introducing Cap’n Web's JavaScript RPC interface, transport modes, promise pipelining, bidirectional object references, capability-security properties, and JSON-based protocol.
 
-## Limits
+## Evidence
 
-The article is a project announcement by its creators, not an independent performance or security assessment. It describes Cap'n Web as new and highly experimental. TypeScript types are erased at runtime, so the protocol does not stop an untrusted peer from sending values of the wrong type; applications still need runtime validation. Its latency argument is architectural and example-based rather than benchmarked in the article.
+### `promise-pipelining`
+
+- **Source explains:** Calls can be chained on unresolved remote promises so a dependent operation reaches the server before earlier results return to the client.
+- **Representation:** `cloudflare-capnweb-2026-09-21`
+- **Locator:** `Features you don't find in typical JSON RPC` → `Chained calls (Promise Pipelining)`
+
+### `capability-security`
+
+- **Source argues:** Authorization can follow possession of object references, including attenuated references that expose narrower authority.
+- **Representation:** `cloudflare-capnweb-2026-09-21`
+- **Locator:** `Did you spot the security?`
+
+### `transport-and-wire-format`
+
+- **Source describes:** Cap’n Web supports WebSocket-style sessions and HTTP batch mode, while encoding its protocol as JSON with reference and call-table conventions.
+- **Representation:** `cloudflare-capnweb-2026-09-21`
+- **Locator:** `Features you don't find in typical JSON RPC` → `HTTP batch mode`; `Implementation details` → `JSON-based serialization` and `RPC protocol`
+
+## Source criticism
+
+This is a first-party launch article and design explanation. It calls the library new and highly experimental, does not provide independent security review or comparative benchmarks, and should not be read as evidence that every deployment inherits the described capability discipline.
 
 ## Connections
 
-[Research brief](../../research/cloudflare-capnweb-javascript-rpc/) · [Cap'n Web](../../entities/capn-web/) · [Object-capability RPC](../../concepts/object-capability-rpc/) · [Promise pipelining collapses dependent RPC round trips](../../notes/promise-pipelining-collapses-dependent-rpc-round-trips/)
+- [Cap’n Web](../../entities/capnweb/) accumulates cross-source project facts.
+- [Promise pipelining collapses dependent remote round trips](../../notes/promise-pipelining-collapses-dependent-remote-round-trips/) derives the latency implication.
+- [Promise-pipelined RPC can preserve capability discipline](../../notes/promise-pipelined-rpc-can-preserve-capability-discipline/) compares the security model with Goblins.

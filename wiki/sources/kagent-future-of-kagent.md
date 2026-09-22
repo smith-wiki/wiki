@@ -1,28 +1,57 @@
 ---
 title: The Future of kagent
-summary: kagent's announcement that it will replace its Deployment-based runtime with Agent Substrate.
+summary: Official announcement that kagent is moving its agent runtime to Agent Substrate.
 ---
 
-- **Original:** [The Future of kagent](https://kagent.dev/blog/the-future-of-kagent)
-- **Suggested citation:** Yarmush, Eitan. “The Future of kagent.” kagent, undated article referencing August 2026. Accessed September 22, 2026.
+## Source
+
+- **Type:** Mutable project announcement
 - **Author:** Eitan Yarmush
-- **Status:** Undated first-party project announcement; its text reports project statistics as of August 2026.
-- **Retrieved:** September 22, 2026 at 06:34:58 UTC
-- **Preserved evidence:** `raw/sources/kagent-future-of-kagent-2026-09-22.html`
-- **Content ID:** `sha256:16498947fa776d9f3f74d48fc18f17b5241be3e0b353151a337c118ad12a5d0b`
+- **Responsible organization:** kagent
+- **Original:** [The Future of kagent](https://kagent.dev/blog/the-future-of-kagent)
+- **Publication status:** The page gives no publication date; its body refers to August 2026
+- **Suggested citation:** Yarmush, Eitan. “The Future of kagent.” kagent. Accessed September 22, 2026.
+- **Assessment:** `recorded`
 
-## Claims and evidence
+## Representation
 
-The announcement says [kagent](../../entities/kagent/) began with declarative Kubernetes APIs for agents and facilities to run, observe, and secure them. It identifies sandboxing, persistent filesystems, and avoiding dedicated compute for idle agents as requirements that became clearer as the project evolved.
+- **ID:** `kagent-future-2026-09-22`
+- **Retrieved:** 2026-09-22T06:34:58Z
+- **Preserved representation:** `raw/sources/kagent-future-of-kagent-2026-09-22.html`
+- **Format:** HTML
+- **Fixity:** `sha256:16498947fa776d9f3f74d48fc18f17b5241be3e0b353151a337c118ad12a5d0b`
 
-kagent had already added an Agent Substrate-backed `SandboxAgent` custom resource, but the article announces a broader replacement of its Deployment-based runtime with [Agent Substrate](../../entities/agent-substrate/). kagent will remain Kubernetes-native while delegating sandboxing, filesystem snapshots, suspend and resume, network controls, and worker sharing to Substrate. The migration also includes a breaking API redesign: the previous runtime remains supported on `release/v0.10.x`, new work moves to `main`, migration guides were still forthcoming, and the linked API proposal remained open.
+## Description
 
-## Limits
+First-party announcement explaining kagent's original Kubernetes-agent goals, its SandboxAgent constraints, and the planned migration from a Deployment-based runtime to Agent Substrate.
 
-This is a project-direction announcement, not evidence that the migration or proposed API is complete. Its security, density, and latency statements are promotional first-party claims.
+## Evidence
 
-**Contradiction:** The article calls sub-100 ms resume a “guarantee,” while the preserved Substrate README claims sub-500 ms resume and the architecture document states 100 ms at the 95th percentile as a target. None of these preserved sources supplies independent benchmark methodology validating those figures.
+### `original-requirements`
+
+- **Source states:** kagent aimed to run agents as Kubernetes resources with first-class observability, human-in-the-loop interaction, and reusable agents and tools.
+- **Representation:** `kagent-future-2026-09-22`
+- **Locator:** Opening section before `The present and the future`, including the three-item requirements list
+
+### `runtime-migration`
+
+- **Source announces:** The project plans to remove its Deployment-based agent runtime and build directly on Agent Substrate.
+- **Representation:** `kagent-future-2026-09-22`
+- **Locator:** `The present and the future` → passages beginning `At this point` and `This is why we decided`
+
+### `claimed-benefits-and-rollout`
+
+- **Source claims:** The migration provides sandboxing, suspend and resume, resource pools, observability, and sub-100-millisecond start times, with API proposals and migration tooling planned around the v0.10.x line and `main`.
+- **Representation:** `kagent-future-2026-09-22`
+- **Locator:** `The present and the future` → Agent Substrate benefit list and release-plan paragraphs
+
+## Source criticism
+
+This is a first-party roadmap announcement, not evidence that the migration or performance targets were delivered. Its sub-100-millisecond statement is stronger than the captured Agent Substrate README's documented target and should be treated as an unverified claim.
 
 ## Connections
 
-[Research brief](../../research/google-ax-agent-substrate/) · [kagent](../../entities/kagent/) · [kagent repository](../kagent/) · [Agent Substrate](../../entities/agent-substrate/)
+- [kagent](../../entities/kagent/) accumulates cross-source project facts.
+- [kagent repository](../kagent/) documents the pre-migration architecture.
+- [Agent Substrate repository](../agent-substrate/) documents the target runtime and its maturity limits.
+- [Research brief](../../research/google-ax-agent-substrate/) compares the three projects.

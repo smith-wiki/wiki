@@ -25,7 +25,7 @@
 ## Published page roles
 
 - `wiki/research/` contains the compact, request-bound artifact for one research turn. It answers or explores the turn; it is not the canonical home of every idea it mentions.
-- `wiki/sources/` contains one page per original source, including provenance, supported claims, and source-specific limits.
+- `wiki/sources/` contains one page per independently citable original source. A source page records that original's identity, preserved representations, supported statements, and source-specific assessment; it is not a topic dossier.
 - `wiki/entities/` contains named people, organizations, projects, products, and places. Entity pages answer “what is this?” and accumulate sourced facts over time.
 - `wiki/concepts/` contains recurring terms or model categories that need a stable definition. Use a noun phrase as the title.
 - `wiki/notes/` contains atomic permanent notes written in the wiki's voice. Each page states one reusable claim, distinction, relationship, or implication; use a declarative title and support it with source links.
@@ -84,3 +84,15 @@ When asked to lint or maintain the wiki:
 - Do not put a second title in the body; the layout renders the front-matter title. Keep the page self-contained and omit process narration.
 
 A research page is complete when its local raw evidence and published chronology entry exist, every material factual claim is cited, labels expose non-factual reasoning, useful cross-links resolve, and the rendered `.research-card` exposes both `data-research-turn` equal to its `rkey` and `data-research-mode` equal to its exact `mode`.
+
+## Source page profile
+
+- The source-page contract governs evidence semantics, not visible layout. Do not require one universal sequence of headings, render empty sections, or copy a template mechanically; use the blocks that fit the source type.
+- Distinguish the independently citable intellectual source from its representations. Alternate formats or repeated captures of the same content may share a page; materially changed editions or revisions need separately addressable source identity. Never overwrite a representation cited by published evidence.
+- Every source page must identify the title, source type, creator or responsible organization when known, publication or version status, canonical original URL or identifier, and a suggested citation for that original alone.
+- Give every source page a short neutral description of what the source is and covers. Cross-source synthesis, original ideas, deductions, comparisons, recommendations, research plans, and task state belong in research, entity, concept, or note pages.
+- Record at least one representation with a stable local ID, retrieval time in UTC, local raw path, format or media type, and digest algorithm and value. Add edition, revision, commit, language, resolved URL, capture method, rights, or relations to other representations when they affect later verification.
+- Record an assessment state as `not_assessed`, `none_recorded`, or `recorded`. Add source criticism only when material; `none_recorded` means no limitation was recorded for the present use, not that the source is universally authoritative. Never emit an empty criticism section.
+- Every source-supported statement used by the wiki must identify what the source states or shows, the exact representation used, and a precise locator. Keep exact quotations distinct from source-attributable paraphrases; quotations are optional and must remain short and purposeful. Wiki inference never belongs in an evidence entry.
+- Match locators to the source type. For a mutable webpage, prefer the preserved representation plus a heading, table cell, fragment, or exact text with context. For a machine-readable specification, prefer the immutable representation plus a labeled structural locator such as JSON Pointer and a human-readable operation or path. For a paper, identify the edition and page, section, figure, table, or equation. For a repository, identify the commit plus path and symbol, heading, or line range.
+- Use contextual, typed links for versions, formats, parts, replacements, citations, and downstream use. A source-family or collection page may aid navigation, but claims must still terminate at the independently identified member that supports them.

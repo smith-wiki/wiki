@@ -1,28 +1,64 @@
 ---
-title: "The Heart of Spritely: Distributed Objects and Capability Security"
-summary: An early technical paper connecting object capabilities, transactional distributed objects, and OCapN.
+title: The Heart of Spritely
+summary: Early-draft technical paper describing Spritely Goblins, its object-capability model, and the OCapN protocol.
 ---
 
-- **Original:** [Spritely Institute paper](https://files.spritely.institute/papers/spritely-core.html)
-- **Suggested citation:** Lemmer-Webber, Christine, Randy Farmer, and Juliana Sims. “The Heart of Spritely: Distributed Objects and Capability Security.” Spritely Institute, early draft, HTML export dated May 21, 2025.
+## Source
+
+- **Type:** Technical paper, HTML edition
 - **Authors:** Christine Lemmer-Webber, Randy Farmer, and Juliana Sims
-- **Status:** Early draft under technical review; HTML export dated May 21, 2025
-- **Retrieved:** September 21, 2026 at 19:11:20 UTC
-- **Preserved evidence:** `raw/sources/spritely-core.html`
-- **Content ID:** `sha256:b41043b3c8cdf977d404fc2eeb7792c587e70d355ea13c4ec5588f3f27b44c5c`
+- **Responsible organization:** Spritely Institute
+- **Original:** [The Heart of Spritely](https://files.spritely.institute/papers/spritely-core.html)
+- **Edition status:** Early draft; HTML export dated May 21, 2025
+- **Suggested citation:** Lemmer-Webber, Christine, Randy Farmer, and Juliana Sims. “The Heart of Spritely.” Early draft, HTML edition, May 21, 2025.
+- **Assessment:** `recorded`
 
-## Claims and evidence
+## Representation
 
-The paper presents object-capability security as ordinary reference passing: code begins without ambient authority and can act only through explicitly received references. It develops this model through [Spritely Goblins](../../entities/spritely-goblins/), where objects in the same vat can call synchronously while objects across vats communicate asynchronously without application code needing to distinguish another process from another machine.
+- **ID:** `heart-of-spritely-html-2025-05-21`
+- **Retrieved:** 2026-09-21T19:11:20Z
+- **Preserved representation:** `raw/sources/spritely-core.html`
+- **Format:** HTML
+- **Fixity:** `sha256:b41043b3c8cdf977d404fc2eeb7792c587e70d355ea13c4ec5588f3f27b44c5c`
 
-Goblins stores each vat’s objects in a transactional actormap. A successful turn commits state changes and outbound messages together; an unhandled error leaves the turn uncommitted. The same object graph supports capability-preserving serialization, planned time-travel debugging, and upgrades. Promise pipelining allows messages to target unresolved results, reducing dependency-driven network waits.
+## Description
 
-[OCapN](../../entities/ocapn/) supplies the network abstraction. CapTP carries capability-aware messages, distributed garbage collection, and pipelined promises; netlayers separate those semantics from transports and connection timing; URIs or certificates bootstrap references. The paper also specifies requirements for portable encrypted storage but states that Goblins does not implement that storage system.
+An early-draft paper explaining Spritely's object-capability security model, Goblins vat and turn semantics, transactional actormaps, promise pipelining, inter-vat communication, and planned encrypted storage.
 
-## Limits
+## Evidence
 
-This is a first-party architecture paper and tutorial, not an independent security assessment or performance evaluation. It explicitly remains under technical review. Several parts are prospective: the distributed debugger is planned, portable encrypted storage is future work, and OCapN is described as entering standardization. Examples use the Guile implementation; the claim that the model can transfer to other first-class-function, lexically scoped languages is architectural rather than demonstrated here.
+### `ocap-reference-authority`
+
+- **Source explains:** In an object-capability system, possession of an unforgeable object reference carries the authority to invoke that object; authority can be delegated by passing references.
+- **Representation:** `heart-of-spritely-html-2025-05-21`
+- **Locator:** `Capabilities as programming` (`#caps-as-programming`)
+
+### `vat-and-transaction-model`
+
+- **Source defines:** A vat runs one turn at a time; Goblins' local actormap interactions are transactional so an uncaught error can roll back the turn.
+- **Representation:** `heart-of-spritely-html-2025-05-21`
+- **Locator:** `Vat model of computation` (`#vat-model-of-computation`); `Transactions make errors survivable` (`#transactions-make-errors-survivable`); `Turns are cheap transactions` (`#turns-are-cheap-transactions`)
+
+### `promise-pipelining`
+
+- **Source describes:** Messages may be sent to unresolved promises and forwarded toward the eventual target, reducing dependent network round trips.
+- **Representation:** `heart-of-spritely-html-2025-05-21`
+- **Locator:** `Promise pipelining` (`#promise-pipelining`)
+
+### `network-and-storage-status`
+
+- **Source describes:** OCapN and its CapTP and netlayer components provide inter-vat communication, while portable encrypted storage is a planned design rather than an implemented subsystem in this draft.
+- **Representation:** `heart-of-spritely-html-2025-05-21`
+- **Locator:** `OCapN` (`#ocapn`) and `Portable encrypted storage` (`#portable-encrypted-storage`)
+
+## Source criticism
+
+The paper is authoritative for the authors' design but labels itself an early draft. Several operational features, including aspects of debugging and portable encrypted storage, are prospective, and the paper provides no independent security evaluation or deployment benchmark.
 
 ## Connections
 
-[Research brief](../../research/spritely-core/) · [Spritely Goblins](../../entities/spritely-goblins/) · [OCapN](../../entities/ocapn/) · [Object-capability RPC](../../concepts/object-capability-rpc/) · [Transactional vat turns contain failed state and messages](../../notes/transactional-vat-turns-contain-failed-state-and-messages/) · [Promise pipelining collapses dependent RPC round trips](../../notes/promise-pipelining-collapses-dependent-rpc-round-trips/)
+- [Spritely Goblins](../../entities/spritely-goblins/) accumulates cross-source project facts.
+- [Spritely Goblins project page](../spritely-goblins-project/) records the public implementation overview.
+- [Research brief](../../research/spritely-goblins/) synthesizes the paper and project page.
+- [Goblins combines transactional turns with promise pipelining](../../notes/goblins-combines-transactional-turns-with-promise-pipelining/) derives the model's fault and latency implications.
+- [Promise-pipelined RPC can preserve capability discipline](../../notes/promise-pipelined-rpc-can-preserve-capability-discipline/) connects the paper's model to Cap’n Web.
