@@ -8,7 +8,7 @@ eleventyExcludeFromCollections: true
 - [Kagi plans and Assistant](./kagi-plans-and-assistant/) — Individual Search plans, Assistant access, allowances, and pricing.
 - [Kagi API services](./kagi-api-services/) — Search API and FastGPT capabilities, authentication, and separate usage billing.
 - [Kagi privacy policy](./kagi-privacy/) — Kagi's statements about search logging, Assistant retention, and third-party services.
-- [OMP web-search runtime](./omp-web-search-runtime/) — OMP tool documentation and a point-in-time inspection of the active search configuration.
+- [Kagi Search features](./kagi-search-features/) — Ranking controls, Lenses, Small Web, Quick Answers, and summarization.
 - [Google AX repository](./google-ax/) — Primary documentation for AX's declarative agent-workload control plane.
 - [AX homepage](./google-ax-homepage/) — AX's public positioning, worked lifecycle example, and Agent Substrate relationship.
 - [Agent Substrate repository](./agent-substrate/) — Primary documentation for stateful actor lifecycle, sandboxing, and worker multiplexing.

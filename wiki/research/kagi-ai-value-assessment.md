@@ -2,15 +2,17 @@
 title: Is Kagi worth paying for personally and for automated research?
 rkey: kagi-ai-value-assessment
 date: 2026-09-22
-brief: Start cheaply for personal search, and evaluate Kagi’s separately billed Search API for automated research.
+brief: Pay for Kagi when ranking control, ad-free attention, or separately priced AI and API capabilities replace a concrete cost.
 turn_url: https://github.com/smith-wiki/wiki/issues/40
 mode: QUESTION_ANSWER
 ---
 
 ## Answer
 
-**Recommendation:** start with Starter: $5/month buys 300 searches and 300 standard-model AI interactions, enough to test Search and web-assisted Assistant personally. Upgrade only if usage proves it: Professional is $10/month for unlimited Search, Summarize, and standard-model Assistant; Ultimate is $25/month and mainly adds premium Assistant models. ([Kagi plans and Assistant](../../sources/kagi-plans-and-assistant/))
+Kagi sells control of ranking and attention, not mere web-result access. The interface is ad-free; Kagi says its ranking down-ranks ad/tracker-heavy pages and promotes independent, noncommercial sources. Raise, lower, pin, or block domains; use Forums, Programming, Academic/PDF, and Small Web Lenses; invoke Quick Answers or page/video summaries. ([Kagi search features](../../sources/kagi-search-features/))
 
-Treat automation separately. OMP uses the metered Search API with `KAGI_API_KEY` or a stored Kagi credential, not consumer Assistant; Ultimate is unnecessary, and subscriptions should not be assumed to cover API spend. Use Search API results for discovery. FastGPT instead generates an LLM answer with references for $15 per 1,000 prepaid web-search queries. Either way, fetch, inspect, and preserve primary sources rather than treating snippets or generated answers as evidence. ([Kagi API services](../../sources/kagi-api-services/); [OMP web search](../../sources/omp-web-search-runtime/))
+**Buy Starter ($5/month)** if 300 searches/month suffice; skip it if you regularly exceed the cap. **Buy Professional ($10/month)** when unlimited search and Summarize justify $5 more; skip it when 300 searches and no summaries suffice. **Buy Ultimate ($25/month)** only if premium Assistant models and its $25 monthly model-usage allowance replace another AI expense—not for better search. ([Kagi plans and Assistant](../../sources/kagi-plans-and-assistant/))
 
-Privacy helps, but is not anonymity: Kagi says it loads no analytics or telemetry, does not track result clicks, and does not use Assistant data to train models; threads default to deletion after 24 hours. Paid accounts require some data, sampled debug logs persist 7 or 90 days, and AI may involve third-party providers. ([Kagi privacy](../../sources/kagi-privacy/))
+Automation has a separate budget. Search API supplies programmable results at $12/1,000 requests through separately funded billing. FastGPT costs $15/1,000 answer queries and adds generated synthesis with references; buy it only when synthesis is worth $3 more, not when ranked results suffice. ([Kagi API services](../../sources/kagi-api-services/))
+
+Quality and privacy advantages are Kagi's first-party claims, not independent proof. Do not pay if ranking control, fewer advertising incentives, and Kagi's privacy commitments do not improve your work. ([Kagi search features](../../sources/kagi-search-features/); [Kagi privacy](../../sources/kagi-privacy/))

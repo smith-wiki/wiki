@@ -22,7 +22,7 @@ FastGPT produces an LLM answer with web references. Its web-search mode costs $1
 
 ## Limits
 
-Search API output is discovery material, not independently verified evidence. FastGPT adds an answer-generation layer and therefore should not replace direct inspection and preservation of cited primary sources.
+Search API charges are separate from consumer-plan allowances. FastGPT costs more per request because it adds generated synthesis, currently requires web search to stay enabled, and rejects attempts to disable it.
 
 ## Connections
 
