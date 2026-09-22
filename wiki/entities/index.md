@@ -5,6 +5,9 @@ permalink: /entities/index.html
 eleventyExcludeFromCollections: true
 ---
 
+- [AX](./google-ax/) — A declarative control plane for composing isolated agent tasks over Agent Substrate.
+- [Agent Substrate](./agent-substrate/) — A runtime for multiplexing stateful sandboxed actors over warm workers.
+- [kagent](./kagent/) — A Kubernetes-native framework for declaratively building, deploying, and operating AI agents.
 - [Cap'n Web](./capn-web/) — A JavaScript-native object-capability RPC protocol and TypeScript implementation.
 - [OCapN](./ocapn/) — A layered protocol effort for interoperable object-capability communication across networks.
 - [Spritely Goblins](./spritely-goblins/) — A distributed object programming environment with transactional vat turns.

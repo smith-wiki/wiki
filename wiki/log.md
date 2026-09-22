@@ -9,6 +9,7 @@ templateEngineOverride: md
 
 ## 2026-09-22
 
+- `SOURCE_BRIEF` — [AX and kagent layer declarative agents over Agent Substrate](../research/google-ax-agent-substrate/)
 - `SOURCE_BRIEF` — [Goblins presents one object model across local and network boundaries](../research/spritely-goblins-project/)
 - `SOURCE_BRIEF` — [Spritely composes secure distributed systems from capabilities](../research/spritely-core/)
 - `SOURCE_BRIEF` — [Cap’n Web maps RPC authority onto JavaScript references](../research/cloudflare-capnweb-javascript-rpc/)
