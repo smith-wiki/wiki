@@ -23,6 +23,20 @@ body:
     validations:
       required: true
 
+  - type: input
+    id: research_session
+    attributes:
+      label: Research session
+      description: Optional parent session Issue URL. Leave blank for the first or only turn; backfill it when a second turn creates the tracker.
+      placeholder: https://github.com/owner/repository/issues/N
+
+  - type: input
+    id: depends_on
+    attributes:
+      label: Depends on
+      description: Optional preceding Issue or pull request URL when this work is stacked or otherwise blocked.
+      placeholder: https://github.com/owner/repository/pull/N
+
   - type: textarea
     id: request
     attributes:

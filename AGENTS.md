@@ -30,10 +30,18 @@
 - `wiki/concepts/` contains recurring terms or model categories that need a stable definition. Use a noun phrase as the title.
 - `wiki/notes/` contains atomic permanent notes written in the wiki's voice. Each page states one reusable claim, distinction, relationship, or implication; use a declarative title and support it with source links.
 
+## Research sessions and turns
+
+- A **research turn** is one user message that adds evidence, asks a research question, or requests a note exploration. Multiple related sources in the same message form one source bundle and one turn. A later message that adds a source starts a new turn even when it continues the same topic. Delivery instructions such as merge approval do not start a research turn.
+- Give every research turn its own task Issue, `issue/<number>-<slug>` branch, pull request, and exactly one created or revised request-bound page in `wiki/research/`. Do not enlarge an earlier turn's Issue or pull request with research input from a later message.
+- A **research session** is a human-directed thread containing at least two related turns. Do not create a session tracker for the first turn. When a second turn appears, create a parent `[Research session]` Issue and link both the earlier turn and the new turn to it.
+- A session tracker has no branch or pull request. It records the turn ledger, introduced sources, open questions, and retrospective process exceptions; close it when the human ends the session. A new subject remains a new turn even when the human keeps it in the same session.
+- If a new turn starts while the preceding turn's pull request is open, stack the new pull request on the preceding branch and declare both `Part of #<session>` and `Depends on #<pull-request>`. After the base merges, retarget the stacked pull request to `main`, rebase its branch onto `origin/main`, push with `--force-with-lease`, and require fresh passing CI before merge.
+
 ## Issue intake
 
 - Every user request that would change tracked files, change repository settings, or publish research must have a GitHub issue before implementation begins. If the user supplies an existing issue, use it and do not create a duplicate.
-- Write every issue in English and make it self-contained for an agent without access to the originating conversation. Use the fields and order in `.github/ISSUE_TEMPLATE/task.yml`: task type, request, inputs and sources, context, acceptance criteria, constraints and non-goals, execution mode, and handoff readiness.
+- Write every issue in English and make it self-contained for an agent without access to the originating conversation. Use the fields and order in `.github/ISSUE_TEMPLATE/task.yml`: task type, research session, dependency, request, inputs and sources, context, acceptance criteria, constraints and non-goals, execution mode, and handoff readiness.
 - **Queue only:** create the issue with `Execution mode` set to `Queue only`, return its URL, and stop. Do not create a branch or begin implementation.
 - **Implement now:** create or adopt the issue first, set `Execution mode` to `Implement now`, then execute the task in the same session.
 - For changes to versioned files, use one `issue/<number>-<slug>` branch and pull request per issue. The pull request must contain `Closes #<number>` so merge closes the issue.
@@ -42,7 +50,7 @@
 ## Research turn workflow
 
 1. Preserve fetched evidence under the local `raw/` directory before interpreting it. Existing evidence remains byte-for-byte unchanged; compute a content digest for provenance.
-2. Create exactly one compact page at `wiki/research/<rkey>.md`. Its front matter must contain exactly `title`, `rkey`, `date`, `brief`, `turn_url`, and `mode`; no other keys are allowed. `mode` must be exactly `SOURCE_BRIEF`, `QUESTION_ANSWER`, or `NOTE_EXPLORE`. The folder data file owns the `/<rkey>/` route and research layout.
+2. Create or revise exactly one compact page at `wiki/research/<rkey>.md`. Its front matter must contain exactly `title`, `rkey`, `date`, `brief`, `turn_url`, and `mode`; no other keys are allowed. Set `turn_url` to the turn Issue URL. `mode` must be exactly `SOURCE_BRIEF`, `QUESTION_ANSWER`, or `NOTE_EXPLORE`. The folder data file owns the `/<rkey>/` route and research layout.
 3. Put each durable source note in `wiki/sources/`. Record the original URL, retrieval time, content digest, and local raw path; the raw capture itself stays outside Git.
 4. Update relevant pages in `wiki/entities/` and `wiki/concepts/` only when the turn adds reusable knowledge. Create or improve a page in `wiki/notes/` when the evidence supports a durable claim, distinction, relationship, or implication. Prefer improving an existing page over creating a near-duplicate.
 5. Add the turn to `wiki/log.md` and keep `wiki/index.md` useful as the first navigation surface.
