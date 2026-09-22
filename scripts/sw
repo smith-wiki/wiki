@@ -1,0 +1,252 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+usage() {
+  cat <<'EOF'
+Smith Wiki helper
+
+Usage:
+  sw info [LIMIT]
+  sw search PATTERN
+  sw issue
+  sw issue TITLE BODY_FILE [MILESTONE]
+  sw commit CONVENTIONAL_COMMIT_MESSAGE
+  sw pr ISSUE TITLE SUMMARY VERIFICATION [BASE]
+  sw checks [PR]
+  sw check-ascii --staged|--range RANGE|--commits RANGE|--file FILE
+  sw gh GH_ARGUMENTS...
+
+Commands:
+  info         Show compact limited lists of pages, evidence, and GitHub work.
+  search       Search published Markdown pages with git grep.
+  issue        Open the task form, or create an issue from an ASCII body file.
+  commit       Validate staged additions and create a Conventional Commit.
+  pr           Validate branch metadata/content, push it, and create a PR.
+  checks       Watch GitHub checks for the current or selected PR.
+  check-ascii  Run the repository ASCII policy checker directly.
+  gh           Run any GitHub CLI command inside the managed environment.
+
+PR creation generates the repository body from ISSUE, SUMMARY, and VERIFICATION.
+New non-ASCII content is rejected; existing published history is not rewritten.
+LIMIT defaults to 3 and applies independently to every list (maximum 10).
+EOF
+}
+
+die() {
+  printf 'sw: %s\n' "$*" >&2
+  exit 1
+}
+
+require_args() {
+  local expected=$1
+  shift
+  (( $# >= expected )) || die "missing arguments; run 'sw help'"
+}
+
+repo_root=$(git rev-parse --show-toplevel 2>/dev/null) || die "not inside a Git repository"
+cd "$repo_root"
+ascii_checker="$repo_root/scripts/check_ascii.py"
+[[ -f "$ascii_checker" ]] || die "missing scripts/check_ascii.py"
+
+check_text() {
+  python3 "$ascii_checker" --text "$1" "$2"
+}
+
+print_limited() {
+  local limit=$1 label=$2
+  shift 2
+  local items=("$@") total=$# shown index
+  total=${#items[@]}
+  shown=$total
+  (( shown <= limit )) || shown=$limit
+
+  printf '%-14s (%d): ' "$label" "$total"
+  if (( total == 0 )); then
+    printf 'none\n'
+    return
+  fi
+  for ((index = 0; index < shown; index++)); do
+    (( index == 0 )) || printf ', '
+    printf '%s' "${items[index]}"
+  done
+  if (( total > shown )); then
+    printf ', ... (+%d more)' "$((total - shown))"
+  fi
+  printf '\n'
+}
+
+command_info() {
+  (( $# <= 1 )) || die "usage: sw info [LIMIT]"
+  local limit=${1:-3}
+  local branch dirty role repo index
+  local -a items
+  [[ "$limit" =~ ^[1-9]$|^10$ ]] || die "LIMIT must be between 1 and 10"
+
+  branch=$(git branch --show-current)
+  [[ -n "$branch" ]] || branch="detached"
+  dirty=""
+  [[ -z $(git status --porcelain) ]] || dirty=" dirty"
+  printf 'Smith Wiki | %s%s | limit:%s\n' "$branch" "$dirty" "$limit"
+
+  printf 'Pages\n'
+  for role in research sources entities concepts notes; do
+    mapfile -t items < <(git ls-files "wiki/$role/*.md" | sort)
+    for index in "${!items[@]}"; do
+      items[index]=${items[index]##*/}
+      items[index]=${items[index]%.md}
+    done
+    print_limited "$limit" "  $role" "${items[@]}"
+  done
+
+  items=()
+  if [[ -d raw ]]; then
+    mapfile -t items < <(find raw -type f | sort)
+    for index in "${!items[@]}"; do
+      items[index]=${items[index]#raw/}
+    done
+  fi
+  print_limited "$limit" Evidence "${items[@]}"
+
+  if ! gh auth status >/dev/null 2>&1; then
+    printf 'GitHub: unavailable; run gh auth login\n'
+    return
+  fi
+
+  repo=$(gh repo view --json nameWithOwner --jq .nameWithOwner)
+  printf 'GitHub | %s\n' "$repo"
+
+  mapfile -t items < <(gh api "repos/$repo/milestones?state=open&per_page=100" \
+    --jq '.[] | "#\(.number) \(.title) [\(.open_issues) open/\(.closed_issues) closed]"')
+  print_limited "$limit" Milestones "${items[@]}"
+
+  mapfile -t items < <(gh issue list --state open --limit 1000 --json number,title,milestone \
+    --jq '.[] | "#\(.number) \(.title)" + (if .milestone then " [" + .milestone.title + "]" else "" end)')
+  print_limited "$limit" Issues "${items[@]}"
+
+  mapfile -t items < <(gh pr list --state open --limit 1000 --json number,title,headRefName \
+    --jq '.[] | "#\(.number) \(.title) [" + .headRefName + "]"')
+  print_limited "$limit" "Pull requests" "${items[@]}"
+}
+
+command_search() {
+  require_args 1 "$@"
+  git grep -n -i -- "$*" -- 'wiki/*.md' 'wiki/**/*.md'
+}
+
+command_issue() {
+  if (( $# == 0 )); then
+    gh issue create --web --template task.yml
+    return
+  fi
+  (( $# == 2 || $# == 3 )) || die "usage: sw issue TITLE BODY_FILE [MILESTONE]"
+  local title=$1 body_file=$2 milestone=${3:-} heading
+  [[ -f "$body_file" ]] || die "issue body file not found: $body_file"
+  check_text issue-title "$title"
+  python3 "$ascii_checker" --file "$body_file"
+  for heading in \
+    '## Task type' \
+    '## Research milestone' \
+    '## Process milestone' \
+    '## Depends on' \
+    '## Request' \
+    '## Inputs and sources' \
+    '## Context' \
+    '## Acceptance criteria' \
+    '## Constraints and non-goals' \
+    '## Execution mode' \
+    '## Handoff readiness'; do
+    grep -Fqx -- "$heading" "$body_file" || die "issue body is missing: $heading"
+  done
+  [[ "$title" == \[Task\]* ]] || title="[Task] $title"
+  local args=(issue create --title "$title" --body-file "$body_file" --label task)
+  [[ -z "$milestone" ]] || args+=(--milestone "$milestone")
+  gh "${args[@]}"
+}
+
+command_commit() {
+  require_args 1 "$@"
+  local message=$*
+  check_text commit-message "$message"
+  [[ "$message" =~ ^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9._/-]+\))?!?:\ [[:alnum:]] ]] ||
+    die "commit message must follow Conventional Commits"
+  if git diff --cached --quiet; then
+    die "no staged changes"
+  fi
+  git diff --cached --check
+  python3 "$ascii_checker" --staged
+  git commit -m "$message"
+}
+
+command_pr() {
+  (( $# == 4 || $# == 5 )) || die "usage: sw pr ISSUE TITLE SUMMARY VERIFICATION [BASE]"
+  local issue=$1 title=$2 summary=$3 verification=$4 base=${5:-main}
+  local branch range issue_json state milestone task_type dependency lineage body
+  [[ "$issue" =~ ^[0-9]+$ ]] || die "ISSUE must be a number"
+  for value in issue-title:"$title" summary:"$summary" verification:"$verification" base:"$base"; do
+    check_text "${value%%:*}" "${value#*:}"
+  done
+  [[ -z $(git status --porcelain) ]] || die "commit all tracked changes before creating a PR"
+  branch=$(git branch --show-current)
+  [[ -n "$branch" && "$branch" != "$base" ]] || die "create the PR from an issue branch"
+
+  git fetch --quiet origin "$base"
+  range="origin/$base...HEAD"
+  python3 "$ascii_checker" --range "$range"
+  python3 "$ascii_checker" --commits "$range"
+
+  issue_json=$(gh issue view "$issue" --json body,milestone,state)
+  state=$(jq -r .state <<<"$issue_json")
+  [[ "$state" == OPEN ]] || die "issue #$issue is not open"
+  milestone=$(jq -r '.milestone.title // empty' <<<"$issue_json")
+  task_type=$(jq -r '.body | try capture("## Task type\\s+(?<value>[^\\r\\n]+)").value // empty' <<<"$issue_json")
+  dependency=$(jq -r '.body | try capture("## Depends on\\s+(?<value>[^\\r\\n]+)").value // empty' <<<"$issue_json")
+
+  lineage=""
+  if [[ -n "$milestone" ]]; then
+    case "$task_type" in
+      'Source ingest'|'Research question'|'Note exploration')
+        lineage="Research milestone: $milestone"
+        ;;
+      *)
+        lineage="Process milestone: $milestone"
+        ;;
+    esac
+  fi
+  if [[ -n "$dependency" && "$dependency" != None. && "$dependency" != None ]]; then
+    [[ -z "$lineage" ]] || lineage+=$'\n'
+    lineage+="Depends on $dependency"
+  fi
+  [[ -n "$lineage" ]] || lineage="No milestone or dependency."
+
+  printf -v body '## Issue\n\nCloses #%s\n\n## Lineage\n\n%s\n\n## Summary\n\n- %s\n\n## Verification\n\n- %s' \
+    "$issue" "$lineage" "$summary" "$verification"
+  check_text pr-body "$body"
+
+  git push -u origin "$branch"
+  local args=(pr create --base "$base" --head "$branch" --title "$title" --body "$body")
+  [[ -z "$milestone" ]] || args+=(--milestone "$milestone")
+  gh "${args[@]}"
+}
+
+command_checks() {
+  if (( $# == 0 )); then
+    gh pr checks --watch
+  else
+    gh pr checks "$1" --watch
+  fi
+}
+
+command=${1:-help}
+(( $# == 0 )) || shift
+case "$command" in
+  help|-h|--help) usage ;;
+  info) command_info "$@" ;;
+  search) command_search "$@" ;;
+  issue) command_issue "$@" ;;
+  commit) command_commit "$@" ;;
+  pr) command_pr "$@" ;;
+  checks) command_checks "$@" ;;
+  check-ascii) python3 "$ascii_checker" "$@" ;;
+  gh) gh "$@" ;;
+  *) die "unknown command: $command; run 'sw help'" ;;
+esac

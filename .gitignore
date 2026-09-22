@@ -1,5 +1,6 @@
 node_modules/
 _site/
+.direnv/
 .eleventy-cache/
 raw/
 .DS_Store
