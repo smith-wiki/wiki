@@ -9,6 +9,7 @@ templateEngineOverride: md
 
 ## 2026-09-22
 
+- `QUESTION_ANSWER` — [How does OMP handle arbitrary text and web research?](../research/arbitrary-text-and-web-search/)
 - `QUESTION_ANSWER` — [Can AX orchestrate an isolated Go dependency upgrade?](../research/ax-isolated-repository-maintenance/)
 - `SOURCE_BRIEF` — [AX and kagent layer declarative agents over Agent Substrate](../research/google-ax-agent-substrate/)
 - `SOURCE_BRIEF` — [Goblins presents one object model across local and network boundaries](../research/spritely-goblins-project/)

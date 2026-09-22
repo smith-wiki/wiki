@@ -5,6 +5,8 @@ permalink: /sources/index.html
 eleventyExcludeFromCollections: true
 ---
 
+- [OMP web-search runtime](./omp-web-search-runtime/) — OMP tool documentation and a point-in-time inspection of the active search configuration.
+- [Smith Wiki research workflow](./smith-wiki-research-workflow/) — Repository rules for evidence preservation, provenance, and synthesis.
 - [Google AX repository](./google-ax/) — Primary documentation for AX's declarative agent-workload control plane.
 - [AX homepage](./google-ax-homepage/) — AX's public positioning, worked lifecycle example, and Agent Substrate relationship.
 - [Agent Substrate repository](./agent-substrate/) — Primary documentation for stateful actor lifecycle, sandboxing, and worker multiplexing.
