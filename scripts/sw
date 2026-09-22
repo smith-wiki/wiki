@@ -6,29 +6,55 @@ usage() {
 Smith Wiki helper
 
 Usage:
+  sw
   sw info [LIMIT]
+  sw status
+  sw start ISSUE SLUG [BASE]
+  sw diff [GIT_DIFF_ARGS...]
+  sw stage PATH...
   sw search PATTERN
   sw issue
   sw issue TITLE BODY_FILE [MILESTONE]
-  sw commit CONVENTIONAL_COMMIT_MESSAGE
+  sw commit MESSAGE [PATH...]
   sw pr ISSUE TITLE SUMMARY VERIFICATION [BASE]
   sw checks [PR]
   sw check-ascii --staged|--range RANGE|--commits RANGE|--file FILE
+  sw git GIT_ARGUMENTS...
   sw gh GH_ARGUMENTS...
 
 Commands:
   info         Show compact limited lists of pages, evidence, and GitHub work.
+  status       Show the current branch and concise working-tree state.
+  start        Create an issue branch from main or an explicit stacked base.
+  diff         Show a working-tree or staged diff using Git arguments.
+  stage        Stage explicit paths and show the resulting status.
   search       Search published Markdown pages with git grep.
   issue        Open the task form, or create an issue from an ASCII body file.
-  commit       Validate staged additions and create a Conventional Commit.
-  pr           Validate branch metadata/content, push it, and create a PR.
-  checks       Watch GitHub checks for the current or selected PR.
+  commit       Optionally stage paths, validate them, and create a commit.
+  pr           Validate the branch, push it, and create a pull request.
+  checks       Watch GitHub checks for the current or selected pull request.
   check-ascii  Run the repository ASCII policy checker directly.
-  gh           Run any GitHub CLI command inside the managed environment.
+  git, gh      Run an uncommon Git or GitHub command through this interface.
 
 PR creation generates the repository body from ISSUE, SUMMARY, and VERIFICATION.
 New non-ASCII content is rejected; existing published history is not rewritten.
 LIMIT defaults to 3 and applies independently to every list (maximum 10).
+EOF
+}
+
+quickstart() {
+  cat <<'EOF'
+Examples
+  sw search 'schema validity'
+  sw issue
+  sw start 123 short-slug
+  sw status
+  sw diff
+  sw stage AGENTS.md scripts/sw
+  sw commit 'docs(workflow): require sw'
+  sw pr 123 'Require sw workflow' 'Make sw mandatory.' 'Smoke-tested sw commands.'
+  sw checks
+  sw help
 EOF
 }
 
@@ -128,6 +154,35 @@ command_info() {
   print_limited "$limit" "Pull requests" "${items[@]}"
 }
 
+command_status() {
+  (( $# == 0 )) || die "usage: sw status"
+  git status --short --branch
+}
+
+command_start() {
+  (( $# == 2 || $# == 3 )) || die "usage: sw start ISSUE SLUG [BASE]"
+  local issue=$1 slug=$2 base=${3:-main} state
+  [[ "$issue" =~ ^[0-9]+$ ]] || die "ISSUE must be a number"
+  [[ "$slug" =~ ^[a-z0-9]+(-[a-z0-9]+)*$ ]] || die "SLUG must use lowercase ASCII words and hyphens"
+  [[ "$base" =~ ^[A-Za-z0-9][A-Za-z0-9._/-]*$ && "$base" != *..* ]] ||
+    die "BASE is not a safe branch name"
+  [[ -z $(git status --porcelain) ]] || die "commit or discard tracked changes before starting a branch"
+  state=$(gh issue view "$issue" --json state --jq .state)
+  [[ "$state" == OPEN ]] || die "issue #$issue is not open"
+  git fetch --quiet origin "$base"
+  git switch -c "issue/$issue-$slug" "origin/$base"
+}
+
+command_diff() {
+  git --no-pager diff "$@"
+}
+
+command_stage() {
+  require_args 1 "$@"
+  git add -- "$@"
+  git status --short
+}
+
 command_search() {
   require_args 1 "$@"
   git grep -n -i -- "$*" -- 'wiki/*.md' 'wiki/**/*.md'
@@ -165,10 +220,14 @@ command_issue() {
 
 command_commit() {
   require_args 1 "$@"
-  local message=$*
+  local message=$1
+  shift
   check_text commit-message "$message"
   [[ "$message" =~ ^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9._/-]+\))?!?:\ [[:alnum:]] ]] ||
     die "commit message must follow Conventional Commits"
+  if (( $# > 0 )); then
+    git add -- "$@"
+  fi
   if git diff --cached --quiet; then
     die "no staged changes"
   fi
@@ -236,17 +295,29 @@ command_checks() {
   fi
 }
 
-command=${1:-help}
-(( $# == 0 )) || shift
+if (( $# == 0 )); then
+  command_info
+  printf '\n'
+  quickstart
+  exit
+fi
+
+command=$1
+shift
 case "$command" in
   help|-h|--help) usage ;;
   info) command_info "$@" ;;
+  status) command_status "$@" ;;
+  start) command_start "$@" ;;
+  diff) command_diff "$@" ;;
+  stage) command_stage "$@" ;;
   search) command_search "$@" ;;
   issue) command_issue "$@" ;;
   commit) command_commit "$@" ;;
   pr) command_pr "$@" ;;
   checks) command_checks "$@" ;;
   check-ascii) python3 "$ascii_checker" "$@" ;;
+  git) git "$@" ;;
   gh) gh "$@" ;;
   *) die "unknown command: $command; run 'sw help'" ;;
 esac

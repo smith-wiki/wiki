@@ -15,6 +15,11 @@
 - **Separate roles.** The human curates sources, asks questions, and directs emphasis. The agent preserves evidence, integrates knowledge, maintains links and indexes, and checks the wiki's health.
 - **Let navigation emerge.** Keep `wiki/index.md` as the curated entry point, use links for associative exploration, and use the chronological log only as an audit trail.
 
+## Repository interface
+
+- Start every repository task with `sw`; its default output provides bounded repository state and copyable workflow examples.
+- Use named `sw` commands for every Git and GitHub action. When no named command fits, keep the action inside the interface with `sw git ...` or `sw gh ...`; direct `git` and `gh` invocations violate the repository workflow.
+
 ## Layers
 
 - `raw/` is the local immutable evidence layer. Append source captures, never rewrite existing bytes, and never stage, commit, or push this directory.
