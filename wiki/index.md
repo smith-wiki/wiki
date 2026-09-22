@@ -10,6 +10,7 @@ templateEngineOverride: md
 
 ## Recent research
 
+- [How should one essay become one research turn?](./research/essay-driven-research-workflow/) — A selective process from author text to prioritized evidence and next-cycle writing material.
 - [Can AX orchestrate an isolated Go dependency upgrade?](./research/ax-isolated-repository-maintenance/) — A concrete answer mapping one coding-agent maintenance job onto AX primitives.
 - [AX and kagent layer declarative agents over Agent Substrate](./research/google-ax-agent-substrate/) — A source brief on two agent-facing systems and their shared sandbox lifecycle foundation.
 - [Goblins presents one object model across local and network boundaries](./research/spritely-goblins-project/) — A source brief on the project page, its implementations, and its advertised operating model.

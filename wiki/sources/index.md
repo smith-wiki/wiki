@@ -5,6 +5,7 @@ permalink: /sources/index.html
 eleventyExcludeFromCollections: true
 ---
 
+- [Essay-driven research request](./essay-driven-research-request/) — Requirements for turning one long-form author essay into selective follow-up research.
 - [Google AX repository](./google-ax/) — Primary documentation for AX's declarative agent-workload control plane.
 - [AX homepage](./google-ax-homepage/) — AX's public positioning, worked lifecycle example, and Agent Substrate relationship.
 - [Agent Substrate repository](./agent-substrate/) — Primary documentation for stateful actor lifecycle, sandboxing, and worker multiplexing.
