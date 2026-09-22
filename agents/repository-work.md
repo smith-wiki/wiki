@@ -4,7 +4,7 @@ Read this file for repository setup, tooling, automation, site changes, workflow
 
 ## Repository interface
 
-Repository work does not start with bare `sw`. When the repository exposes a named `sw` command for a repository or GitHub mutation, use that command; it owns the workflow metadata and invariants for the action. When `sw` is unavailable, use Git and GitHub directly while preserving the rules below. When `sw` is available but has no named command, use `sw git ...` or `sw gh ...`.
+Repository work does not start with bare `sw`. Use the named `sw` command for every repository or GitHub mutation; it owns the workflow metadata and invariants for the action. When no named command fits, use `sw git ...` or `sw gh ...`.
 
 ## Coherent task
 
@@ -19,7 +19,7 @@ Repository work is not a research turn. The per-turn Issue, pull-request, resear
 
 ## Issue intake
 
-When available, `sw issue` owns Issue metadata, milestone and dependency selection, execution mode, and branch creation. The rules below are the invariant and the fallback when that command is unavailable.
+`sw issue` owns Issue metadata, milestone and dependency selection, execution mode, and branch creation. The rules below define its invariant.
 
 - Every new independently scoped repository, process, maintenance, or site task that changes tracked files or repository settings needs a GitHub Issue before implementation. If the user supplies an existing Issue, use it and do not create a duplicate.
 - Write every Issue in English and make it self-contained for an agent without the originating conversation. Use the fields and order in `.github/ISSUE_TEMPLATE/task.yml`: task type, research milestone, process milestone, dependency, request, inputs and sources, context, acceptance criteria, constraints and non-goals, execution mode, and handoff readiness.
@@ -30,7 +30,7 @@ When available, `sw issue` owns Issue metadata, milestone and dependency selecti
 
 ## Verification and delivery
 
-When available, use the named `sw commit`, `sw pr`, `sw sync`, `sw checks`, and `sw merge` commands for their matching lifecycle actions.
+Use `sw commit`, `sw pr`, `sw sync`, `sw checks`, and `sw merge` for their matching lifecycle actions.
 
 - GitHub Actions is the sole automated verification environment. For versioned work, commit and push the Issue branch, then inspect the pull-request checks. Do not search the workstation for Node or npm, install JavaScript tooling locally, attempt a local site build, or recreate CI checks with ad hoc local scripts.
 - Format every commit subject as Conventional Commits 1.0.0: `<type>[optional scope]: <description>`.

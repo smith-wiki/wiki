@@ -2,7 +2,7 @@
 
 Repository setup and its explicit follow-ups form one coherent task: keep them in the same Issue, branch, and pull request. Per-turn research rules never apply to repository work.
 
-When `sw` is available, use its bare overview for topical research and published-wiki discovery. Repository work does not require bare `sw`; use named workflow commands only as described in the repository guide.
+Use bare `sw` for topical research and published-wiki discovery. Repository work skips the bare overview and uses the named workflow commands described in the repository guide.
 
 ## Route before acting
 
