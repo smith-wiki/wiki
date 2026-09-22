@@ -1,6 +1,6 @@
 ---
 title: Kagi privacy policy
-summary: Kagi's first-party statements about search logging, Assistant retention, proxying, and third-party AI services.
+summary: Kagi's first-party statements about search-query logging, billing metadata, and debugging retention.
 ---
 
 - **Original:** [Your Privacy and Kagi](https://kagi.com/privacy)
@@ -12,14 +12,12 @@ summary: Kagi's first-party statements about search logging, Assistant retention
 
 ## Claims and evidence
 
-Kagi says its paid model avoids advertising incentives, does not track result clicks, and proxies media and Assistant connections through its servers. It may temporarily retain browser requests for debugging without linking them to an account; search queries are automatically purged after a short period while usage volume is retained for billing.
-
-Assistant threads are deleted after one day by default. Kagi says requests to AI tools are generally not saved or account-associated beyond short debugging retention, but qualifies its third-party-provider commitment with “whenever possible” when describing providers that do not retain data or train on it.
+Kagi says search queries are logged temporarily for debugging and automatically purged after a short period. Usage volume remains for billing. Sampled load-balancer and virtual-machine logs have seven-day retention, while sampled server-error data in Sentry has 90-day retention; Kagi says temporarily stored browser requests are not linked to an account.
 
 ## Limits
 
-These are Kagi's policy statements rather than an independent audit. API and account metadata still exist for authentication, billing, limits, and operations; sensitive unpublished material therefore still needs deliberate handling.
+These are Kagi's policy statements rather than an independent audit. The policy does not promise Zero Data Retention for Search API requests or separately specify that endpoint's retention. API keys, account metadata, usage volume, and billing records necessarily remain operational data.
 
 ## Connections
 
-[Kagi value assessment](../../research/kagi-ai-value-assessment/) · [Kagi plans and Assistant](../kagi-plans-and-assistant/)
+[Kagi Search API value assessment](../../research/kagi-ai-value-assessment/) · [Kagi Search API](../kagi-api-services/) · [Search API pricing comparison](../search-api-pricing-comparison/)

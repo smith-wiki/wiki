@@ -5,10 +5,9 @@ permalink: /sources/index.html
 eleventyExcludeFromCollections: true
 ---
 
-- [Kagi plans and Assistant](./kagi-plans-and-assistant/) — Individual Search plans, Assistant access, allowances, and pricing.
-- [Kagi API services](./kagi-api-services/) — Search API and FastGPT capabilities, authentication, and separate usage billing.
-- [Kagi privacy policy](./kagi-privacy/) — Kagi's statements about search logging, Assistant retention, and third-party services.
-- [Kagi Search features](./kagi-search-features/) — Ranking controls, Lenses, Small Web, Quick Answers, and summarization.
+- [Kagi Search API](./kagi-api-services/) — Search result types, controls, extraction, and usage billing.
+- [Kagi privacy policy](./kagi-privacy/) — Kagi's statements about query logging, billing metadata, and retention.
+- [Search API pricing comparison](./search-api-pricing-comparison/) — Public rates and included units from Brave, Tavily, and Exa.
 - [Google AX repository](./google-ax/) — Primary documentation for AX's declarative agent-workload control plane.
 - [AX homepage](./google-ax-homepage/) — AX's public positioning, worked lifecycle example, and Agent Substrate relationship.
 - [Agent Substrate repository](./agent-substrate/) — Primary documentation for stateful actor lifecycle, sandboxing, and worker multiplexing.

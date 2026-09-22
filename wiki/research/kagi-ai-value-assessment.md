@@ -1,18 +1,16 @@
 ---
-title: Is Kagi worth paying for personally and for automated research?
+title: Is Kagi Search API worth $12 per 1,000 requests?
 rkey: kagi-ai-value-assessment
 date: 2026-09-22
-brief: Pay for Kagi when ranking control, ad-free attention, or separately priced AI and API capabilities replace a concrete cost.
+brief: Kagi Search API is worth its premium only when its ranking and control features materially outperform cheaper APIs.
 turn_url: https://github.com/smith-wiki/wiki/issues/40
 mode: QUESTION_ANSWER
 ---
 
 ## Answer
 
-Kagi sells control of ranking and attention, not mere web-result access. The interface is ad-free; Kagi says its ranking down-ranks ad/tracker-heavy pages and promotes independent, noncommercial sources. Raise, lower, pin, or block domains; use Forums, Programming, Academic/PDF, and Small Web Lenses; invoke Quick Answers or page/video summaries. ([Kagi search features](../../sources/kagi-search-features/))
+**No—not as the default search API at current public pricing.** Kagi costs $12 per 1,000 requests ($0.012 each). It returns structured web, image, news, video, and podcast results with region/date filters, pagination, and standard snippets. Optional extraction costs another $4 per 1,000 pages, for up to ten pages per request. Choose Kagi only when Kagi-specific ranking, Lenses, domain/regex personalization, multi-vertical results, or Small Web materially improve your output. ([Kagi API services](../../sources/kagi-api-services/))
 
-**Buy Starter ($5/month)** if 300 searches/month suffice; skip it if you regularly exceed the cap. **Buy Professional ($10/month)** when unlimited search and Summarize justify $5 more; skip it when 300 searches and no summaries suffice. **Buy Ultimate ($25/month)** only if premium Assistant models and its $25 monthly model-usage allowance replace another AI expense—not for better search. ([Kagi plans and Assistant](../../sources/kagi-plans-and-assistant/))
+At 2,000 searches, search costs $24. Extracting five pages per search means 10,000 pages and another $40, for $64 total before any LLM cost. Official public rates are lower: Brave costs $5 per 1,000; Tavily basic pay-as-you-go costs $8 per 1,000 with 1,000 free monthly credits; Exa costs $7 per 1,000 including up to ten results. These are not quality-equivalent products, but without independent evidence that Kagi improves outcomes enough, buy the cheaper API. ([Search API pricing comparison](../../sources/search-api-pricing-comparison/))
 
-Automation has a separate budget. Search API supplies programmable results at $12/1,000 requests through separately funded billing. FastGPT costs $15/1,000 answer queries and adds generated synthesis with references; buy it only when synthesis is worth $3 more, not when ranked results suffice. ([Kagi API services](../../sources/kagi-api-services/))
-
-Quality and privacy advantages are Kagi's first-party claims, not independent proof. Do not pay if ranking control, fewer advertising incentives, and Kagi's privacy commitments do not improve your work. ([Kagi search features](../../sources/kagi-search-features/); [Kagi privacy](../../sources/kagi-privacy/))
+Privacy does not by itself justify Kagi's premium. Kagi says it temporarily logs some queries for debugging, while Brave advertises zero-data retention (ZDR). These are vendor claims and different policies, not evidence of better search quality. ([Kagi privacy](../../sources/kagi-privacy/); [Search API pricing comparison](../../sources/search-api-pricing-comparison/))
