@@ -10,7 +10,7 @@ templateEngineOverride: md
 
 ## Recent research
 
-- [AX layers declarative orchestration over Agent Substrate](./research/google-ax-agent-substrate/) — A source brief on AX's agent-facing resources and Substrate's sandbox lifecycle.
+- [AX and kagent layer declarative agents over Agent Substrate](./research/google-ax-agent-substrate/) — A source brief on two agent-facing systems and their shared sandbox lifecycle foundation.
 - [Goblins presents one object model across local and network boundaries](./research/spritely-goblins-project/) — A source brief on the project page, its implementations, and its advertised operating model.
 - [Spritely composes secure distributed systems from capabilities](./research/spritely-core/) — A source brief on Goblins, transactional vats, and OCapN.
 - [Cap’n Web maps RPC authority onto JavaScript references](./research/cloudflare-capnweb-javascript-rpc/) — A source brief on Cloudflare's JavaScript-native object-capability RPC system.
@@ -18,7 +18,7 @@ templateEngineOverride: md
 
 ## Starting points
 
-- [AX](./entities/google-ax/), [Agent Substrate](./entities/agent-substrate/), and why [AX separates orchestration from sandbox execution](./notes/ax-separates-orchestration-from-sandbox-execution/)
+- [AX](./entities/google-ax/), [kagent](./entities/kagent/), [Agent Substrate](./entities/agent-substrate/), and why [AX separates orchestration from sandbox execution](./notes/ax-separates-orchestration-from-sandbox-execution/)
 - [TypeSafe AI](./entities/typesafe-ai/) and its first public model, [Jev](./entities/jev/)
 - [Cap'n Web](./entities/capn-web/), [object-capability RPC](./concepts/object-capability-rpc/), and why [promise pipelining collapses dependent RPC round trips](./notes/promise-pipelining-collapses-dependent-rpc-round-trips/)
 - [Spritely Goblins](./entities/spritely-goblins/), [OCapN](./entities/ocapn/), and how [transactional vat turns contain failed state and messages](./notes/transactional-vat-turns-contain-failed-state-and-messages/)

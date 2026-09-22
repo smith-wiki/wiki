@@ -9,9 +9,11 @@ Agent Substrate is a framework-agnostic execution runtime for agent-like workloa
 
 Kubernetes provisions infrastructure and worker pods through resources such as `WorkerPool`, while Substrate stores frequently changing Actor and Worker records in its own control-plane database. `ActorTemplate` defines a checkpointable workload version. Full snapshots preserve process memory, root-filesystem changes, and durable data; data-only snapshots preserve configured durable directories. ([Agent Substrate contributors, 2026](../../sources/agent-substrate/))
 
-## Relationship to AX
+## Higher-level systems
 
-[AX](../google-ax/) builds its declarative `Task`, `Workspace`, `Gateway`, and `Model` interface on Substrate’s atespaces, actors, workers, sandbox lifecycle, and network controls. [AX separates orchestration from sandbox execution](../../notes/ax-separates-orchestration-from-sandbox-execution/) describes why the two projects expose different abstractions. ([Google, 2026](../../sources/google-ax/))
+[AX](../google-ax/) builds its `Task`, `Workspace`, `Gateway`, and `Model` interface on Substrate’s atespaces, actors, workers, sandbox lifecycle, and network controls. [AX separates orchestration from sandbox execution](../../notes/ax-separates-orchestration-from-sandbox-execution/) describes that boundary. ([Google, 2026](../../sources/google-ax/))
+
+[kagent](../kagent/) announced that it will replace its Deployment-based runtime with Substrate while retaining its Kubernetes-native agent, model, tool, UI, and observability abstractions. The preserved announcement describes a transition and open API proposal, not completed behavior. ([Yarmush, undated](../../sources/kagent-future-of-kagent/))
 
 ## Status and security boundary
 

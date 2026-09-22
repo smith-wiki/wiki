@@ -26,4 +26,4 @@ The architecture document explicitly says much of its design is aspirational. Pe
 
 ## Connections
 
-[Research brief](../../research/google-ax-agent-substrate/) · [Agent Substrate](../../entities/agent-substrate/) · [AX](../../entities/google-ax/) · [AX separates orchestration from sandbox execution](../../notes/ax-separates-orchestration-from-sandbox-execution/)
+[Research brief](../../research/google-ax-agent-substrate/) · [Agent Substrate](../../entities/agent-substrate/) · [AX](../../entities/google-ax/) · [kagent](../../entities/kagent/) · [AX separates orchestration from sandbox execution](../../notes/ax-separates-orchestration-from-sandbox-execution/)

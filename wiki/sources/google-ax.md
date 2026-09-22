@@ -25,4 +25,4 @@ These are first-party design and project claims, not independent evidence of sca
 
 ## Connections
 
-[Research brief](../../research/google-ax-agent-substrate/) · [AX](../../entities/google-ax/) · [Agent Substrate](../../entities/agent-substrate/) · [AX separates orchestration from sandbox execution](../../notes/ax-separates-orchestration-from-sandbox-execution/)
+[Research brief](../../research/google-ax-agent-substrate/) · [AX](../../entities/google-ax/) · [AX homepage](../google-ax-homepage/) · [Agent Substrate](../../entities/agent-substrate/) · [AX separates orchestration from sandbox execution](../../notes/ax-separates-orchestration-from-sandbox-execution/)

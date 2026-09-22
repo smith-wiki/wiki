@@ -16,3 +16,5 @@ AX delegates atespace provisioning, actor lifecycle, worker assignment, sandboxi
 ## Status
 
 The repository warns that AX’s core concepts, protocols, and specifications are still changing and may break before a stable release. Its claims about running billions of tasks are not benchmarked in the preserved repository documentation. ([Google, 2026](../../sources/google-ax/))
+
+**Contradiction:** The public homepage says AX was “built for production,” while the repository warns of likely pre-stable breaking changes and Agent Substrate says its underlying runtime is not production-ready. The homepage’s scale and sub-second-resumption claims are promotional and unverified in the preserved evidence. ([AX project, undated](../../sources/google-ax-homepage/); [Agent Substrate contributors, 2026](../../sources/agent-substrate/))
