@@ -2,6 +2,8 @@
 
 Repository setup and its explicit follow-ups form one coherent task: keep them in the same Issue, branch, and pull request. Per-turn research rules never apply to repository work.
 
+When the repository exposes `sw`, start every Smith Wiki task with it. Its bounded overview is the shared map of research pages, evidence, threads, Issues, and pull requests; use that map before choosing the route below.
+
 ## Route before acting
 
 The linked files are mandatory parts of this contract when their trigger matches:

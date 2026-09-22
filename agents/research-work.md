@@ -8,6 +8,12 @@ Read this file for evidence-backed knowledge about a subject, source, entity, co
 - Discussion, design, evaluation, or implementation of the research process itself is repository work, not a topical research turn. This includes intake design, search or tool configuration, evidence handling, publication rules, Issue, pull-request, and milestone mechanics, and workflows for supplied writing.
 - Classify by the requested outcome, not by whether the message uses the word "research." Knowledge about a product is topical research; deciding how Smith Wiki should use that product is repository work.
 
+## Research orientation
+
+- Start with bare `sw` and scan its bounded page, evidence, research-milestone, Issue, and pull-request summaries.
+- Run `sw search PATTERN` before creating or revising a page, then read the relevant existing pages and connections.
+- Treat `sw` as discovery and workflow context, not evidence. Preserve and assess original sources through the research workflow below.
+
 ## Named methods
 
 ### Compile, do not rediscover
@@ -40,7 +46,7 @@ Directories express page roles, not a fixed subject taxonomy. Build lines of tho
 
 ### Integrate before expanding
 
-Search the wiki before creating a page. Prefer revising an existing page, recording a contradiction, or adding a connection over producing a parallel summary.
+When `sw` is available, use `sw search PATTERN` before creating a page, then read the matching pages. Prefer revising an existing page, recording a contradiction, or adding a connection over producing a parallel summary.
 
 ### Connectivity creates value
 
