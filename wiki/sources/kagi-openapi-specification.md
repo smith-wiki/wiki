@@ -1,62 +1,22 @@
 ---
 title: Kagi API OpenAPI specification
 summary: Kagi's machine-readable API contract for Search request controls, result schemas, pagination, and extraction.
+url: https://kagi.com/api/docs/_spec/openapi.yaml
+author: Kagi
+kind: specification
+captures:
+  - retrieved: 2026-09-22T09:20:23Z
+    sha256: "6b438426481d385b6e29d027d4252fe516683e81acce336a2f8d0f04e3d63bdf"
+    type: application/yaml
 ---
 
-## Source
+## Overview
 
-- **Type:** OpenAPI description
-- **Creator and publisher:** Kagi
-- **Published:** Not stated
-- **Original:** [Kagi API OpenAPI specification](https://kagi.com/api/docs/_spec/openapi.yaml)
-- **Suggested citation:** Kagi. “Kagi API.” OpenAPI 3.0.0 description, API version `1`. Accessed September 22, 2026.
-- **Assessment:** Recorded
+Kagi's machine-readable contract for API version 1, written in OpenAPI 3.0.0, defines what the Search endpoint accepts and returns: search types, filters, Lenses, domain-ranking and URL-rewrite rules, pagination, optional page extraction, and the kinds of results a response can contain. Published by Kagi for developers, it is authoritative for the captured contract but shows neither that a deployment behaves this way nor that results are relevant. The live file changes without a revision identifier, so claims rest on the preserved capture. Prices for the same operations are on [Kagi API pricing](../kagi-api-pricing/).
 
-## Representation
+## Key points
 
-- **ID:** `kagi-openapi-yaml-2026-09-22T09:20:23Z`
-- **Retrieved:** 2026-09-22T09:20:23Z
-- **Preserved representation:** `raw/2026-09-22/kagi-ai-value-assessment/kagi-openapi.yaml`
-- **Format:** `application/yaml`
-- **OAS dialect:** `openapi: 3.0.0`
-- **API designation:** `info.version: '1'`
-- **Fixity:** `sha256:6b438426481d385b6e29d027d4252fe516683e81acce336a2f8d0f04e3d63bdf`
-
-## Description
-
-Machine-readable contract for Kagi API version 1. This source defines accepted Search parameters and response shapes; it does not demonstrate the behavior of a deployed request.
-
-## Evidence
-
-### `search-request-controls`
-
-- **Source defines:** `POST /search` accepts web, image, video, news, and podcast workflows; date and region filters; reusable or inline Lenses; safe search; domain-ranking rules; and regular-expression URL rewrites.
-- **Representation:** `kagi-openapi-yaml-2026-09-22T09:20:23Z`
-- **Locator:** JSON Pointer `/paths/~1search/post/requestBody/content/application~1json/schema/properties`
-
-### `search-personalization-bounds`
-
-- **Source defines:** Domain and regular-expression personalization collections each permit up to 1,000 rules; domain actions are `block`, `lower`, `raise`, or `pin`.
-- **Representation:** `kagi-openapi-yaml-2026-09-22T09:20:23Z`
-- **Locator:** JSON Pointer `/paths/~1search/post/requestBody/content/application~1json/schema/properties/personalizations/properties`
-
-### `search-pagination-and-extraction`
-
-- **Source defines:** Search pages range from 1 through 10; the result `limit` ranges from 1 through 1,024 but does not increase retrieval; optional extraction replaces snippets with page Markdown for up to ten results and incurs separate Extract API charges.
-- **Representation:** `kagi-openapi-yaml-2026-09-22T09:20:23Z`
-- **Locator:** JSON Pointers `/paths/~1search/post/requestBody/content/application~1json/schema/properties/page`, `/limit`, and `/extract`
-
-### `search-response-kinds`
-
-- **Source defines:** Search responses may separate web, image, video, podcast, news, direct-answer, adjacent-question, infobox, code, public-record, archived-page, related-search, and Small Web result kinds.
-- **Representation:** `kagi-openapi-yaml-2026-09-22T09:20:23Z`
-- **Locator:** JSON Pointer `/paths/~1search/post/responses/200/content/application~1json/schema/properties/data/properties`
-
-## Source criticism
-
-The description is authoritative for the captured contract, not proof that a deployment implements it or that returned results are relevant. The live URL is mutable and exposes no immutable revision identifier, so evidence remains bound to the preserved representation and digest.
-
-## Connections
-
-- [Kagi Search API value assessment](../../research/kagi-ai-value-assessment/) uses this source for request controls, bounds, and response types.
-- [Kagi API pricing](../kagi-api-pricing/) supplies the separately maintained public prices.
+- `POST /search` accepts web, image, video, news, and podcast searches, date and region filters, reusable or inline Lenses, safe search, domain-ranking rules, and regular-expression URL rewrites. (JSON Pointer `/paths/~1search/post/requestBody/content/application~1json/schema/properties`)
+- Domain and regular-expression personalization lists each allow up to 1,000 rules, and domains can be blocked, lowered, raised, or pinned. (`.../schema/properties/personalizations/properties`)
+- Pages run from 1 to 10; `limit` ranges from 1 to 1,024 but does not retrieve more; optional extraction replaces snippets with page Markdown for up to ten results and is charged separately as Extract. (`.../schema/properties/page`, `/limit`, and `/extract`)
+- A response can separate web, image, video, podcast, news, direct-answer, adjacent-question, infobox, code, public-record, archived-page, related-search, and Small Web results. (`/paths/~1search/post/responses/200/content/application~1json/schema/properties/data/properties`)

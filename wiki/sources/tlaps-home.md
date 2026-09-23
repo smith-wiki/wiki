@@ -1,44 +1,20 @@
 ---
 title: TLA+ Proof System homepage
 summary: The TLAPS project states its proof-checking role and captured release's limits on temporal reasoning.
+url: https://proofs.tlapl.us/doc/web/content/Home.html
+author: "TLA+ Proof System project"
+kind: webpage
+captures:
+  - retrieved: 2026-09-23T09:01:15Z
+    sha256: "15c347b3eb1c6caa80a5f552995de813d18e667cc22429bb16d976c770c5bc55"
+    type: text/html
 ---
 
-## Source
+## Overview
 
-- **Type:** Mutable official tool homepage
-- **Responsible organization:** TLA+ Proof System project, developed by the Tools for Proofs project at Microsoft Research-Inria
-- **Original:** [TLA+ Proof System](https://proofs.tlapl.us/doc/web/content/Home.html)
-- **Publication or version status:** No page date stated; captured page labels current release `1.4.5`
-- **Suggested citation:** TLA+ Proof System project. "TLA+ Proof System." Accessed September 23, 2026.
+The homepage of the TLA+ Proof System describes TLAPS as a tool that mechanically checks hierarchical TLA+ proofs, recommends using it from the TLA+ Toolbox, and names the Tools for Proofs project at Microsoft Research-Inria as its developer. The captured page labels release 1.4.5 as suitable for nontrivial safety properties but unable to reason about temporal properties or handle some TLA+ features. The page is undated and mutable, so these limits describe that release only. It complements [TLA+ Tools](../lamport-tla-tools/) and the [TLAPS tutorial](../tlaps-tutorial-example/).
 
-## Representation
+## Key points
 
-- **ID:** `tlaps-home-2026-09-23`
-- **Retrieved:** 2026-09-23T09:01:15Z
-- **Preserved representation:** `raw/sources/tlaps-home-2026-09-23.html`
-- **Readable extraction:** `raw/sources/tlaps-home-2026-09-23.txt`
-- **Format:** HTML
-- **Fixity:** `sha256:15c347b3eb1c6caa80a5f552995de813d18e667cc22429bb16d976c770c5bc55`
-
-## Evidence
-
-### `proof-checking-and-limits`
-
-- **Source states:** TLAPS mechanically checks hierarchical TLA+ proofs. The release described on the page is suitable for nontrivial safety properties, but does not perform temporal reasoning and does not support some TLA+ features.
-- **Locator:** `About`
-
-### `release-and-stewardship`
-
-- **Source states:** The page names release `1.4.5`, recommends use from the Toolbox, and identifies the Tools for Proofs project at Microsoft Research-Inria as developer.
-- **Locator:** `Get it`; `Community`
-
-## Source criticism
-
-This is a mutable homepage without a page-level timestamp. Its limitations pertain to the captured `1.4.5` release; do not infer that every historical or later implementation of TLAPS has identical coverage. The ability to express liveness in TLA+ is distinct from whether this proof checker supports proving it.
-
-## Connections
-
-- [TLA+](../../entities/tla-plus/) distinguishes language expressiveness from this tool's scope.
-- [TLAPS tutorial](../tlaps-tutorial-example/) shows a proof workflow.
-- [Lamport's tools page](../lamport-tla-tools/) links the proof system.
-- [Lean comparison](../../research/lean-versus-tla/) notes that TLA+ is more than TLC, with versioned proof-system limitations.
+- TLAPS mechanically checks hierarchical TLA+ proofs. The release described on the page is suitable for nontrivial safety properties, but does not perform temporal reasoning and does not support some TLA+ features. (`About`)
+- The page names release `1.4.5`, recommends use from the Toolbox, and identifies the Tools for Proofs project at Microsoft Research-Inria as developer. (`Get it`; `Community`)

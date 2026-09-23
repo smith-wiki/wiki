@@ -1,6 +1,0 @@
-{
-  "layout": "layouts/page.njk",
-  "eyebrow": "Source",
-  "tags": ["source"],
-  "templateEngineOverride": "md"
-}
