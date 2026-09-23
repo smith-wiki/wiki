@@ -263,15 +263,10 @@ def http_get(url: str) -> tuple[bytes, str, str]:
         raise FetchError(f"could not fetch {url}: {error}") from error
 
 
-def firecrawl(url: str) -> tuple[bytes, str, str | None]:
-    """Return (original bytes, media type, Markdown) scraped by Firecrawl."""
+def firecrawl_scrape(url: str, formats: list[str]) -> dict:
+    """One uncached Firecrawl scrape of URL in the given formats."""
     api = os.environ.get("FIRECRAWL_API_URL", "https://api.firecrawl.dev/v2").rstrip("/")
-    body = json.dumps({
-        "url": url,
-        "formats": ["markdown", "rawBase64"],
-        "maxAge": 0,
-        "onlyMainContent": True,
-    }).encode()
+    body = json.dumps({"url": url, "formats": formats, "maxAge": 0, "onlyMainContent": True}).encode()
     request = urllib.request.Request(
         f"{api}/scrape",
         data=body,
@@ -291,12 +286,24 @@ def firecrawl(url: str) -> tuple[bytes, str, str | None]:
 
     data = payload.get("data") or {}
     status = (data.get("metadata") or {}).get("statusCode")
-    if not payload.get("success") or not data.get("rawBase64"):
+    if not payload.get("success") or not any(data.get(name) for name in formats):
         raise FetchError(f"Firecrawl could not scrape {url}: {payload.get('error') or 'no content'}")
     if isinstance(status, int) and status >= 400:
         raise FetchError(f"{url} answered HTTP {status} to Firecrawl")
-    original = base64.b64decode(data["rawBase64"])
-    return original, media_type((data.get("metadata") or {}).get("contentType")), data.get("markdown")
+    return data
+
+
+def firecrawl(url: str) -> tuple[bytes, str, str | None]:
+    """Return (original bytes, media type, Markdown) scraped by Firecrawl.
+
+    Firecrawl returns the original response body (rawBase64) only on its own,
+    so the original and the Markdown reading copy take two requests.
+    """
+    raw = firecrawl_scrape(url, ["rawBase64"])
+    original = base64.b64decode(raw["rawBase64"])
+    mime = media_type((raw.get("metadata") or {}).get("contentType"))
+    markdown = firecrawl_scrape(url, ["markdown"]).get("markdown")
+    return original, mime, markdown
 
 
 def reading_copy(original: bytes, mime: str, base_url: str) -> str | None:
