@@ -21,12 +21,12 @@ Repository work changes tracked files, scripts, CI, the site, or GitHub settings
 
 - A **research thread** is a GitHub milestone. A **turn** is one Issue (the question) and one pull request (the answer) in that milestone, plus one research card in `wiki/research/`.
 - A conversation has one active thread. Its first turn passes `--new-thread`, or the milestone the user names to resume. Every later turn in the conversation passes that same milestone, whatever its topic. In a new conversation, resume a thread only from a name, number, or URL the user supplies; if the user asks to resume without one, ask which. Start a different thread mid-conversation only when the user says so.
-- Open a turn with `sw turn (--new-thread | THREAD) SLUG TITLE REQUEST`. The Issue body is the request in English with its source URLs. When the thread already has an open turn pull request, the new branch stacks on it; after that base merges, run `sw sync`.
+- Open a turn with `sw turn (--new-thread | THREAD) SLUG TITLE REQUEST`. TITLE and REQUEST are English even when the user writes in another language: translate the user's question, never paste it. The Issue body is the request with its source URLs. When the thread already has an open turn pull request, the new branch stacks on it; after that base merges, run `sw sync`.
 
 Doing a turn:
 
 1. **Orient.** Run `sw` and read the existing pages the turn touches.
-2. **Preserve evidence.** Save every source you rely on under `raw/sources/`, which Git ignores, and record its SHA-256 digest and UTC retrieval time. A new capture is a new file. Read sources yourself; use a subagent only for discovery across many sources.
+2. **Preserve evidence.** Capture every source you rely on with `sw fetch URL NAME`. It stores the original under `raw/sources/`, which Git ignores, prints the retrieval time and SHA-256 digest for the source page, and writes a readable `.txt` beside each HTML capture. Read that `.txt` or the preserved PDF instead of fetching the page again. When the page renders client-side, save the rendered HTML from the browser and run `sw fetch URL NAME FILE`. For a repository, fetch files by their raw URL at a fixed commit. Read sources yourself; use a subagent only for discovery across many sources.
 3. **Build the graph.** Depth lives in source, entity, concept, and note pages, not on the card. Ask what the turn adds to what the wiki already holds: new facts go to the entity or concept they describe, a reusable claim, distinction, or relationship becomes a note, and a connection to an existing page is stated on both pages with why it matters. Revise existing pages before creating new ones.
 4. **Write the card.** Answer the turn's question briefly and link the graph pages that carry the depth.
 5. **Deliver.** `sw commit`, then `sw pr TITLE BODY`, where the body is the answer: findings, pages added or changed, connections, and open questions. Watch `sw checks`.
