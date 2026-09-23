@@ -7,7 +7,8 @@ Smith Wiki helper
 
 Usage:
   sw                                   Show wiki pages, open threads, Issues, and pull requests.
-  sw fetch URL NAME [FILE]             Preserve a source under raw/sources/ and print its provenance.
+  sw fetch URL [--file FILE]           Capture a source: Markdown to read, original stored by SHA-256.
+  sw fetch --hash SHA                  Restore a stored capture into the local cache.
   sw turn [--queue] (--new-thread | THREAD) SLUG TITLE REQUEST
                                        Open a research turn: Issue in the thread milestone and branch.
   sw task [--queue] SLUG TITLE REQUEST Open a repository task: Issue and branch.
@@ -20,7 +21,7 @@ Usage:
 
 THREAD is a milestone number, title, or URL. --new-thread creates a milestone
 named after TITLE. --queue records the Issue without creating a branch.
-TITLE and REQUEST must be English. FILE preserves an already rendered copy of URL.
+TITLE and REQUEST must be English. FILE is a copy of URL saved from a browser.
 EOF
 }
 
@@ -236,62 +237,7 @@ command_open() {
 }
 
 command_fetch() {
-  (( $# == 2 || $# == 3 )) || die "usage: sw fetch URL NAME [FILE]"
-  local url=$1 name=$2 file=${3:-} retrieved tmp meta content_type final_url ext base raw sha text lines n=1
-  [[ "$url" =~ ^https?:// ]] || die "URL must start with http:// or https://"
-  validate_slug "$name"
-  retrieved=$(date -u +%Y-%m-%dT%H:%M:%SZ)
-  tmp=$(mktemp)
-  if [[ -n "$file" ]]; then
-    [[ -f "$file" ]] || die "file not found: $file"
-    cp "$file" "$tmp"
-    final_url=$url
-    case "$file" in
-      *.html|*.htm) content_type=text/html ;;
-      *.pdf) content_type=application/pdf ;;
-      *.md) content_type=text/markdown ;;
-      *.txt) content_type=text/plain ;;
-      *.json) content_type=application/json ;;
-      *) content_type=application/octet-stream ;;
-    esac
-  else
-    meta=$(curl --fail --location --silent --show-error --compressed --max-time 60 \
-      --output "$tmp" --write-out '%{content_type}\n%{url_effective}' "$url") ||
-      { rm -f "$tmp"; die "could not fetch $url"; }
-    content_type=${meta%%$'\n'*}
-    final_url=${meta#*$'\n'}
-  fi
-  case "${content_type%%;*}" in
-    text/html|application/xhtml+xml) ext=html ;;
-    application/pdf) ext=pdf ;;
-    application/json) ext=json ;;
-    text/markdown) ext=md ;;
-    text/plain) ext=txt ;;
-    *) ext=bin ;;
-  esac
-
-  mkdir -p raw/sources
-  base="raw/sources/$name-${retrieved%%T*}"
-  while [[ -e "$base.$ext" || -e "$base.txt" ]]; do
-    n=$((n + 1))
-    base="raw/sources/$name-${retrieved%%T*}-$n"
-  done
-  raw="$base.$ext"
-  mv "$tmp" "$raw"
-  sha=$(python3 -c 'import hashlib, sys; print(hashlib.sha256(open(sys.argv[1], "rb").read()).hexdigest())' "$raw")
-
-  printf 'url: %s\n' "$url"
-  [[ "$final_url" == "$url" ]] || printf 'resolved: %s\n' "$final_url"
-  printf 'retrieved: %s\ncontent-type: %s\nraw: %s (%s bytes)\nsha256: %s\n' \
-    "$retrieved" "$content_type" "$raw" "$(wc -c <"$raw" | tr -d ' ')" "$sha"
-  if [[ "$ext" == html ]]; then
-    text="$base.txt"
-    python3 "$repo_root/scripts/extract_text.py" "$raw" "$final_url" >"$text"
-    lines=$(wc -l <"$text" | tr -d ' ')
-    printf 'text: %s (%s lines)\n' "$text" "$lines"
-    (( lines >= 10 )) ||
-      printf 'warning: little text; the page may render client-side. Save the rendered HTML and rerun with FILE.\n'
-  fi
+  python3 "$repo_root/scripts/fetch.py" "$@"
 }
 
 command_start() {

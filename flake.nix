@@ -18,7 +18,7 @@
           sw = pkgs.writeShellApplication {
             name = "sw";
             runtimeInputs = with pkgs; [
-              curl
+              awscli2
               coreutils
               gh
               git
