@@ -18,6 +18,7 @@
           sw = pkgs.writeShellApplication {
             name = "sw";
             runtimeInputs = with pkgs; [
+              curl
               coreutils
               gh
               git

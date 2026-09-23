@@ -1,0 +1,10 @@
+---
+layout: layouts/page.njk
+---
+{{ content | safe }}
+<h2>Recent research</h2>
+<ul>
+{% for turn in collections.research | reverse %}{% if loop.index <= 8 %}
+  <li><a href="{{ turn.url }}">{{ turn.data.title | escape }}</a> &mdash; {{ turn.data.brief | escape }}</li>
+{% endif %}{% endfor %}
+</ul>

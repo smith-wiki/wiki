@@ -6,76 +6,27 @@ usage() {
 Smith Wiki helper
 
 Usage:
-  sw
-  sw info [LIMIT]
-  sw status
-  sw start ISSUE SLUG [BASE]
-  sw diff [GIT_DIFF_ARGS...]
-  sw stage PATH...
-  sw search PATTERN
-  sw issue [--queue] research MODE SLUG TITLE BRIEF_FILE [THREAD]
-  sw issue [--queue] process|maintenance|site SLUG TITLE BRIEF_FILE
-  sw commit MESSAGE [PATH...]
-  sw pr TITLE SUMMARY VERIFICATION
-  sw checks [PR]
-  sw sync
-  sw thread retire THREAD
-  sw thread merge SOURCE_THREAD TARGET_THREAD
-  sw merge [PR]
-  sw check-ascii --staged|--range RANGE|--commits RANGE|--file FILE
-  sw git GIT_ARGUMENTS...
-  sw gh GH_ARGUMENTS...
+  sw                                   Show wiki pages, open threads, Issues, and pull requests.
+  sw fetch URL NAME [FILE]             Preserve a source under raw/sources/ and print its provenance.
+  sw turn [--queue] (--new-thread | THREAD) SLUG TITLE REQUEST
+                                       Open a research turn: Issue in the thread milestone and branch.
+  sw task [--queue] SLUG TITLE REQUEST Open a repository task: Issue and branch.
+  sw start ISSUE SLUG                  Start work on a queued Issue.
+  sw commit MESSAGE [PATH...]          Stage paths, check ASCII, and commit (Conventional Commits).
+  sw pr TITLE BODY                     Push and open a pull request that closes the current Issue.
+  sw checks [PR]                       Watch pull request checks.
+  sw sync                              Rebase a stacked turn onto its dependency's current base.
+  sw merge [PR]                        Watch checks, then merge an explicitly authorized pull request.
 
-Commands:
-  info         Show bounded titled pages, research threads, and GitHub work.
-  status       Show the current branch and concise working-tree state.
-  start        Adopt an existing Issue on a branch from BASE.
-  diff         Show a working-tree or staged diff using Git arguments.
-  stage        Stage explicit paths and show the resulting status.
-  search       Search published Markdown pages with git grep.
-  issue        Create a policy-correct Issue and branch from a five-section brief.
-  commit       Optionally stage paths, validate them, and create a commit.
-  pr           Derive Issue, base, lineage, and milestone; then push and open a PR.
-  checks       Watch GitHub checks for the current or selected pull request.
-  sync         Rebase a stacked PR onto its current dependency-derived base.
-  thread       Retire a research thread or merge one thread into another.
-  merge        Watch checks, then merge an explicitly authorized pull request.
-  check-ascii  Run the repository ASCII and binary-file policy checker directly.
-  git, gh      Run an uncommon operation only when no named command fits.
-
-Research MODE is SOURCE_BRIEF, QUESTION_ANSWER, or NOTE_EXPLORE.
-THREAD is an explicitly supplied research milestone number, title, or URL.
-Without THREAD, sw creates a new research milestone. Open thread PRs stack automatically.
-BRIEF_FILE contains Request, Inputs and sources, Context, Acceptance criteria,
-and Constraints and non-goals headings. sw owns all workflow metadata.
-LIMIT defaults to 5 and applies independently to every list (maximum 20).
-EOF
-}
-
-quickstart() {
-  cat <<'EOF'
-Examples
-  sw search 'schema validity'
-  sw issue research QUESTION_ANSWER kagi-value 'Is Kagi worth its price?' /tmp/brief.txt
-  sw issue process tighten-intake 'Tighten issue intake' /tmp/brief.txt
-  sw status
-  sw diff
-  sw commit 'docs(research): answer Kagi value' wiki/research/kagi-value.md
-  sw pr 'Answer Kagi value' 'Publish the evidence-backed answer.' 'Checked rendered research card.'
-  sw checks
-  sw help
+THREAD is a milestone number, title, or URL. --new-thread creates a milestone
+named after TITLE. --queue records the Issue without creating a branch.
+TITLE and REQUEST must be English. FILE preserves an already rendered copy of URL.
 EOF
 }
 
 die() {
   printf 'sw: %s\n' "$*" >&2
   exit 1
-}
-
-require_args() {
-  local expected=$1
-  shift
-  (( $# >= expected )) || die "missing arguments; run 'sw help'"
 }
 
 repo_root=$(git rev-parse --show-toplevel 2>/dev/null) || die "not inside a Git repository"
@@ -85,6 +36,14 @@ ascii_checker="$repo_root/scripts/check_ascii.py"
 
 check_text() {
   python3 "$ascii_checker" --text "$1" "$2"
+}
+
+require_english() {
+  check_text "$1" "$2" || die "$1 must be English; translate the user's words"
+}
+
+require_clean() {
+  [[ -z $(git status --porcelain) ]] || die "$1"
 }
 
 load_lines() {
@@ -100,498 +59,318 @@ validate_slug() {
     die "SLUG must use lowercase ASCII words and hyphens"
 }
 
-validate_brief() {
-  local brief_file=$1 heading
-  [[ -f "$brief_file" ]] || die "brief file not found: $brief_file"
-  python3 "$ascii_checker" --file "$brief_file"
-  for heading in \
-    '## Request' \
-    '## Inputs and sources' \
-    '## Context' \
-    '## Acceptance criteria' \
-    '## Constraints and non-goals'; do
-    grep -Fqx -- "$heading" "$brief_file" || die "brief is missing: $heading"
-  done
-  if grep -Eq '^## (Task type|Research milestone|Process milestone|Depends on|Execution mode|Handoff readiness)$' "$brief_file"; then
-    die "brief contains workflow metadata owned by sw"
-  fi
+current_repo() {
+  gh repo view --json nameWithOwner --jq .nameWithOwner || die "could not identify GitHub repository"
 }
 
-clear_milestone() {
-  milestone_number=""
-  milestone_title=""
-  milestone_url=""
-}
-
-load_milestone_number() {
-  local repo=$1 number=$2 milestone_json
-  milestone_json=$(gh api "repos/$repo/milestones/$number") || return 1
-  [[ $(jq -r .state <<<"$milestone_json") == open ]] || return 1
-  milestone_number=$(jq -r .number <<<"$milestone_json")
-  milestone_title=$(jq -r .title <<<"$milestone_json")
-  milestone_url=$(jq -r .html_url <<<"$milestone_json")
-  check_text milestone-title "$milestone_title"
-}
+milestone_title=""
 
 resolve_milestone() {
-  local repo=$1 reference=$2 milestones_json number
+  local repo=$1 reference=$2 number milestone_json
   if [[ "$reference" =~ /milestone/([0-9]+)$ ]]; then
     number=${BASH_REMATCH[1]}
   elif [[ "$reference" =~ ^[0-9]+$ ]]; then
     number=$reference
   else
-    milestones_json=$(gh api "repos/$repo/milestones?state=open&per_page=100") || return 1
-    number=$(jq -r --arg title "$reference" \
-      '[.[] | select(.title == $title)][0].number // empty' <<<"$milestones_json")
+    number=$(gh api "repos/$repo/milestones?state=open&per_page=100" |
+      jq -r --arg title "$reference" '[.[] | select(.title == $title)][0].number // empty')
     [[ -n "$number" ]] || return 1
   fi
-  load_milestone_number "$repo" "$number"
-}
-
-create_research_milestone() {
-  local repo=$1 title=$2 milestone_json
-  check_text milestone-title "$title"
-  milestone_json=$(gh api --method POST "repos/$repo/milestones" -f title="$title") ||
-    die "could not create research milestone"
-  milestone_number=$(jq -r .number <<<"$milestone_json")
+  milestone_json=$(gh api "repos/$repo/milestones/$number") || return 1
+  [[ $(jq -r .state <<<"$milestone_json") == open ]] || return 1
   milestone_title=$(jq -r .title <<<"$milestone_json")
-  milestone_url=$(jq -r .html_url <<<"$milestone_json")
 }
 
-issue_field() {
-  local issue_json=$1 heading=$2
-  jq -r --arg heading "$heading" \
-    '.body | try capture("(?m)^## " + $heading + "\\r?\\n\\r?\\n(?<value>[^\\r\\n]*)").value // empty' \
-    <<<"$issue_json"
+create_milestone() {
+  local repo=$1 title=$2 milestone_json
+  milestone_json=$(gh api --method POST "repos/$repo/milestones" -f title="$title") ||
+    die "could not create thread milestone"
+  milestone_title=$(jq -r .title <<<"$milestone_json")
 }
 
-normalize_optional() {
-  case "$1" in
-    ""|None|None.|'_No response_') printf '' ;;
-    '## '*) printf '' ;;
-    *) printf '%s' "$1" ;;
-  esac
+issue_dependency() {
+  jq -r '.body | try capture("(?m)^## Depends on\\r?\\n\\r?\\n(?<value>[^\\r\\n]*)").value // empty' <<<"$1"
 }
 
 base_for_dependency() {
-  local dependency=$1 pr_number pr_json state
+  local dependency=$1 pr_json
   if [[ "$dependency" =~ /pull/([0-9]+)$ ]]; then
-    pr_number=${BASH_REMATCH[1]}
-    pr_json=$(gh pr view "$pr_number" --json headRefName,state) ||
-      die "could not resolve dependency PR #$pr_number"
-    state=$(jq -r .state <<<"$pr_json")
-    case "$state" in
+    pr_json=$(gh pr view "${BASH_REMATCH[1]}" --json headRefName,state) ||
+      die "could not resolve dependency $dependency"
+    case $(jq -r .state <<<"$pr_json") in
       OPEN) jq -r .headRefName <<<"$pr_json" ;;
       MERGED) printf 'main' ;;
-      *) die "dependency PR #$pr_number is closed without merge" ;;
+      *) die "dependency $dependency is closed without merge" ;;
     esac
   else
     printf 'main'
   fi
 }
 
+switch_to_issue_branch() {
+  local issue=$1 slug=$2 base=$3
+  [[ "$base" =~ ^[A-Za-z0-9][A-Za-z0-9._/-]*$ && "$base" != *..* ]] ||
+    die "base is not a safe branch name: $base"
+  git fetch --quiet origin "$base"
+  git switch -c "issue/$issue-$slug" "origin/$base"
+}
+
 current_issue_context() {
   current_branch=$(git branch --show-current)
-  check_text branch-name "$current_branch"
-  if [[ ! "$current_branch" =~ ^issue/([0-9]+)-[a-z0-9]+(-[a-z0-9]+)*$ ]]; then
+  [[ "$current_branch" =~ ^issue/([0-9]+)-[a-z0-9]+(-[a-z0-9]+)*$ ]] ||
     die "current branch must be issue/<number>-<slug>"
-  fi
   current_issue=${BASH_REMATCH[1]}
   current_issue_json=$(gh issue view "$current_issue" --json body,milestone,state) ||
     die "could not read issue #$current_issue"
-  [[ $(jq -r .state <<<"$current_issue_json") == OPEN ]] ||
-    die "issue #$current_issue is not open"
+  [[ $(jq -r .state <<<"$current_issue_json") == OPEN ]] || die "issue #$current_issue is not open"
 }
 
 print_limited() {
   local limit=$1 label=$2
   shift 2
-  local items=("$@") total=$# shown index
-  total=${#items[@]}
-  shown=$total
-  (( shown <= limit )) || shown=$limit
-
+  local items=("$@") total=$# index
   printf '%-14s: ' "$label"
   if (( total == 0 )); then
     printf 'none\n'
     return
   fi
-  for ((index = 0; index < shown; index++)); do
+  for ((index = 0; index < total && index < limit; index++)); do
     (( index == 0 )) || printf ', '
     printf '%s' "${items[index]}"
   done
-  if (( total > shown )); then
-    printf ', ... (+%d more)' "$((total - shown))"
-  fi
+  (( total <= limit )) || printf ', ... (+%d more)' "$((total - limit))"
   printf '\n'
 }
 
-command_info() {
-  (( $# <= 1 )) || die "usage: sw info [LIMIT]"
-  local limit=${1:-5}
-  local branch dirty role repo index path slug title line frontmatter
+command_overview() {
+  local limit=20 branch dirty role repo path title
   local -a items
-  [[ "$limit" =~ ^([1-9]|1[0-9]|20)$ ]] || die "LIMIT must be between 1 and 20"
-
   branch=$(git branch --show-current)
-  [[ -n "$branch" ]] || branch="detached"
   dirty=""
   [[ -z $(git status --porcelain) ]] || dirty=" dirty"
-  printf 'Smith Wiki | %s%s | limit:%s\n' "$branch" "$dirty" "$limit"
+  printf 'Smith Wiki | %s%s\n' "${branch:-detached}" "$dirty"
 
-  printf 'Pages\n'
   for role in research sources entities concepts notes; do
-    load_lines items "could not list $role pages" git ls-files "wiki/$role/*.md"
-    if (( ${#items[@]} > 0 )); then
-      mapfile -t items < <(printf '%s\n' "${items[@]}" | sort)
-    fi
-    for index in "${!items[@]}"; do
-      path=${items[index]}
-      slug=${path##*/}
-      slug=${slug%.md}
-      title=""
-      frontmatter=false
-      while IFS= read -r line; do
-        if [[ "$line" == --- ]]; then
-          [[ "$frontmatter" == false ]] || break
-          frontmatter=true
-          continue
-        fi
-        [[ "$frontmatter" == true && "$line" == title:* ]] || continue
-        title=${line#title:}
-        title=${title#"${title%%[![:space:]]*}"}
-        title=${title%"${title##*[![:space:]]}"}
-        if [[ "$title" == \"*\" && "$title" == *\" ]]; then
-          title=${title:1:${#title}-2}
-        elif [[ "$title" == \'*\' && "$title" == *\' ]]; then
-          title=${title:1:${#title}-2}
-        fi
-        break
-      done <"$path"
-      [[ -n "$title" ]] || title=$slug
-      items[index]="$title [$slug]"
-    done
-    print_limited "$limit" "  $role" "${items[@]}"
+    items=()
+    while IFS= read -r path; do
+      [[ "${path##*/}" == index.md ]] && continue
+      title=$(grep -m 1 '^title:' "$path" || true)
+      title=${title#title:}
+      title=${title# }
+      title=${title#[\"\']}
+      title=${title%[\"\']}
+      path=${path##*/}
+      items+=("$title [${path%.md}]")
+    done < <(git ls-files "wiki/$role/*.md" | sort)
+    print_limited "$limit" "$role" "${items[@]}"
   done
-
 
   if ! gh auth status >/dev/null 2>&1; then
     printf 'GitHub: unavailable; run gh auth login\n'
     return
   fi
-
-  repo=$(gh repo view --json nameWithOwner --jq .nameWithOwner) ||
-    die "could not identify GitHub repository"
-  printf 'GitHub | %s\n' "$repo"
-
+  repo=$(current_repo)
   load_lines items "could not list milestones" \
     gh api "repos/$repo/milestones?state=open&per_page=100" \
     --jq '.[] | "#\(.number) \(.title) [\(.open_issues) open/\(.closed_issues) closed]"'
   print_limited "$limit" Milestones "${items[@]}"
-
   load_lines items "could not list Issues" \
-    gh issue list --state open --limit 1000 --json number,title,milestone \
+    gh issue list --state open --limit 100 --json number,title,milestone \
     --jq '.[] | "#\(.number) \(.title)" + (if .milestone then " [" + .milestone.title + "]" else "" end)'
   print_limited "$limit" Issues "${items[@]}"
-
   load_lines items "could not list pull requests" \
-    gh pr list --state open --limit 1000 --json number,title,headRefName \
+    gh pr list --state open --limit 100 --json number,title,headRefName \
     --jq '.[] | "#\(.number) \(.title) [" + .headRefName + "]"'
   print_limited "$limit" "Pull requests" "${items[@]}"
 }
 
-command_status() {
-  (( $# == 0 )) || die "usage: sw status"
-  git status --short --branch
-}
-
-command_start() {
-  (( $# == 2 || $# == 3 )) || die "usage: sw start ISSUE SLUG [BASE]"
-  local issue=$1 slug=$2 base=${3:-} state issue_json dependency
-  [[ "$issue" =~ ^[0-9]+$ ]] || die "ISSUE must be a number"
-  validate_slug "$slug"
-  [[ -z $(git status --porcelain) ]] || die "commit or discard tracked changes before starting a branch"
-  issue_json=$(gh issue view "$issue" --json body,state) || die "could not read issue #$issue"
-  state=$(jq -r .state <<<"$issue_json")
-  [[ "$state" == OPEN ]] || die "issue #$issue is not open"
-  if [[ -z "$base" ]]; then
-    dependency=$(normalize_optional "$(issue_field "$issue_json" 'Depends on')")
-    base=$(base_for_dependency "$dependency")
-  fi
-  [[ "$base" =~ ^[A-Za-z0-9][A-Za-z0-9._/-]*$ && "$base" != *..* ]] ||
-    die "BASE is not a safe branch name"
-  git fetch --quiet origin "$base"
-  git switch -c "issue/$issue-$slug" "origin/$base"
-}
-
-command_diff() {
-  git --no-pager diff "$@"
-}
-
-command_stage() {
-  require_args 1 "$@"
-  git add -- "$@"
-  git status --short
-}
-
-command_search() {
-  require_args 1 "$@"
-  git grep -n -i -- "$*" -- 'wiki/*.md' 'wiki/**/*.md'
-}
-
-command_issue() {
-  local queue=false
+command_open() {
+  local kind=$1 queue=false selector="" slug title request repo body issue_url
+  local dependency="" base=main latest
+  local -a args
+  shift
   if [[ ${1:-} == --queue ]]; then
     queue=true
     shift
   fi
-  require_args 1 "$@"
-  local kind=$1 mode="" slug title brief_file thread="" task_type
-  local repo brief execution_mode research_milestone="None." process_milestone="None."
-  local dependency="None." base="main" prs_json latest issue_title body issue_url issue
-  local -a args
-  shift
-
-  case "$kind" in
-    research)
-      (( $# == 4 || $# == 5 )) ||
-        die "usage: sw issue [--queue] research MODE SLUG TITLE BRIEF_FILE [THREAD]"
-      mode=$1
-      slug=$2
-      title=$3
-      brief_file=$4
-      thread=${5:-}
-      case "$mode" in
-        SOURCE_BRIEF) task_type="Source ingest" ;;
-        QUESTION_ANSWER) task_type="Research question" ;;
-        NOTE_EXPLORE) task_type="Note exploration" ;;
-        *) die "research MODE must be SOURCE_BRIEF, QUESTION_ANSWER, or NOTE_EXPLORE" ;;
-      esac
-      ;;
-    process|maintenance|site)
-      (( $# == 3 )) ||
-        die "usage: sw issue [--queue] process|maintenance|site SLUG TITLE BRIEF_FILE"
-      slug=$1
-      title=$2
-      brief_file=$3
-      case "$kind" in
-        process) task_type="Research process" ;;
-        maintenance) task_type="Wiki maintenance" ;;
-        site) task_type="Site change" ;;
-      esac
-      ;;
-    *) die "issue kind must be research, process, maintenance, or site" ;;
-  esac
-
-  validate_slug "$slug"
-  check_text issue-title "$title"
-  validate_brief "$brief_file"
-  if [[ "$queue" == false ]]; then
-    [[ -z $(git status --porcelain) ]] ||
-      die "commit or discard tracked changes before creating an implementation Issue"
+  if [[ "$kind" == turn ]]; then
+    (( $# == 4 )) || die "usage: sw turn [--queue] (--new-thread | THREAD) SLUG TITLE REQUEST"
+    selector=$1
+    shift
+  else
+    (( $# == 3 )) || die "usage: sw task [--queue] SLUG TITLE REQUEST"
   fi
+  slug=$1
+  title=$2
+  request=$3
+  validate_slug "$slug"
+  [[ -n "$request" ]] || die "REQUEST must not be empty"
+  require_english TITLE "$title"
+  require_english REQUEST "$request"
+  [[ "$queue" == true ]] || require_clean "commit or discard tracked changes before starting work"
 
-  repo=$(gh repo view --json nameWithOwner --jq .nameWithOwner) ||
-    die "could not identify GitHub repository"
-  clear_milestone
-
-  if [[ "$kind" == research ]]; then
-    if [[ -n "$thread" ]]; then
-      resolve_milestone "$repo" "$thread" ||
-        die "research thread milestone not found or not open: $thread"
+  repo=$(current_repo)
+  if [[ "$kind" == turn ]]; then
+    if [[ "$selector" == --new-thread ]]; then
+      create_milestone "$repo" "$title"
     else
-      create_research_milestone "$repo" "$title"
+      resolve_milestone "$repo" "$selector" || die "thread not found or not open: $selector"
     fi
-    research_milestone=$milestone_url
-    prs_json=$(gh pr list --state open --limit 100 --json url,headRefName,milestone,createdAt) ||
-      die "could not inspect open thread pull requests"
-    latest=$(jq -c --arg title "$milestone_title" \
-      '[.[] | select(.milestone != null and .milestone.title == $title)] | sort_by(.createdAt) | last // empty' \
-      <<<"$prs_json")
+    latest=$(gh pr list --state open --limit 100 --json url,headRefName,milestone,createdAt |
+      jq -c --arg title "$milestone_title" \
+        '[.[] | select(.milestone.title? == $title)] | sort_by(.createdAt) | last // empty')
     if [[ -n "$latest" ]]; then
       dependency=$(jq -r .url <<<"$latest")
       base=$(jq -r .headRefName <<<"$latest")
     fi
-  elif [[ "$kind" == process ]]; then
-    if resolve_milestone "$repo" "Research process development"; then
-      process_milestone=$milestone_url
-    else
-      clear_milestone
-    fi
   fi
 
-  check_text branch-base "$base"
-  brief=$(cat "$brief_file")
-  if [[ "$queue" == true ]]; then
-    execution_mode="Queue only"
-  else
-    execution_mode="Implement now"
-  fi
-  printf -v body \
-    '## Task type\n\n%s\n\n## Research milestone\n\n%s\n\n## Process milestone\n\n%s\n\n## Depends on\n\n%s\n\n%s\n\n## Execution mode\n\n%s\n\n## Handoff readiness\n\n- [x] This issue contains enough context and acceptance criteria for another agent to execute it without the originating chat.' \
-    "$task_type" "$research_milestone" "$process_milestone" "$dependency" "$brief" "$execution_mode"
+  body="## Request"$'\n\n'"$request"
+  [[ -z "$dependency" ]] || body+=$'\n\n'"## Depends on"$'\n\n'"$dependency"
   check_text issue-body "$body"
-
-  issue_title=$title
-  [[ "$issue_title" == \[Task\]* ]] || issue_title="[Task] $issue_title"
-  args=(issue create --title "$issue_title" --body "$body" --label task)
+  args=(issue create --title "$title" --body "$body")
   [[ -z "$milestone_title" ]] || args+=(--milestone "$milestone_title")
   issue_url=$(gh "${args[@]}") || die "could not create Issue"
   printf '%s\n' "$issue_url"
+  [[ "$queue" == true ]] || switch_to_issue_branch "${issue_url##*/}" "$slug" "$base"
+}
 
-  if [[ "$queue" == false ]]; then
-    issue=${issue_url##*/}
-    git fetch --quiet origin "$base"
-    git switch -c "issue/$issue-$slug" "origin/$base"
+command_fetch() {
+  (( $# == 2 || $# == 3 )) || die "usage: sw fetch URL NAME [FILE]"
+  local url=$1 name=$2 file=${3:-} retrieved tmp meta content_type final_url ext base raw sha text lines n=1
+  [[ "$url" =~ ^https?:// ]] || die "URL must start with http:// or https://"
+  validate_slug "$name"
+  retrieved=$(date -u +%Y-%m-%dT%H:%M:%SZ)
+  tmp=$(mktemp)
+  if [[ -n "$file" ]]; then
+    [[ -f "$file" ]] || die "file not found: $file"
+    cp "$file" "$tmp"
+    final_url=$url
+    case "$file" in
+      *.html|*.htm) content_type=text/html ;;
+      *.pdf) content_type=application/pdf ;;
+      *.md) content_type=text/markdown ;;
+      *.txt) content_type=text/plain ;;
+      *.json) content_type=application/json ;;
+      *) content_type=application/octet-stream ;;
+    esac
+  else
+    meta=$(curl --fail --location --silent --show-error --compressed --max-time 60 \
+      --output "$tmp" --write-out '%{content_type}\n%{url_effective}' "$url") ||
+      { rm -f "$tmp"; die "could not fetch $url"; }
+    content_type=${meta%%$'\n'*}
+    final_url=${meta#*$'\n'}
+  fi
+  case "${content_type%%;*}" in
+    text/html|application/xhtml+xml) ext=html ;;
+    application/pdf) ext=pdf ;;
+    application/json) ext=json ;;
+    text/markdown) ext=md ;;
+    text/plain) ext=txt ;;
+    *) ext=bin ;;
+  esac
+
+  mkdir -p raw/sources
+  base="raw/sources/$name-${retrieved%%T*}"
+  while [[ -e "$base.$ext" || -e "$base.txt" ]]; do
+    n=$((n + 1))
+    base="raw/sources/$name-${retrieved%%T*}-$n"
+  done
+  raw="$base.$ext"
+  mv "$tmp" "$raw"
+  sha=$(python3 -c 'import hashlib, sys; print(hashlib.sha256(open(sys.argv[1], "rb").read()).hexdigest())' "$raw")
+
+  printf 'url: %s\n' "$url"
+  [[ "$final_url" == "$url" ]] || printf 'resolved: %s\n' "$final_url"
+  printf 'retrieved: %s\ncontent-type: %s\nraw: %s (%s bytes)\nsha256: %s\n' \
+    "$retrieved" "$content_type" "$raw" "$(wc -c <"$raw" | tr -d ' ')" "$sha"
+  if [[ "$ext" == html ]]; then
+    text="$base.txt"
+    python3 "$repo_root/scripts/extract_text.py" "$raw" "$final_url" >"$text"
+    lines=$(wc -l <"$text" | tr -d ' ')
+    printf 'text: %s (%s lines)\n' "$text" "$lines"
+    (( lines >= 10 )) ||
+      printf 'warning: little text; the page may render client-side. Save the rendered HTML and rerun with FILE.\n'
   fi
 }
 
+command_start() {
+  (( $# == 2 )) || die "usage: sw start ISSUE SLUG"
+  local issue=$1 slug=$2 issue_json
+  [[ "$issue" =~ ^[0-9]+$ ]] || die "ISSUE must be a number"
+  validate_slug "$slug"
+  require_clean "commit or discard tracked changes before starting work"
+  issue_json=$(gh issue view "$issue" --json body,state) || die "could not read issue #$issue"
+  [[ $(jq -r .state <<<"$issue_json") == OPEN ]] || die "issue #$issue is not open"
+  switch_to_issue_branch "$issue" "$slug" "$(base_for_dependency "$(issue_dependency "$issue_json")")"
+}
+
 command_commit() {
-  require_args 1 "$@"
+  (( $# >= 1 )) || die "usage: sw commit MESSAGE [PATH...]"
   local message=$1
   shift
   check_text commit-message "$message"
   [[ "$message" =~ ^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9._/-]+\))?!?:\ [[:alnum:]] ]] ||
     die "commit message must follow Conventional Commits"
-  if (( $# > 0 )); then
-    git add -- "$@"
-  fi
-  if git diff --cached --quiet; then
-    die "no staged changes"
-  fi
+  (( $# == 0 )) || git add -- "$@"
+  ! git diff --cached --quiet || die "no staged changes"
   git diff --cached --check
   python3 "$ascii_checker" --staged
   git commit -m "$message"
 }
 
-command_sync() {
-  (( $# == 0 )) || die "usage: sw sync"
-  local dependency base pr_number
-  [[ -z $(git status --porcelain) ]] || die "commit all tracked changes before syncing a stack"
-  current_issue_context
-  dependency=$(normalize_optional "$(issue_field "$current_issue_json" 'Depends on')")
-  [[ -n "$dependency" ]] || die "current Issue has no pull request dependency"
-  base=$(base_for_dependency "$dependency")
-  pr_number=$(gh pr view --json number --jq .number) || die "current branch has no open pull request"
-  git fetch --quiet origin "$base"
-  git rebase "origin/$base"
-  git push --force-with-lease -u origin "$current_branch"
-  gh pr edit "$pr_number" --base "$base"
-}
-
-command_thread() {
-  require_args 1 "$@"
-  local action=$1 repo source_number target_number target_url items_json item
-  shift
-  repo=$(gh repo view --json nameWithOwner --jq .nameWithOwner) ||
-    die "could not identify GitHub repository"
-  case "$action" in
-    retire)
-      (( $# == 1 )) || die "usage: sw thread retire THREAD"
-      resolve_milestone "$repo" "$1" || die "research thread not found or not open: $1"
-      gh api --method PATCH "repos/$repo/milestones/$milestone_number" -f state=closed \
-        --jq .html_url
-      ;;
-    merge)
-      (( $# == 2 )) || die "usage: sw thread merge SOURCE_THREAD TARGET_THREAD"
-      resolve_milestone "$repo" "$1" || die "source thread not found or not open: $1"
-      source_number=$milestone_number
-      resolve_milestone "$repo" "$2" || die "target thread not found or not open: $2"
-      target_number=$milestone_number
-      target_url=$milestone_url
-      [[ "$source_number" != "$target_number" ]] || die "source and target threads must differ"
-      items_json=$(gh api --paginate \
-        "repos/$repo/issues?milestone=$source_number&state=all&per_page=100" --slurp) ||
-        die "could not list source thread work"
-      while IFS= read -r item; do
-        gh api --method PATCH "repos/$repo/issues/$item" -F milestone="$target_number" >/dev/null ||
-          die "could not move item #$item to target thread"
-      done < <(jq -r 'flatten | .[].number' <<<"$items_json")
-      gh api --method PATCH "repos/$repo/milestones/$source_number" -f state=closed >/dev/null ||
-        die "could not close source thread"
-      printf '%s\n' "$target_url"
-      ;;
-    *) die "thread action must be retire or merge" ;;
-  esac
-}
-
-command_merge() {
-  (( $# <= 1 )) || die "usage: sw merge [PR]"
-  local pr=${1:-}
-  if [[ -z "$pr" ]]; then
-    pr=$(gh pr view --json number --jq .number) || die "current branch has no pull request"
-  fi
-  gh pr checks "$pr" --watch
-  gh pr merge "$pr" --merge --delete-branch
-}
-
 command_pr() {
-  (( $# == 3 )) || die "usage: sw pr TITLE SUMMARY VERIFICATION"
-  local title=$1 summary=$2 verification=$3
-  local issue branch base issue_json milestone task_type dependency lineage body
-  local diff_range commit_range
+  (( $# == 2 )) || die "usage: sw pr TITLE BODY"
+  local title=$1 summary=$2 dependency base milestone body
   local -a args
-  for value in pr-title:"$title" summary:"$summary" verification:"$verification"; do
-    check_text "${value%%:*}" "${value#*:}"
-  done
-  [[ -z $(git status --porcelain) ]] || die "commit all tracked changes before creating a PR"
+  check_text pr-title "$title"
+  require_clean "commit all tracked changes before opening a pull request"
   current_issue_context
-  branch=$current_branch
-  issue=$current_issue
-  issue_json=$current_issue_json
-  milestone=$(jq -r '.milestone.title // empty' <<<"$issue_json")
-  task_type=$(issue_field "$issue_json" 'Task type')
-  dependency=$(normalize_optional "$(issue_field "$issue_json" 'Depends on')")
+  milestone=$(jq -r '.milestone.title // empty' <<<"$current_issue_json")
+  dependency=$(issue_dependency "$current_issue_json")
   base=$(base_for_dependency "$dependency")
-  check_text branch-base "$base"
-  [[ "$base" =~ ^[A-Za-z0-9][A-Za-z0-9._/-]*$ && "$base" != *..* ]] ||
-    die "derived base is not a safe branch name"
-
   git fetch --quiet origin "$base"
-  diff_range="origin/$base...HEAD"
-  commit_range="origin/$base..HEAD"
-  python3 "$ascii_checker" --range "$diff_range"
-  python3 "$ascii_checker" --commits "$commit_range"
+  python3 "$ascii_checker" --range "origin/$base...HEAD"
+  python3 "$ascii_checker" --commits "origin/$base..HEAD"
 
-  lineage=""
-  if [[ -n "$milestone" ]]; then
-    case "$task_type" in
-      'Source ingest'|'Research question'|'Note exploration')
-        lineage="Research milestone: $milestone"
-        ;;
-      *)
-        lineage="Process milestone: $milestone"
-        ;;
-    esac
-  fi
-  if [[ -n "$dependency" ]]; then
-    [[ -z "$lineage" ]] || lineage+=$'\n'
-    lineage+="Depends on $dependency"
-  fi
-  [[ -n "$lineage" ]] || lineage="No milestone or dependency."
-
-  printf -v body '## Issue\n\nCloses #%s\n\n## Lineage\n\n%s\n\n## Summary\n\n- %s\n\n## Verification\n\n- %s' \
-    "$issue" "$lineage" "$summary" "$verification"
+  body="Closes #$current_issue"
+  [[ -z "$dependency" ]] || body+=$'\n'"Depends on $dependency"
+  body+=$'\n\n'"$summary"
   check_text pr-body "$body"
 
-  git push -u origin "$branch"
-  args=(pr create --base "$base" --head "$branch" --title "$title" --body "$body")
+  git push -u origin "$current_branch"
+  args=(pr create --base "$base" --head "$current_branch" --title "$title" --body "$body")
   [[ -z "$milestone" ]] || args+=(--milestone "$milestone")
   gh "${args[@]}"
 }
 
 command_checks() {
-  if (( $# == 0 )); then
-    gh pr checks --watch
-  else
-    gh pr checks "$1" --watch
-  fi
+  (( $# <= 1 )) || die "usage: sw checks [PR]"
+  gh pr checks "$@" --watch
+}
+
+command_sync() {
+  (( $# == 0 )) || die "usage: sw sync"
+  local dependency base
+  require_clean "commit all tracked changes before syncing"
+  current_issue_context
+  dependency=$(issue_dependency "$current_issue_json")
+  [[ -n "$dependency" ]] || die "current Issue has no pull request dependency"
+  base=$(base_for_dependency "$dependency")
+  git fetch --quiet origin "$base"
+  git rebase "origin/$base"
+  git push --force-with-lease -u origin "$current_branch"
+  gh pr edit --base "$base"
+}
+
+command_merge() {
+  (( $# <= 1 )) || die "usage: sw merge [PR]"
+  gh pr checks "$@" --watch
+  gh pr merge "$@" --merge --delete-branch
 }
 
 if (( $# == 0 )); then
-  command_info
-  printf '\n'
-  quickstart
+  command_overview
   exit
 fi
 
@@ -599,21 +378,13 @@ command=$1
 shift
 case "$command" in
   help|-h|--help) usage ;;
-  info) command_info "$@" ;;
-  status) command_status "$@" ;;
+  turn|task) command_open "$command" "$@" ;;
+  fetch) command_fetch "$@" ;;
   start) command_start "$@" ;;
-  diff) command_diff "$@" ;;
-  stage) command_stage "$@" ;;
-  search) command_search "$@" ;;
-  issue) command_issue "$@" ;;
   commit) command_commit "$@" ;;
   pr) command_pr "$@" ;;
-  sync) command_sync "$@" ;;
-  thread) command_thread "$@" ;;
-  merge) command_merge "$@" ;;
   checks) command_checks "$@" ;;
-  check-ascii) python3 "$ascii_checker" "$@" ;;
-  git) git "$@" ;;
-  gh) gh "$@" ;;
+  sync) command_sync "$@" ;;
+  merge) command_merge "$@" ;;
   *) die "unknown command: $command; run 'sw help'" ;;
 esac
