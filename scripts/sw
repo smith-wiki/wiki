@@ -13,7 +13,7 @@ Usage:
   sw diff [GIT_DIFF_ARGS...]
   sw stage PATH...
   sw search PATTERN
-  sw issue [--queue] research MODE SLUG TITLE BRIEF_FILE [THREAD]
+  sw issue [--queue] research MODE SLUG TITLE BRIEF_FILE (--new-thread | THREAD)
   sw issue [--queue] process|maintenance|site SLUG TITLE BRIEF_FILE
   sw commit MESSAGE [PATH...]
   sw pr TITLE SUMMARY VERIFICATION
@@ -44,8 +44,8 @@ Commands:
   git, gh      Run an uncommon operation only when no named command fits.
 
 Research MODE is SOURCE_BRIEF, QUESTION_ANSWER, or NOTE_EXPLORE.
-THREAD is an explicitly supplied research milestone number, title, or URL.
-Without THREAD, sw creates a new research milestone. Open thread PRs stack automatically.
+--new-thread explicitly creates a research milestone. THREAD is the active
+session milestone number, title, or URL. Open thread PRs stack automatically.
 BRIEF_FILE contains Request, Inputs and sources, Context, Acceptance criteria,
 and Constraints and non-goals headings. sw owns all workflow metadata.
 LIMIT defaults to 5 and applies independently to every list (maximum 20).
@@ -56,7 +56,7 @@ quickstart() {
   cat <<'EOF'
 Examples
   sw search 'schema validity'
-  sw issue research QUESTION_ANSWER kagi-value 'Is Kagi worth its price?' /tmp/brief.txt
+  sw issue research QUESTION_ANSWER kagi-value 'Is Kagi worth its price?' /tmp/brief.txt --new-thread
   sw issue process tighten-intake 'Tighten issue intake' /tmp/brief.txt
   sw status
   sw diff
@@ -346,7 +346,7 @@ command_issue() {
     shift
   fi
   require_args 1 "$@"
-  local kind=$1 mode="" slug title brief_file thread="" task_type
+  local kind=$1 mode="" slug title brief_file thread="" new_thread=false task_type
   local repo brief execution_mode research_milestone="None." process_milestone="None."
   local dependency="None." base="main" prs_json latest issue_title body issue_url issue
   local -a args
@@ -354,13 +354,17 @@ command_issue() {
 
   case "$kind" in
     research)
-      (( $# == 4 || $# == 5 )) ||
-        die "usage: sw issue [--queue] research MODE SLUG TITLE BRIEF_FILE [THREAD]"
+      (( $# == 5 )) ||
+        die "usage: sw issue [--queue] research MODE SLUG TITLE BRIEF_FILE (--new-thread | THREAD)"
       mode=$1
       slug=$2
       title=$3
       brief_file=$4
-      thread=${5:-}
+      case "$5" in
+        --new-thread) new_thread=true ;;
+        --*) die "research thread selector must be --new-thread or a milestone number, title, or URL" ;;
+        *) thread=$5 ;;
+      esac
       case "$mode" in
         SOURCE_BRIEF) task_type="Source ingest" ;;
         QUESTION_ANSWER) task_type="Research question" ;;
@@ -396,11 +400,11 @@ command_issue() {
   clear_milestone
 
   if [[ "$kind" == research ]]; then
-    if [[ -n "$thread" ]]; then
+    if [[ "$new_thread" == true ]]; then
+      create_research_milestone "$repo" "$title"
+    else
       resolve_milestone "$repo" "$thread" ||
         die "research thread milestone not found or not open: $thread"
-    else
-      create_research_milestone "$repo" "$title"
     fi
     research_milestone=$milestone_url
     prs_json=$(gh pr list --state open --limit 100 --json url,headRefName,milestone,createdAt) ||

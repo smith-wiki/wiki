@@ -28,7 +28,7 @@ body:
     id: research_milestone
     attributes:
       label: Research milestone
-      description: Required only for a topical research turn. Use the existing research milestone name or URL explicitly supplied by the user, or the new milestone created for that turn. Leave blank for process and other non-research work.
+      description: Required only for a topical research turn. Use the current conversation's active research milestone, whether explicitly created for its first turn or explicitly resumed from an earlier session. Leave blank for process and other non-research work.
       placeholder: https://github.com/owner/repository/milestone/N
 
   - type: input

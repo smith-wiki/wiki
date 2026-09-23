@@ -19,4 +19,4 @@ Classify by the requested outcome, not by words in the request:
 - Knowledge about a product or question is topical research.
 - Deciding how Smith Wiki should use a product is repository work.
 - Changing `AGENTS.md`, scripts, CI, intake, evidence handling, or publication rules is repository work.
-- A later message that adds topical research evidence starts a new research turn.
+- A later message that adds topical research evidence starts a new research turn in the current conversation's active research thread; a later session resumes a thread only from an explicit milestone identifier.
