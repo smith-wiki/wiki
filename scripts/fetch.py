@@ -32,6 +32,8 @@ from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urljoin
 
+from tidy import FOLD
+
 EXTENSIONS = {
     "text/html": "html",
     "application/xhtml+xml": "html",
@@ -386,14 +388,8 @@ class Store:
 
 # Source pages
 
-ASCII_FOLD = str.maketrans({
-    "\u2018": "'", "\u2019": "'", "\u201c": '"', "\u201d": '"',
-    "\u2013": "-", "\u2014": "-", "\u2026": "...", "\u00a0": " ",
-})
-
-
 def scalar(value: str) -> str:
-    return json.dumps(value.translate(ASCII_FOLD))
+    return json.dumps(value.translate(FOLD))
 
 
 def guess_kind(capture: Capture) -> str:
@@ -427,7 +423,7 @@ def record_in_page(worktree: Path, slug: str, capture: Capture) -> str:
         if meta.get("published"):
             lines.append(f"published: {meta['published']}")
         lines += [f"kind: {guess_kind(capture)}", "captures:", *capture_lines(capture, capture.url), "---", ""]
-        lines += ["## Overview", "", "", "## Key points", "", ""]
+        lines += ["## Overview", "", "", "## Key points", ""]
         path.write_text("\n".join(lines))
         missing = ["summary", *(field for field in ("title", "author") if not meta.get(field))]
         if not meta.get("published"):

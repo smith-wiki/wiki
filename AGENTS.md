@@ -13,7 +13,7 @@ Repository work changes tracked files, scripts, CI, the site, or GitHub settings
 
 - One coherent outcome is one Issue, one `issue/<number>-<slug>` branch, and one pull request that closes the Issue. Follow-up requests go into that pull request while it is open.
 - Start with `sw task SLUG TITLE REQUEST`. Add `--queue` to record a task for later; start a queued Issue with `sw start ISSUE SLUG`.
-- Commit with `sw commit` using Conventional Commits. Open the pull request with `sw pr TITLE BODY`, where the body says what changed and why. Changes under `wiki/` follow [Wiki content](#wiki-content).
+- Commit with `sw commit` using Conventional Commits; it stages every change unless given paths, tidies the wiki pages it commits, and rejects broken links between them. Open the pull request with `sw pr TITLE BODY`, where the body says what changed and why. Changes under `wiki/` follow [Wiki content](#wiki-content).
 - GitHub Actions is the only verification environment; watch it with `sw checks` instead of building the site locally.
 - Merge with `sw merge` only after checks pass and the user authorizes that merge in the current conversation. Merging a stacked turn also merges the turns beneath it into `main`.
 
