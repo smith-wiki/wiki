@@ -310,6 +310,51 @@
     line-height: 1.42;
   }
 
+  .source-byline {
+    display: flex;
+    flex-wrap: wrap;
+    margin: -0.35rem 0 0.9rem;
+    gap: 0.35rem 1rem;
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+
+  .source-cited-by,
+  .source-provenance {
+    margin-top: 2rem;
+    border-top: 1px solid var(--line);
+    padding-top: 1rem;
+  }
+
+  .source-cited-by h2 {
+    margin-top: 0;
+    font-size: 1.1rem;
+  }
+
+  .source-cited-by ul,
+  .source-provenance ul {
+    margin: 0;
+    padding-left: 1.1rem;
+  }
+
+  .source-provenance summary {
+    cursor: pointer;
+    color: var(--muted);
+    font-weight: 700;
+  }
+
+  .source-provenance p,
+  .source-provenance li {
+    margin-top: 0.6rem;
+    color: var(--muted);
+    font-size: 0.9rem;
+  }
+
+  .source-provenance code,
+  .source-capture-url {
+    overflow-wrap: anywhere;
+  }
+
   .research-body {
     max-width: 60ch;
     font-size: 1.55rem;
