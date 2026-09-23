@@ -2,11 +2,13 @@
 """Capture a source: store the original and a Markdown reading copy by SHA-256.
 
 Usage:
-  fetch.py URL [--file FILE]   capture URL (or a copy of it saved from a browser)
-  fetch.py --hash SHA          restore a stored capture into the local cache
+  fetch.py URL [SOURCE] [--file FILE]   capture URL (or a copy of it saved from a browser)
+  fetch.py --hash SHA                   restore a stored capture into the local cache
 
 Originals go to a private Cloudflare R2 bucket under <sha256>/; a local cache
-under raw/captures/ in the primary worktree keeps copies for reading.
+under raw/captures/ in the primary worktree keeps copies for reading. With
+SOURCE, the capture is recorded in wiki/sources/SOURCE.md, which is created
+with generated front matter when it does not exist yet.
 """
 
 from __future__ import annotations
@@ -227,8 +229,14 @@ def person_names(value) -> list[str]:
 
 
 def iso_date(value: str | None) -> str | None:
-    match = re.match(r"\d{4}-\d{2}-\d{2}", value or "")
+    match = re.match(r"\d{4}-\d{2}-\d{2}", value.replace("/", "-") if isinstance(value, str) else "")
     return match.group(0) if match else None
+
+
+def join_names(names: list[str]) -> str:
+    if len(names) <= 2:
+        return " and ".join(names)
+    return ", ".join(names[:-1]) + ", and " + names[-1]
 
 
 def html_metadata(original: bytes) -> dict[str, str]:
@@ -240,6 +248,7 @@ def html_metadata(original: bytes) -> dict[str, str]:
     title = first("citation_title", "og:title", "twitter:title") or re.sub(r"\s+", " ", reader.title).strip()
     authors = meta.get("citation_author") or []
     published = iso_date(first("citation_publication_date", "citation_date", "article:published_time", "dc.date"))
+    publisher = first("citation_journal_title", "citation_conference_title", "og:site_name")
     for item in json_ld_objects(reader.json_ld):
         authors = authors or person_names(item.get("author"))
         published = published or iso_date(item.get("datePublished"))
@@ -247,7 +256,12 @@ def html_metadata(original: bytes) -> dict[str, str]:
         author = first("author", "dc.creator")
         authors = [author] if author and not author.startswith("http") else []
 
-    result = {"title": title, "author": "; ".join(dict.fromkeys(authors)), "published": published or ""}
+    result = {
+        "title": title,
+        "author": join_names(list(dict.fromkeys(authors))),
+        "publisher": publisher or "",
+        "published": published or "",
+    }
     return {key: value for key, value in result.items() if value}
 
 
@@ -394,6 +408,72 @@ class Store:
             raise FetchError(f"R2 download failed for {key}: {result.stderr.strip()}")
 
 
+# Source pages
+
+ASCII_FOLD = str.maketrans({
+    "\u2018": "'", "\u2019": "'", "\u201c": '"', "\u201d": '"',
+    "\u2013": "-", "\u2014": "-", "\u2026": "...", "\u00a0": " ",
+})
+
+
+def scalar(value: str) -> str:
+    return json.dumps(value.translate(ASCII_FOLD))
+
+
+def guess_kind(capture: Capture) -> str:
+    if re.match(r"https?://(www\.)?(github|gitlab|codeberg)\.(com|org)/", capture.url):
+        return "repository"
+    if capture.type == "application/pdf":
+        return "paper"
+    return "webpage"
+
+
+def capture_lines(capture: Capture, page_url: str) -> list[str]:
+    lines = [
+        f"  - retrieved: {capture.retrieved}",
+        f"    sha256: {scalar(capture.sha256)}",
+        f"    type: {capture.type}",
+    ]
+    if capture.url != page_url:
+        lines.append(f"    url: {capture.url}")
+    return lines
+
+
+def record_in_page(worktree: Path, slug: str, capture: Capture) -> str:
+    """Create the source page, or append the capture to it; return what happened."""
+    path = worktree / "wiki" / "sources" / f"{slug}.md"
+    if not path.exists():
+        meta = capture.meta
+        lines = ["---", f"title: {scalar(meta.get('title', ''))}", 'summary: ""', f"url: {capture.url}"]
+        lines.append(f"author: {scalar(meta.get('author', ''))}")
+        if meta.get("publisher"):
+            lines.append(f"publisher: {scalar(meta['publisher'])}")
+        if meta.get("published"):
+            lines.append(f"published: {meta['published']}")
+        lines += [f"kind: {guess_kind(capture)}", "captures:", *capture_lines(capture, capture.url), "---", ""]
+        lines += ["## Overview", "", "", "## Key points", "", ""]
+        path.write_text("\n".join(lines))
+        return f"created {path.relative_to(worktree)}; fill summary, empty fields, Overview, and Key points"
+
+    lines = path.read_text().split("\n")
+    end = lines.index("---", 1)
+    front = lines[1:end]
+    if any(capture.sha256 in line for line in front):
+        return f"{path.relative_to(worktree)} already records this capture"
+    page_url = next((line.split(":", 1)[1].strip() for line in front if line.startswith("url:")), "")
+    start = next((i for i, line in enumerate(front) if line.startswith("captures:")), None)
+    if start is None:
+        insert, new = end, ["captures:", *capture_lines(capture, page_url)]
+    else:
+        last = start
+        while last + 1 < len(front) and front[last + 1].startswith(" "):
+            last += 1
+        insert, new = last + 2, capture_lines(capture, page_url)
+    lines[insert:insert] = new
+    path.write_text("\n".join(lines))
+    return f"added the capture to {path.relative_to(worktree)}"
+
+
 # Commands
 
 
@@ -421,7 +501,7 @@ def print_capture(capture: Capture, markdown: Path | None, stored: str, method: 
     print(f"  retrieved: {capture.retrieved}")
     print(f"  sha256: {capture.sha256}")
     print(f"  type: {capture.type}")
-    for key in ("title", "author", "published"):
+    for key in ("title", "author", "publisher", "published"):
         if capture.meta.get(key):
             print(f"{key}: {json.dumps(capture.meta[key], ensure_ascii=False)}")
     if markdown:
@@ -437,6 +517,7 @@ def print_capture(capture: Capture, markdown: Path | None, stored: str, method: 
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("url", nargs="?")
+    parser.add_argument("source", nargs="?", help="source page slug under wiki/sources/")
     parser.add_argument("--file", type=Path, help="copy of URL saved from a browser")
     parser.add_argument("--hash", dest="sha", help="restore a stored capture")
     args = parser.parse_args()
@@ -447,8 +528,8 @@ def main() -> int:
     stored = f"r2://{store.bucket}/<sha256>/" if store.remote else "local cache only (R2 is not configured)"
     try:
         if args.sha:
-            if args.url or args.file:
-                parser.error("--hash takes no URL or --file")
+            if args.url or args.file or args.source:
+                parser.error("--hash takes no URL, SOURCE, or --file")
             if not re.fullmatch(r"[0-9a-f]{64}", args.sha):
                 parser.error("--hash needs a 64-character hex SHA-256")
             capture, original = store.restore(args.sha)
@@ -460,9 +541,18 @@ def main() -> int:
             parser.error("give an http(s) URL or --hash SHA")
         if args.file and not args.file.is_file():
             parser.error(f"file not found: {args.file}")
+        if args.source and not re.fullmatch(r"[a-z0-9]+(-[a-z0-9]+)*", args.source):
+            parser.error("SOURCE must use lowercase ASCII words and hyphens")
+        if args.source and re.search(r"-\d{4}-\d{2}-\d{2}$", args.source):
+            parser.error("SOURCE names the source, not the capture; drop the date")
         capture, original, markdown_text, method = capture_url(args.url, args.file)
         markdown = store.save(capture, original, markdown_text)
         print_capture(capture, markdown, stored.replace("<sha256>", capture.sha256), method)
+        if args.source:
+            worktree = Path(subprocess.run(
+                ["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True, check=True,
+            ).stdout.strip())
+            print(f"page: {record_in_page(worktree, args.source, capture)}")
         return 0
     except FetchError as error:
         print(f"sw fetch: {error}", file=sys.stderr)

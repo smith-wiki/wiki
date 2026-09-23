@@ -1,58 +1,30 @@
 ---
 title: Google AX repository
 summary: Primary repository documentation for AX, a declarative agent-workload orchestrator built on Agent Substrate.
+url: https://github.com/google/ax
+author: Google
+kind: repository
+captures:
+  - retrieved: 2026-09-22T06:22:30Z
+    sha256: "95d27df32ff26887224cdde472b890952b192ae1fb169f40963c3feefb679db1"
+    type: text/markdown
+    url: https://raw.githubusercontent.com/google/ax/d8ed0fe38bceb7842d3c47817d53d16ccdfcb601/README.md
+  - retrieved: 2026-09-22T06:22:30Z
+    sha256: "34239d8cf86d167069c6dba77ad0c4463e64366002abf8424b145802775fde70"
+    type: text/markdown
+    url: https://raw.githubusercontent.com/google/ax/d8ed0fe38bceb7842d3c47817d53d16ccdfcb601/DESIGN.md
+  - retrieved: 2026-09-22T06:22:30Z
+    sha256: "34c884e16717952427691b24decd6c4ce5dc5015abeba3603b608ff958f713df"
+    type: text/markdown
+    url: https://raw.githubusercontent.com/google/ax/d8ed0fe38bceb7842d3c47817d53d16ccdfcb601/docs/concepts.md
 ---
 
-## Source
+## Overview
 
-- **Type:** Versioned Git repository
-- **Creator and responsible organization:** Google
-- **Original:** [google/ax](https://github.com/google/ax)
-- **Revision:** `d8ed0fe38bceb7842d3c47817d53d16ccdfcb601`
-- **Suggested citation:** Google. “AX.” GitHub repository, revision `d8ed0fe38bceb7842d3c47817d53d16ccdfcb601`. Accessed September 22, 2026.
-- **Assessment:** `recorded`
+The google/ax repository, captured at commit `d8ed0fe`, documents AX, a Kubernetes-shaped orchestrator for agent workloads. Its README, design document, and concepts guide define the task, workspace, network, and model resources, the Redis-backed control plane, and the handoff of sandboxes to [Agent Substrate](../agent-substrate/). Written by Google for engineers evaluating or running AX, it is authoritative for the design at that commit but not for scale, throughput, security, or operational maturity: the README warns that concepts and protocols are still changing, and the "billions of tasks" language repeated on the [homepage](../google-ax-homepage/) has no benchmark behind it.
 
-## Representations
+## Key points
 
-All representations were retrieved at 2026-09-22T06:22:30Z as Markdown from the cited revision.
-
-- **`ax-readme-d8ed0fe`:** `raw/sources/google-ax-readme-d8ed0fe.md`; `sha256:95d27df32ff26887224cdde472b890952b192ae1fb169f40963c3feefb679db1`
-- **`ax-design-d8ed0fe`:** `raw/sources/google-ax-design-d8ed0fe.md`; `sha256:34239d8cf86d167069c6dba77ad0c4463e64366002abf8424b145802775fde70`
-- **`ax-concepts-d8ed0fe`:** `raw/sources/google-ax-concepts-d8ed0fe.md`; `sha256:34c884e16717952427691b24decd6c4ce5dc5015abeba3603b608ff958f713df`
-
-## Description
-
-Repository documentation for AX's task, workspace, network, model, storage, controller, and Agent Substrate integration model at one commit.
-
-## Evidence
-
-### `declarative-resource-model`
-
-- **Source defines:** `Task` as the smallest isolated execution unit, `Workspace` as prepared data and tools, `Gateway` as a network boundary, and `Model` as a named provider configuration.
-- **Representation:** `ax-concepts-d8ed0fe`
-- **Locator:** `Task`, `Workspace`, `Gateway`, and `Model`
-
-### `control-plane-architecture`
-
-- **Source describes:** AX stores task state in Redis, uses Redis Streams between its API server and controllers, and delegates sandbox provisioning and policy to Agent Substrate.
-- **Representation:** `ax-design-d8ed0fe`
-- **Locator:** `Architecture` and `Components`
-
-### `task-lifecycle-example`
-
-- **Source shows:** The CLI applying a multi-resource task, observing it, entering its sandbox, and managing it with Kubernetes-shaped verbs.
-- **Representation:** `ax-readme-d8ed0fe`
-- **Locator:** `Quick start` → `Run your first task`; `CLI usage`
-
-## Source criticism
-
-The repository is authoritative for AX's design at the cited commit, not independent evidence of scale, throughput, security, or operational maturity. The README warns that concepts and protocols are changing; the “billions” scale language is an aspiration without a preserved benchmark.
-
-## Connections
-
-- [Research brief](../../research/google-ax-agent-substrate/) compares AX, kagent, and Agent Substrate.
-- [Practical answer](../../research/ax-isolated-repository-maintenance/) maps an isolated maintenance job onto these primitives.
-- [AX](../../entities/google-ax/) accumulates cross-source facts about the project.
-- [AX homepage](../google-ax-homepage/) is a separate promotional representation of the project.
-- [Agent Substrate repository](../agent-substrate/) documents the runtime AX delegates sandbox lifecycle to.
-- [AX separates orchestration from sandbox execution](../../notes/ax-separates-orchestration-from-sandbox-execution/) derives the architectural seam.
+- `Task` is the smallest isolated execution unit, `Workspace` holds prepared data and tools, `Gateway` is a network boundary, and `Model` is a named provider configuration. (docs/concepts.md, "Task", "Workspace", "Gateway", and "Model")
+- AX stores task state in Redis, connects its API server and controllers through Redis Streams, and delegates sandbox provisioning and policy to Agent Substrate. (DESIGN.md, "Architecture" and "Components")
+- The CLI applies a multi-resource task, observes it, enters its sandbox, and manages it with Kubernetes-shaped verbs. (README, "Quick start" > "Run your first task" and "CLI usage")

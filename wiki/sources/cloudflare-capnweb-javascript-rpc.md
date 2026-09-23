@@ -1,55 +1,23 @@
 ---
-title: Cap’n Web — a new RPC system for browsers and web servers
-summary: Cloudflare's technical introduction to Cap’n Web, its promise-pipelined RPC model, capability security, and wire format.
+title: "Cap'n Web: A new RPC system for browsers and web servers"
+summary: Cloudflare's technical introduction to Cap'n Web, its promise-pipelined RPC model, capability security, and wire format.
+url: https://blog.cloudflare.com/capnweb-javascript-rpc-library/
+author: Kenton Varda and Steve Faulkner
+publisher: Cloudflare Blog
+published: 2025-09-22
+kind: article
+captures:
+  - retrieved: 2026-09-21T17:59:09Z
+    sha256: "504f51b74400e2804f20ffacd2a43e75fcd3aff63daafee79dece07c8871aa4c"
+    type: text/markdown
 ---
 
-## Source
+## Overview
 
-- **Type:** Mutable technical article
-- **Authors:** Kenton Varda and Steve Faulkner
-- **Responsible organization:** Cloudflare
-- **Original:** [Cap’n Web — a new RPC system for browsers and web servers](https://blog.cloudflare.com/capnweb-javascript-rpc-library/)
-- **Publication status:** Published September 22, 2025; page metadata says modified July 15, 2026
-- **Suggested citation:** Varda, Kenton, and Steve Faulkner. “Cap’n Web — a new RPC system for browsers and web servers.” Cloudflare Blog, September 22, 2025.
-- **Assessment:** `recorded`
+Two Cloudflare engineers introduce Cap'n Web, a TypeScript RPC library for browsers and servers that passes functions and objects by reference, lets calls chain on results that have not arrived yet, and runs over WebSocket sessions or HTTP batches with a JSON-based protocol. Written for JavaScript developers at launch, it explains the design and its object-capability security model rather than evaluating them: there is no independent security review or comparative benchmark, and the authors call the library highly experimental. The capture is a Markdown copy of the article; the page was modified in July 2026. Its reference-as-authority model is the one [The Heart of Spritely](../the-heart-of-spritely/) develops for distributed objects.
 
-## Representation
+## Key points
 
-- **ID:** `cloudflare-capnweb-2026-09-21`
-- **Retrieved:** 2026-09-21T17:59:09Z
-- **Preserved representation:** `raw/sources/cloudflare-capnweb-javascript-rpc-2026-09-22.md`
-- **Format:** Markdown capture of the article
-- **Fixity:** `sha256:504f51b74400e2804f20ffacd2a43e75fcd3aff63daafee79dece07c8871aa4c`
-
-## Description
-
-First-party technical article introducing Cap’n Web's JavaScript RPC interface, transport modes, promise pipelining, bidirectional object references, capability-security properties, and JSON-based protocol.
-
-## Evidence
-
-### `promise-pipelining`
-
-- **Source explains:** Calls can be chained on unresolved remote promises so a dependent operation reaches the server before earlier results return to the client.
-- **Representation:** `cloudflare-capnweb-2026-09-21`
-- **Locator:** `Features you don't find in typical JSON RPC` → `Chained calls (Promise Pipelining)`
-
-### `capability-security`
-
-- **Source argues:** Authorization can follow possession of object references, including attenuated references that expose narrower authority.
-- **Representation:** `cloudflare-capnweb-2026-09-21`
-- **Locator:** `Did you spot the security?`
-
-### `transport-and-wire-format`
-
-- **Source describes:** Cap’n Web supports WebSocket-style sessions and HTTP batch mode, while encoding its protocol as JSON with reference and call-table conventions.
-- **Representation:** `cloudflare-capnweb-2026-09-21`
-- **Locator:** `Features you don't find in typical JSON RPC` → `HTTP batch mode`; `Implementation details` → `JSON-based serialization` and `RPC protocol`
-
-## Source criticism
-
-This is a first-party launch article and design explanation. It calls the library new and highly experimental, does not provide independent security review or comparative benchmarks, and should not be read as evidence that every deployment inherits the described capability discipline.
-
-## Connections
-
-- [Cap’n Web](../../entities/capn-web/) accumulates cross-source project facts.
-- [Promise pipelining collapses dependent RPC round trips](../../notes/promise-pipelining-collapses-dependent-rpc-round-trips/) derives the latency implication.
+- Calls can be chained on unresolved remote promises, so a dependent call reaches the server before earlier results come back. (Section "Features you don't find in typical JSON RPC", "Chained calls (Promise Pipelining)")
+- Authorization follows possession of object references, including attenuated references that expose narrower authority. (Section "Did you spot the security?")
+- The library supports WebSocket-style sessions and an HTTP batch mode, and encodes its protocol as JSON with reference and call-table conventions. (Sections "HTTP batch mode" and "Implementation details", "JSON-based serialization" and "RPC protocol")
