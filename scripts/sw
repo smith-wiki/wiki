@@ -6,8 +6,7 @@ usage() {
 Smith Wiki helper
 
 Usage:
-  sw                                   Show wiki pages, worktrees, open threads, Issues, and pull requests.
-  sw session [OMP_ARGS...]             Start omp in a new worktree of origin/main; remove it on exit if unused.
+  sw                                   Show wiki pages, open threads, Issues, and pull requests.
   sw fetch URL [SOURCE] [--file FILE]  Capture a source; with SOURCE, record it in wiki/sources/SOURCE.md.
   sw fetch --hash SHA                  Restore a stored capture into the local cache.
   sw turn [--queue] (--new-thread | THREAD) SLUG TITLE REQUEST
@@ -20,15 +19,13 @@ Usage:
   sw sync                              Rebase a stacked turn onto its dependency's current base.
   sw merge [PR]                        Wait for checks, merge an explicitly authorized pull request,
                                        and fast-forward main in the primary worktree.
-  sw prune                             Remove worktrees whose pull request is merged or closed.
 
 THREAD is a milestone number, title, or URL. --new-thread creates a milestone
 named after TITLE. --queue records the Issue without creating a branch.
 TITLE and REQUEST must be English. FILE is a copy of URL saved from a browser.
 
-Every session runs in its own worktree: start it with sw session, or move a
-running omp session with /wt. The primary worktree stays on main; turn, task,
-and start refuse to create branches there.
+The primary worktree stays on main; turn, task, and start refuse to create
+branches there.
 EOF
 }
 
@@ -65,7 +62,7 @@ in_primary() {
 }
 
 require_session_worktree() {
-  ! in_primary || die "this session runs in the primary worktree; ask the user to restart it with sw session or move it with /wt"
+  ! in_primary || die "this session runs in the primary worktree; ask the user to move it into a worktree with /wt"
   require_clean "commit or discard tracked changes before starting work"
 }
 
@@ -188,8 +185,6 @@ command_overview() {
     print_limited "$limit" "$role" "${items[@]}"
   done
 
-  load_lines items "could not list worktrees" git worktree list
-  print_limited "$limit" Worktrees "${items[@]}"
 
   if ! gh auth status >/dev/null 2>&1; then
     printf 'GitHub: unavailable; run gh auth login\n'
@@ -339,21 +334,6 @@ command_checks() {
   printf 'OK\n'
 }
 
-command_session() {
-  local path status=0
-  git fetch --quiet origin main
-  path="$(primary_root).worktrees/session-$(date -u +%Y%m%d-%H%M%S)"
-  git worktree add --quiet --detach "$path" origin/main
-  # A lock keeps sw prune and git worktree remove away while the session runs.
-  git worktree lock --reason "omp session" "$path"
-  printf 'worktree: %s\n' "$path"
-  omp --cwd "$path" "$@" || status=$?
-  git worktree unlock "$path"
-  if [[ -z $(git -C "$path" branch --show-current) && -z $(git -C "$path" status --porcelain) ]]; then
-    git worktree remove "$path" && printf 'removed unused worktree %s\n' "$path"
-  fi
-  return "$status"
-}
 
 command_sync() {
   (( $# == 0 )) || die "usage: sw sync"
@@ -389,30 +369,6 @@ command_merge() {
   fi
 }
 
-command_prune() {
-  (( $# == 0 )) || die "usage: sw prune"
-  local path branch state
-  while IFS=$'\t' read -r path branch; do
-    [[ -n "$branch" ]] || continue
-    if [[ -n $(git -C "$path" status --porcelain --untracked-files=no) ]]; then
-      printf 'kept %s: uncommitted changes\n' "$path"
-      continue
-    fi
-    state=$(gh pr view "$branch" --json state --jq .state 2>/dev/null || true)
-    case "$state" in
-      MERGED|CLOSED)
-        if git worktree remove "$path"; then
-          git branch -D "$branch" >/dev/null
-          printf 'removed %s (%s)\n' "$path" "$state"
-        fi
-        ;;
-      *) printf 'kept %s: pull request %s\n' "$path" "${state:-not opened}" ;;
-    esac
-  done < <(git worktree list --porcelain | awk -v primary="$(primary_root)" '
-    /^worktree / { path = substr($0, 10) }
-    /^branch refs\/heads\// { if (path != primary) print path "\t" substr($0, 19) }')
-  git worktree prune
-}
 
 if (( $# == 0 )); then
   command_overview
@@ -431,7 +387,5 @@ case "$command" in
   checks) command_checks "$@" ;;
   sync) command_sync "$@" ;;
   merge) command_merge "$@" ;;
-  session) command_session "$@" ;;
-  prune) command_prune "$@" ;;
   *) die "unknown command: $command; run 'sw help'" ;;
 esac

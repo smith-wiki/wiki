@@ -7,14 +7,6 @@ Smith Wiki is a public research wiki. Everything written to this repository or t
 - **Research turn:** a message that starts with `/turn` adds knowledge to the wiki. Follow [Research turns](#research-turns).
 - **Everything else** is conversation or repository work. Answer questions and discussion in chat. A request to adjust the current turn's pages amends that turn's open pull request.
 
-## Worktrees
-
-Several sessions work in parallel, so each session works in its own Git worktree. The primary worktree, where sessions start, stays on `main` and holds `.env` and the capture cache; never edit, commit, or switch branches there.
-
-- `sw turn`, `sw task`, and `sw start` run from the primary worktree create the Issue branch in a new worktree beside it and print `worktree: PATH`. From then on, use PATH as the working directory for every command and read and edit files under PATH.
-- Later turns and tasks in the same conversation run from that worktree; there the commands switch branches in place.
-- `sw merge` also fast-forwards `main` in the primary worktree. Leave `sw prune`, which removes worktrees of merged or closed pull requests, to the user.
-
 ## Repository work
 
 Repository work changes tracked files, scripts, CI, the site, or GitHub settings.
