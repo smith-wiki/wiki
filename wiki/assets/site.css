@@ -210,10 +210,9 @@
     padding-block: 1.5rem 4rem;
   }
 
-  .wiki-card,
-  .research-card {
+  .wiki-card {
     border: 1px solid var(--line);
-    border-top: 5px solid var(--research-mode-accent, var(--accent));
+    border-top: 5px solid var(--accent);
     border-radius: 0.35rem;
     background: var(--paper);
     box-shadow: 0 22px 65px rgb(34 33 49 / 9%);
@@ -223,73 +222,9 @@
     padding: clamp(2rem, 6vw, 5.5rem);
   }
 
-  .research-card {
-    width: min(1080px, 100%);
-    margin-inline: auto;
-    padding: clamp(2rem, 5vw, 4.25rem) clamp(1.4rem, 6vw, 5rem) clamp(1.5rem, 4vw, 3rem);
-    background:
-      linear-gradient(135deg, var(--research-mode-wash, transparent), transparent 21rem),
-      var(--paper);
-  }
-
-  .research-card[data-research-mode="SOURCE_BRIEF"] {
-    --research-mode-accent: #14627b;
-    --research-mode-wash: #e8f5f8;
-  }
-
-  .research-card[data-research-mode="QUESTION_ANSWER"] {
-    --research-mode-accent: #5c42aa;
-    --research-mode-wash: #ece8fa;
-  }
-
-  .research-card[data-research-mode="NOTE_EXPLORE"] {
-    --research-mode-accent: #9a5717;
-    --research-mode-wash: #fff1dc;
-  }
-
   .page-heading,
-  .research-heading,
   .prose {
     max-width: 74ch;
-  }
-
-  .research-heading {
-    margin-bottom: 1.6rem;
-    border-bottom: 1px solid var(--line);
-    padding-bottom: 1.4rem;
-  }
-
-  .research-heading h1 {
-    max-width: 19ch;
-    font-size: clamp(2.2rem, 5vw, 4.2rem);
-  }
-
-  .research-kicker {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-    gap: 1rem;
-    color: var(--muted);
-    font-size: 0.9rem;
-    font-weight: 800;
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-  }
-
-  .research-mode-label {
-    display: inline-flex;
-    align-items: baseline;
-    border: 1px solid color-mix(in srgb, var(--research-mode-accent, var(--accent)) 36%, transparent);
-    border-radius: 999px;
-    background: var(--research-mode-wash, var(--accent-soft));
-    padding: 0.28rem 0.65rem;
-    color: var(--research-mode-accent, var(--accent));
-    gap: 0.45rem;
-  }
-
-  .research-mode-label > span {
-    color: var(--muted);
-    font-size: 0.68em;
   }
 
   .eyebrow {
@@ -310,7 +245,7 @@
     line-height: 1.42;
   }
 
-  .source-byline {
+  .byline {
     display: flex;
     flex-wrap: wrap;
     margin: -0.35rem 0 0.9rem;
@@ -353,43 +288,6 @@
   .source-provenance code,
   .source-capture-url {
     overflow-wrap: anywhere;
-  }
-
-  .research-body {
-    max-width: 60ch;
-    font-size: 1.55rem;
-    line-height: 1.46;
-  }
-
-  .research-body h2 {
-    margin-top: 1.25em;
-    font-size: 2rem;
-  }
-
-  .research-body h3 {
-    margin-top: 1.15em;
-  }
-
-  .research-body p,
-  .research-body ul,
-  .research-body ol,
-  .research-body blockquote {
-    margin-bottom: 0.78em;
-  }
-
-  .research-body strong:first-child {
-    color: var(--research-mode-accent, var(--accent));
-  }
-
-  .turn-footer {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 2rem;
-    border-top: 1px solid var(--line);
-    padding-top: 1rem;
-    gap: 1rem;
-    color: var(--muted);
-    font-size: 0.95rem;
   }
 
   .section-links {
@@ -465,8 +363,7 @@
       padding-block: 0.5rem 2.5rem;
     }
 
-    .wiki-card,
-    .research-card {
+    .wiki-card {
       border-inline: 0;
       border-radius: 0;
       box-shadow: none;
@@ -474,11 +371,6 @@
 
     .section-links {
       grid-template-columns: 1fr;
-    }
-
-    .turn-footer {
-      align-items: flex-start;
-      flex-direction: column;
     }
   }
 
@@ -497,7 +389,6 @@
       padding: 0;
     }
 
-    .research-card,
     .wiki-card {
       border-inline: 0;
       border-bottom: 0;
