@@ -16,3 +16,4 @@ templateEngineOverride: md
 - [Spritely Goblins](./entities/spritely-goblins/), [OCapN](./entities/ocapn/), and how [transactional vat turns contain failed state and messages](./notes/transactional-vat-turns-contain-failed-state-and-messages/)
 - [System One Models](./concepts/system-one-models/)
 - [Schema validity does not imply semantic correctness](./notes/schema-validity-does-not-imply-semantic-correctness/)
+- [Lean](./entities/lean/), a [concrete software-verification task](./research/lean-software-verification/), and why [a proof of a model does not certify separate production code](./notes/a-proof-of-a-model-does-not-certify-separate-production-code/)
