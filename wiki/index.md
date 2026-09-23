@@ -10,6 +10,7 @@ templateEngineOverride: md
 
 ## Recent research
 
+- [Lean joins programming and formal proof in one language](./research/lean-lang-website/) - The official homepage's account of Lean as a language for programs, proofs, and extensible automation.
 - [Is Kagi Search API worth $12 per 1,000 requests?](./research/kagi-ai-value-assessment/) — A costed comparison of Kagi's configurable search results against lower-priced APIs.
 - [Can AX orchestrate an isolated Go dependency upgrade?](./research/ax-isolated-repository-maintenance/) — A concrete answer mapping one coding-agent maintenance job onto AX primitives.
 - [AX and kagent layer declarative agents over Agent Substrate](./research/google-ax-agent-substrate/) — A source brief on two agent-facing systems and their shared sandbox lifecycle foundation.
@@ -20,6 +21,7 @@ templateEngineOverride: md
 
 ## Starting points
 
+- [Lean](./entities/lean/) as a programming language and proof assistant, grounded in the [official homepage](./sources/lean-lang-homepage/)
 - [AX](./entities/google-ax/), [kagent](./entities/kagent/), [Agent Substrate](./entities/agent-substrate/), [a concrete AX repository-maintenance task](./research/ax-isolated-repository-maintenance/), and why [AX separates orchestration from sandbox execution](./notes/ax-separates-orchestration-from-sandbox-execution/)
 - [TypeSafe AI](./entities/typesafe-ai/) and its first public model, [Jev](./entities/jev/)
 - [Cap'n Web](./entities/capn-web/), [object-capability RPC](./concepts/object-capability-rpc/), and why [promise pipelining collapses dependent RPC round trips](./notes/promise-pipelining-collapses-dependent-rpc-round-trips/)

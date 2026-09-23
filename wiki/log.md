@@ -7,6 +7,10 @@ permalink: /log/index.html
 templateEngineOverride: md
 ---
 
+## 2026-09-23
+
+- `SOURCE_BRIEF` - [Lean joins programming and formal proof in one language](../research/lean-lang-website/)
+
 ## 2026-09-22
 
 - `QUESTION_ANSWER` — [Is Kagi Search API worth $12 per 1,000 requests?](../research/kagi-ai-value-assessment/)

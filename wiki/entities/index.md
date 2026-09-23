@@ -5,6 +5,7 @@ permalink: /entities/index.html
 eleventyExcludeFromCollections: true
 ---
 
+- [Lean](./lean/) - An open-source programming language and proof assistant for executable code and machine-checked formal proofs.
 - [AX](./google-ax/) — A declarative control plane for composing isolated agent tasks over Agent Substrate.
 - [Agent Substrate](./agent-substrate/) — A runtime for multiplexing stateful sandboxed actors over warm workers.
 - [kagent](./kagent/) — A Kubernetes-native framework for declaratively building, deploying, and operating AI agents.
