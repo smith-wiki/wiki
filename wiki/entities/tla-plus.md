@@ -11,4 +11,8 @@ State a property such as "no account balance is negative" as an invariant, then 
 
 The language also has the [TLAPS proof system](../../sources/lamport-tla-tools/): its tutorial describes checking a hierarchy of proof obligations for a theorem, not enumerating a single finite model. TLA+ can state invariants and liveness claims about unbounded specifications; fairness assumptions matter for progress properties. The captured [TLAPS 1.4.5 homepage](../../sources/tlaps-home/) says that release is suited to safety proofs but lacks temporal reasoning, even though TLC can check liveness in finite models. A proof of an abstract model, like a finite TLC check, still needs a justified connection to deployed code. ([TLAPS project, undated](../../sources/tlaps-tutorial-example/); [Lamport, 2021](../../sources/lamport-tla-high-level-view/); [Lamport, 2022](../../sources/lamport-tla-tools/))
 
+## Infrastructure configuration
+
+For [infrastructure as code](../../concepts/infrastructure-as-code/), a TLA+ specification can model apply, rollback, scaling, and failure interleavings; a TLC result covers the finite configuration checked. These transitions must be related to real provider behavior before treating the result as a production guarantee. [IaC assurance depends on the model and measurements](../../notes/iac-assurance-depends-on-model-and-measurements/). ([Lamport, 2021](../../sources/lamport-tla-high-level-view/); [HashiCorp, undated](../../sources/terraform-plan/))
+
 See [the comparison with Lean](../../research/lean-versus-tla/) and [the distinction in verification questions](../../notes/lean-and-tla-prove-different-claims-about-software/).

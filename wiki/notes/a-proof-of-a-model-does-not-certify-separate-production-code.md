@@ -11,4 +11,6 @@ Before treating a proof as assurance about a shipped system, inspect the formal 
 
 The same boundary applies to [TLA+](../../entities/tla-plus/): [Lamport](../../sources/lamport-tla-high-level-view/) explicitly distinguishes an above-code system model from its implementation and warns that modeling does not prevent coding errors. [Lean and TLA+ emphasize different verification questions](../lean-and-tla-prove-different-claims-about-software/), but neither makes the model-to-code connection automatic. ([Lamport, 2021](../../sources/lamport-tla-high-level-view/))
 
+[IaC assurance](../iac-assurance-depends-on-model-and-measurements/) extends this distinction: a plan or formal cloud model can diverge from deployed resources, actual workload demand, and prices. ([HashiCorp, undated](../../sources/terraform-plan/); [AWS, undated](../../sources/aws-pricing-calculator/))
+
 [The verification task](../../research/lean-software-verification/) applies this boundary to an authorization rule.
