@@ -15,9 +15,9 @@ Usage:
   sw start ISSUE SLUG                  Start work on a queued Issue.
   sw commit MESSAGE [PATH...]          Stage paths, check ASCII, and commit (Conventional Commits).
   sw pr TITLE BODY                     Push and open a pull request that closes the current Issue.
-  sw checks [PR]                       Watch pull request checks.
+  sw checks [PR]                       Wait for pull request checks; print OK or the failed checks.
   sw sync                              Rebase a stacked turn onto its dependency's current base.
-  sw merge [PR]                        Watch checks, then merge an explicitly authorized pull request.
+  sw merge [PR]                        Wait for checks, then merge an explicitly authorized pull request.
 
 THREAD is a milestone number, title, or URL. --new-thread creates a milestone
 named after TITLE. --queue records the Issue without creating a branch.
@@ -297,7 +297,21 @@ command_pr() {
 
 command_checks() {
   (( $# <= 1 )) || die "usage: sw checks [PR]"
-  gh pr checks "$@" --watch
+  local deadline=$((SECONDS + 1800)) json failed
+  while :; do
+    json=$(gh pr checks "$@" --json name,bucket,link 2>/dev/null || true)
+    if [[ -n "$json" ]] && jq -e 'length > 0 and all(.bucket != "pending")' <<<"$json" >/dev/null; then
+      break
+    fi
+    (( SECONDS < deadline )) || die "checks still pending after 30 minutes"
+    sleep 10
+  done
+  failed=$(jq -r '.[] | select(.bucket == "fail" or .bucket == "cancel") | "\(.name): \(.link)"' <<<"$json")
+  if [[ -n "$failed" ]]; then
+    printf 'failed checks:\n%s\n' "$failed"
+    return 1
+  fi
+  printf 'OK\n'
 }
 
 command_sync() {
@@ -316,8 +330,17 @@ command_sync() {
 
 command_merge() {
   (( $# <= 1 )) || die "usage: sw merge [PR]"
-  gh pr checks "$@" --watch
-  gh pr merge "$@" --merge --delete-branch
+  local pr=${1:-} out
+  if [[ -z "$pr" ]]; then
+    pr=$(gh pr view --json number --jq .number) || die "current branch has no pull request"
+  fi
+  if ! out=$(command_checks "$pr"); then
+    printf '%s\n' "$out"
+    die "not merging #$pr"
+  fi
+  # gh prints worktree cleanup advice when the branch is checked out here; the session keeps its worktree.
+  out=$(gh pr merge "$pr" --merge --delete-branch 2>&1) || { printf '%s\n' "$out" >&2; die "could not merge #$pr"; }
+  printf 'merged #%s\n' "$pr"
 }
 
 if (( $# == 0 )); then
