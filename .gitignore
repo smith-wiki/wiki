@@ -8,3 +8,4 @@ npm-debug.log*
 .devenv/
 __pycache__/
 devenv.local.nix
+.env
