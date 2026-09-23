@@ -9,6 +9,7 @@ templateEngineOverride: md
 
 ## 2026-09-23
 
+- `SOURCE_BRIEF` - [TLA+ sources pair a project map with a practical guide](../research/tla-plus-learning/)
 - `SOURCE_BRIEF` - [Lean joins programming and formal proof in one language](../research/lean-lang-website/)
 
 ## 2026-09-22

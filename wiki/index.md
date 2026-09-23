@@ -10,6 +10,7 @@ templateEngineOverride: md
 
 ## Recent research
 
+- [TLA+ sources pair a project map with a practical guide](./research/tla-plus-learning/) - A comparison of Leslie Lamport's legacy project map and Hillel Wayne's structured teaching path.
 - [Lean joins programming and formal proof in one language](./research/lean-lang-website/) - The official homepage's account of Lean as a language for programs, proofs, and extensible automation.
 - [Is Kagi Search API worth $12 per 1,000 requests?](./research/kagi-ai-value-assessment/) — A costed comparison of Kagi's configurable search results against lower-priced APIs.
 - [Can AX orchestrate an isolated Go dependency upgrade?](./research/ax-isolated-repository-maintenance/) — A concrete answer mapping one coding-agent maintenance job onto AX primitives.
@@ -21,6 +22,7 @@ templateEngineOverride: md
 
 ## Starting points
 
+- [TLA+](./entities/tla-plus/), Leslie Lamport's [personal project map](./sources/leslie-lamport-tla-homepage/), and Hillel Wayne's [Learn TLA+](./sources/learn-tla/) guide
 - [Lean](./entities/lean/) as a programming language and proof assistant, grounded in the [official homepage](./sources/lean-lang-homepage/)
 - [AX](./entities/google-ax/), [kagent](./entities/kagent/), [Agent Substrate](./entities/agent-substrate/), [a concrete AX repository-maintenance task](./research/ax-isolated-repository-maintenance/), and why [AX separates orchestration from sandbox execution](./notes/ax-separates-orchestration-from-sandbox-execution/)
 - [TypeSafe AI](./entities/typesafe-ai/) and its first public model, [Jev](./entities/jev/)

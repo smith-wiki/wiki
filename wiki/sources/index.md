@@ -5,6 +5,8 @@ permalink: /sources/index.html
 eleventyExcludeFromCollections: true
 ---
 
+- [My TLA+ Home Page](./leslie-lamport-tla-homepage/) - Leslie Lamport's personal project map for TLA+, its tools, and its stewardship transition.
+- [Learn TLA+](./learn-tla/) - Hillel Wayne's free, structured guide for learning TLA+.
 - [Lean Programming Language homepage](./lean-lang-homepage/) - Lean's official account of its programming, proof, trust, extensibility, and onboarding model.
 - [Kagi API pricing](./kagi-api-pricing/) — Public Search and Extract prices and advertised capabilities.
 - [Kagi API OpenAPI specification](./kagi-openapi-specification/) — Search request controls, result schemas, pagination, and extraction semantics.
