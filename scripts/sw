@@ -6,7 +6,8 @@ usage() {
 Smith Wiki helper
 
 Usage:
-  sw                                   Show wiki pages, open threads, Issues, and pull requests.
+  sw                                   Show wiki pages, worktrees, open threads, Issues, and pull requests.
+  sw session [OMP_ARGS...]             Start omp in a new worktree of origin/main; remove it on exit if unused.
   sw fetch URL [SOURCE] [--file FILE]  Capture a source; with SOURCE, record it in wiki/sources/SOURCE.md.
   sw fetch --hash SHA                  Restore a stored capture into the local cache.
   sw turn [--queue] (--new-thread | THREAD) SLUG TITLE REQUEST
@@ -15,9 +16,9 @@ Usage:
   sw start ISSUE SLUG                  Start work on a queued Issue.
   sw commit MESSAGE [PATH...]          Stage paths, check ASCII, and commit (Conventional Commits).
   sw pr TITLE BODY                     Push and open a pull request that closes the current Issue.
-  sw checks [PR]                       Watch pull request checks.
+  sw checks [PR]                       Wait for pull request checks; print OK or the failed checks.
   sw sync                              Rebase a stacked turn onto its dependency's current base.
-  sw merge [PR]                        Watch checks, merge an explicitly authorized pull request,
+  sw merge [PR]                        Wait for checks, merge an explicitly authorized pull request,
                                        and fast-forward main in the primary worktree.
   sw prune                             Remove worktrees whose pull request is merged or closed.
 
@@ -25,9 +26,9 @@ THREAD is a milestone number, title, or URL. --new-thread creates a milestone
 named after TITLE. --queue records the Issue without creating a branch.
 TITLE and REQUEST must be English. FILE is a copy of URL saved from a browser.
 
-The primary worktree stays on main. Run from it, turn, task, and start create
-the branch in a new worktree next to it and print its path; run from a
-worktree, they switch branches there.
+Every session runs in its own worktree: start it with sw session, or move a
+running omp session with /wt. The primary worktree stays on main; turn, task,
+and start refuse to create branches there.
 EOF
 }
 
@@ -63,8 +64,9 @@ in_primary() {
   [[ $(git rev-parse --absolute-git-dir) == "$(git rev-parse --path-format=absolute --git-common-dir)" ]]
 }
 
-require_clean_worktree() {
-  in_primary || require_clean "commit or discard tracked changes before starting work"
+require_session_worktree() {
+  ! in_primary || die "this session runs in the primary worktree; ask the user to restart it with sw session or move it with /wt"
+  require_clean "commit or discard tracked changes before starting work"
 }
 
 load_lines() {
@@ -129,19 +131,11 @@ base_for_dependency() {
 }
 
 switch_to_issue_branch() {
-  local issue=$1 slug=$2 base=$3 branch path
+  local issue=$1 slug=$2 base=$3
   [[ "$base" =~ ^[A-Za-z0-9][A-Za-z0-9._/-]*$ && "$base" != *..* ]] ||
     die "base is not a safe branch name: $base"
-  branch="issue/$issue-$slug"
   git fetch --quiet origin "$base"
-  if in_primary; then
-    path="$(primary_root).worktrees/$issue-$slug"
-    git worktree add --quiet -b "$branch" "$path" "origin/$base"
-  else
-    git switch --quiet -c "$branch" "origin/$base"
-    path=$repo_root
-  fi
-  printf 'worktree: %s\n' "$path"
+  git switch --quiet -c "issue/$issue-$slug" "origin/$base"
 }
 
 current_issue_context() {
@@ -239,7 +233,7 @@ command_open() {
   [[ -n "$request" ]] || die "REQUEST must not be empty"
   require_english TITLE "$title"
   require_english REQUEST "$request"
-  [[ "$queue" == true ]] || require_clean_worktree
+  [[ "$queue" == true ]] || require_session_worktree
 
   repo=$(current_repo)
   if [[ "$kind" == turn ]]; then
@@ -281,7 +275,7 @@ command_start() {
   local issue=$1 slug=$2 issue_json
   [[ "$issue" =~ ^[0-9]+$ ]] || die "ISSUE must be a number"
   validate_slug "$slug"
-  require_clean_worktree
+  require_session_worktree
   issue_json=$(gh issue view "$issue" --json body,state) || die "could not read issue #$issue"
   [[ $(jq -r .state <<<"$issue_json") == OPEN ]] || die "issue #$issue is not open"
   switch_to_issue_branch "$issue" "$slug" "$(base_for_dependency "$(issue_dependency "$issue_json")")"
@@ -328,7 +322,37 @@ command_pr() {
 
 command_checks() {
   (( $# <= 1 )) || die "usage: sw checks [PR]"
-  gh pr checks "$@" --watch
+  local deadline=$((SECONDS + 1800)) json failed
+  while :; do
+    json=$(gh pr checks "$@" --json name,bucket,link 2>/dev/null || true)
+    if [[ -n "$json" ]] && jq -e 'length > 0 and all(.bucket != "pending")' <<<"$json" >/dev/null; then
+      break
+    fi
+    (( SECONDS < deadline )) || die "checks still pending after 30 minutes"
+    sleep 10
+  done
+  failed=$(jq -r '.[] | select(.bucket == "fail" or .bucket == "cancel") | "\(.name): \(.link)"' <<<"$json")
+  if [[ -n "$failed" ]]; then
+    printf 'failed checks:\n%s\n' "$failed"
+    return 1
+  fi
+  printf 'OK\n'
+}
+
+command_session() {
+  local path status=0
+  git fetch --quiet origin main
+  path="$(primary_root).worktrees/session-$(date -u +%Y%m%d-%H%M%S)"
+  git worktree add --quiet --detach "$path" origin/main
+  # A lock keeps sw prune and git worktree remove away while the session runs.
+  git worktree lock --reason "omp session" "$path"
+  printf 'worktree: %s\n' "$path"
+  omp --cwd "$path" "$@" || status=$?
+  git worktree unlock "$path"
+  if [[ -z $(git -C "$path" branch --show-current) && -z $(git -C "$path" status --porcelain) ]]; then
+    git worktree remove "$path" && printf 'removed unused worktree %s\n' "$path"
+  fi
+  return "$status"
 }
 
 command_sync() {
@@ -351,7 +375,7 @@ command_merge() {
   if [[ -z "$pr" ]]; then
     pr=$(gh pr view --json number --jq .number) || die "current branch has no pull request"
   fi
-  gh pr checks "$pr" --watch
+  command_checks "$pr" || die "not merging #$pr: checks failed"
   head=$(gh pr view "$pr" --json headRefName --jq .headRefName) || die "could not read pull request #$pr"
   gh pr merge "$pr" --merge
   # Delete the remote branch here: gh would try to check out main, which the primary worktree holds.
@@ -407,6 +431,7 @@ case "$command" in
   checks) command_checks "$@" ;;
   sync) command_sync "$@" ;;
   merge) command_merge "$@" ;;
+  session) command_session "$@" ;;
   prune) command_prune "$@" ;;
   *) die "unknown command: $command; run 'sw help'" ;;
 esac
