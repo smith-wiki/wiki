@@ -17,11 +17,17 @@ Usage:
   sw pr TITLE BODY                     Push and open a pull request that closes the current Issue.
   sw checks [PR]                       Watch pull request checks.
   sw sync                              Rebase a stacked turn onto its dependency's current base.
-  sw merge [PR]                        Watch checks, then merge an explicitly authorized pull request.
+  sw merge [PR]                        Watch checks, merge an explicitly authorized pull request,
+                                       and fast-forward main in the primary worktree.
+  sw prune                             Remove worktrees whose pull request is merged or closed.
 
 THREAD is a milestone number, title, or URL. --new-thread creates a milestone
 named after TITLE. --queue records the Issue without creating a branch.
 TITLE and REQUEST must be English. FILE is a copy of URL saved from a browser.
+
+The primary worktree stays on main. Run from it, turn, task, and start create
+the branch in a new worktree next to it and print its path; run from a
+worktree, they switch branches there.
 EOF
 }
 
@@ -45,6 +51,20 @@ require_english() {
 
 require_clean() {
   [[ -z $(git status --porcelain) ]] || die "$1"
+}
+
+primary_root() {
+  local common
+  common=$(git rev-parse --path-format=absolute --git-common-dir) || die "could not locate the primary worktree"
+  printf '%s' "${common%/.git}"
+}
+
+in_primary() {
+  [[ $(git rev-parse --absolute-git-dir) == "$(git rev-parse --path-format=absolute --git-common-dir)" ]]
+}
+
+require_clean_worktree() {
+  in_primary || require_clean "commit or discard tracked changes before starting work"
 }
 
 load_lines() {
@@ -109,11 +129,19 @@ base_for_dependency() {
 }
 
 switch_to_issue_branch() {
-  local issue=$1 slug=$2 base=$3
+  local issue=$1 slug=$2 base=$3 branch path
   [[ "$base" =~ ^[A-Za-z0-9][A-Za-z0-9._/-]*$ && "$base" != *..* ]] ||
     die "base is not a safe branch name: $base"
+  branch="issue/$issue-$slug"
   git fetch --quiet origin "$base"
-  git switch -c "issue/$issue-$slug" "origin/$base"
+  if in_primary; then
+    path="$(primary_root).worktrees/$issue-$slug"
+    git worktree add --quiet -b "$branch" "$path" "origin/$base"
+  else
+    git switch --quiet -c "$branch" "origin/$base"
+    path=$repo_root
+  fi
+  printf 'worktree: %s\n' "$path"
 }
 
 current_issue_context() {
@@ -166,6 +194,9 @@ command_overview() {
     print_limited "$limit" "$role" "${items[@]}"
   done
 
+  load_lines items "could not list worktrees" git worktree list
+  print_limited "$limit" Worktrees "${items[@]}"
+
   if ! gh auth status >/dev/null 2>&1; then
     printf 'GitHub: unavailable; run gh auth login\n'
     return
@@ -208,7 +239,7 @@ command_open() {
   [[ -n "$request" ]] || die "REQUEST must not be empty"
   require_english TITLE "$title"
   require_english REQUEST "$request"
-  [[ "$queue" == true ]] || require_clean "commit or discard tracked changes before starting work"
+  [[ "$queue" == true ]] || require_clean_worktree
 
   repo=$(current_repo)
   if [[ "$kind" == turn ]]; then
@@ -250,7 +281,7 @@ command_start() {
   local issue=$1 slug=$2 issue_json
   [[ "$issue" =~ ^[0-9]+$ ]] || die "ISSUE must be a number"
   validate_slug "$slug"
-  require_clean "commit or discard tracked changes before starting work"
+  require_clean_worktree
   issue_json=$(gh issue view "$issue" --json body,state) || die "could not read issue #$issue"
   [[ $(jq -r .state <<<"$issue_json") == OPEN ]] || die "issue #$issue is not open"
   switch_to_issue_branch "$issue" "$slug" "$(base_for_dependency "$(issue_dependency "$issue_json")")"
@@ -316,8 +347,47 @@ command_sync() {
 
 command_merge() {
   (( $# <= 1 )) || die "usage: sw merge [PR]"
-  gh pr checks "$@" --watch
-  gh pr merge "$@" --merge --delete-branch
+  local pr=${1:-} head primary
+  if [[ -z "$pr" ]]; then
+    pr=$(gh pr view --json number --jq .number) || die "current branch has no pull request"
+  fi
+  gh pr checks "$pr" --watch
+  head=$(gh pr view "$pr" --json headRefName --jq .headRefName) || die "could not read pull request #$pr"
+  gh pr merge "$pr" --merge
+  # Delete the remote branch here: gh would try to check out main, which the primary worktree holds.
+  git push --quiet origin --delete "$head" 2>/dev/null || printf 'sw: remote branch %s was already gone\n' "$head" >&2
+  primary=$(primary_root)
+  git fetch --quiet origin main
+  if [[ $(git -C "$primary" branch --show-current) == main && -z $(git -C "$primary" status --porcelain --untracked-files=no) ]]; then
+    git -C "$primary" merge --quiet --ff-only origin/main && printf 'primary worktree: main is at origin/main\n'
+  else
+    printf 'primary worktree is not a clean main checkout; update it manually\n'
+  fi
+}
+
+command_prune() {
+  (( $# == 0 )) || die "usage: sw prune"
+  local path branch state
+  while IFS=$'\t' read -r path branch; do
+    [[ -n "$branch" ]] || continue
+    if [[ -n $(git -C "$path" status --porcelain --untracked-files=no) ]]; then
+      printf 'kept %s: uncommitted changes\n' "$path"
+      continue
+    fi
+    state=$(gh pr view "$branch" --json state --jq .state 2>/dev/null || true)
+    case "$state" in
+      MERGED|CLOSED)
+        if git worktree remove "$path"; then
+          git branch -D "$branch" >/dev/null
+          printf 'removed %s (%s)\n' "$path" "$state"
+        fi
+        ;;
+      *) printf 'kept %s: pull request %s\n' "$path" "${state:-not opened}" ;;
+    esac
+  done < <(git worktree list --porcelain | awk -v primary="$(primary_root)" '
+    /^worktree / { path = substr($0, 10) }
+    /^branch refs\/heads\// { if (path != primary) print path "\t" substr($0, 19) }')
+  git worktree prune
 }
 
 if (( $# == 0 )); then
@@ -337,5 +407,6 @@ case "$command" in
   checks) command_checks "$@" ;;
   sync) command_sync "$@" ;;
   merge) command_merge "$@" ;;
+  prune) command_prune "$@" ;;
   *) die "unknown command: $command; run 'sw help'" ;;
 esac
