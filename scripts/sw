@@ -15,17 +15,14 @@ Usage:
   sw start ISSUE SLUG                  Start work on a queued Issue.
   sw commit MESSAGE [PATH...]          Stage paths, check ASCII, and commit (Conventional Commits).
   sw pr TITLE BODY                     Push and open a pull request that closes the current Issue.
-  sw checks [PR]                       Wait for pull request checks; print OK or the failed checks.
+  sw checks [PR]                       Watch pull request checks.
   sw sync                              Rebase a stacked turn onto its dependency's current base.
-  sw merge [PR]                        Wait for checks, merge an explicitly authorized pull request,
+  sw merge [PR]                        Watch checks, merge an explicitly authorized pull request,
                                        and fast-forward main in the primary worktree.
 
 THREAD is a milestone number, title, or URL. --new-thread creates a milestone
 named after TITLE. --queue records the Issue without creating a branch.
 TITLE and REQUEST must be English. FILE is a copy of URL saved from a browser.
-
-The primary worktree stays on main; turn, task, and start refuse to create
-branches there.
 EOF
 }
 
@@ -49,21 +46,6 @@ require_english() {
 
 require_clean() {
   [[ -z $(git status --porcelain) ]] || die "$1"
-}
-
-primary_root() {
-  local common
-  common=$(git rev-parse --path-format=absolute --git-common-dir) || die "could not locate the primary worktree"
-  printf '%s' "${common%/.git}"
-}
-
-in_primary() {
-  [[ $(git rev-parse --absolute-git-dir) == "$(git rev-parse --path-format=absolute --git-common-dir)" ]]
-}
-
-require_session_worktree() {
-  ! in_primary || die "this session runs in the primary worktree; ask the user to move it into a worktree with /wt"
-  require_clean "commit or discard tracked changes before starting work"
 }
 
 load_lines() {
@@ -132,7 +114,7 @@ switch_to_issue_branch() {
   [[ "$base" =~ ^[A-Za-z0-9][A-Za-z0-9._/-]*$ && "$base" != *..* ]] ||
     die "base is not a safe branch name: $base"
   git fetch --quiet origin "$base"
-  git switch --quiet -c "issue/$issue-$slug" "origin/$base"
+  git switch -c "issue/$issue-$slug" "origin/$base"
 }
 
 current_issue_context() {
@@ -185,7 +167,6 @@ command_overview() {
     print_limited "$limit" "$role" "${items[@]}"
   done
 
-
   if ! gh auth status >/dev/null 2>&1; then
     printf 'GitHub: unavailable; run gh auth login\n'
     return
@@ -228,7 +209,7 @@ command_open() {
   [[ -n "$request" ]] || die "REQUEST must not be empty"
   require_english TITLE "$title"
   require_english REQUEST "$request"
-  [[ "$queue" == true ]] || require_session_worktree
+  [[ "$queue" == true ]] || require_clean "commit or discard tracked changes before starting work"
 
   repo=$(current_repo)
   if [[ "$kind" == turn ]]; then
@@ -270,7 +251,7 @@ command_start() {
   local issue=$1 slug=$2 issue_json
   [[ "$issue" =~ ^[0-9]+$ ]] || die "ISSUE must be a number"
   validate_slug "$slug"
-  require_session_worktree
+  require_clean "commit or discard tracked changes before starting work"
   issue_json=$(gh issue view "$issue" --json body,state) || die "could not read issue #$issue"
   [[ $(jq -r .state <<<"$issue_json") == OPEN ]] || die "issue #$issue is not open"
   switch_to_issue_branch "$issue" "$slug" "$(base_for_dependency "$(issue_dependency "$issue_json")")"
@@ -317,23 +298,8 @@ command_pr() {
 
 command_checks() {
   (( $# <= 1 )) || die "usage: sw checks [PR]"
-  local deadline=$((SECONDS + 1800)) json failed
-  while :; do
-    json=$(gh pr checks "$@" --json name,bucket,link 2>/dev/null || true)
-    if [[ -n "$json" ]] && jq -e 'length > 0 and all(.bucket != "pending")' <<<"$json" >/dev/null; then
-      break
-    fi
-    (( SECONDS < deadline )) || die "checks still pending after 30 minutes"
-    sleep 10
-  done
-  failed=$(jq -r '.[] | select(.bucket == "fail" or .bucket == "cancel") | "\(.name): \(.link)"' <<<"$json")
-  if [[ -n "$failed" ]]; then
-    printf 'failed checks:\n%s\n' "$failed"
-    return 1
-  fi
-  printf 'OK\n'
+  gh pr checks "$@" --watch
 }
-
 
 command_sync() {
   (( $# == 0 )) || die "usage: sw sync"
@@ -351,24 +317,23 @@ command_sync() {
 
 command_merge() {
   (( $# <= 1 )) || die "usage: sw merge [PR]"
-  local pr=${1:-} head primary
+  local pr=${1:-} head common primary
   if [[ -z "$pr" ]]; then
     pr=$(gh pr view --json number --jq .number) || die "current branch has no pull request"
   fi
-  command_checks "$pr" || die "not merging #$pr: checks failed"
+  gh pr checks "$pr" --watch
   head=$(gh pr view "$pr" --json headRefName --jq .headRefName) || die "could not read pull request #$pr"
   gh pr merge "$pr" --merge
-  # Delete the remote branch here: gh would try to check out main, which the primary worktree holds.
+  # gh merge --delete-branch would check out main, which the primary worktree holds.
   git push --quiet origin --delete "$head" 2>/dev/null || printf 'sw: remote branch %s was already gone\n' "$head" >&2
-  primary=$(primary_root)
+  # Keep main current in the primary worktree, where new sessions start.
+  common=$(git rev-parse --path-format=absolute --git-common-dir)
+  primary=${common%/.git}
   git fetch --quiet origin main
   if [[ $(git -C "$primary" branch --show-current) == main && -z $(git -C "$primary" status --porcelain --untracked-files=no) ]]; then
-    git -C "$primary" merge --quiet --ff-only origin/main && printf 'primary worktree: main is at origin/main\n'
-  else
-    printf 'primary worktree is not a clean main checkout; update it manually\n'
+    git -C "$primary" merge --quiet --ff-only origin/main
   fi
 }
-
 
 if (( $# == 0 )); then
   command_overview
