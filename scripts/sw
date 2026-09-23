@@ -17,11 +17,13 @@ Usage:
   sw pr TITLE BODY                     Push and open a pull request that closes the current Issue.
   sw checks [PR]                       Wait for pull request checks; print OK or the failed checks.
   sw sync                              Rebase a stacked turn onto its dependency's current base.
-  sw merge [PR]                        Wait for checks, then merge an explicitly authorized pull request.
+  sw merge [PR]                        Wait for checks, then merge an explicitly authorized pull request;
+                                       a stacked turn is merged together with the turns beneath it.
 
 THREAD is a milestone number, title, or URL. --new-thread creates a milestone
 named after TITLE. --queue records the Issue without creating a branch.
-TITLE and REQUEST must be English. FILE is a copy of URL saved from a browser.
+TITLE and REQUEST must be English; typographic quotes and dashes become ASCII.
+FILE is a copy of URL saved from a browser.
 EOF
 }
 
@@ -41,6 +43,11 @@ check_text() {
 
 require_english() {
   check_text "$1" "$2" || die "$1 must be English; translate the user's words"
+}
+
+# Typographic quotes, dashes, ellipses, and no-break spaces are not a language; fold them to ASCII.
+fold_typography() {
+  python3 -c 'import sys; sys.stdout.write(sys.argv[1].translate({0x2018: "\x27", 0x2019: "\x27", 0x201c: "\"", 0x201d: "\"", 0x2013: "-", 0x2014: "-", 0x2026: "...", 0xa0: " "}))' "$1"
 }
 
 require_clean() {
@@ -202,8 +209,8 @@ command_open() {
     (( $# == 3 )) || die "usage: sw task [--queue] SLUG TITLE REQUEST"
   fi
   slug=$1
-  title=$2
-  request=$3
+  title=$(fold_typography "$2")
+  request=$(fold_typography "$3")
   validate_slug "$slug"
   [[ -n "$request" ]] || die "REQUEST must not be empty"
   require_english TITLE "$title"
@@ -258,7 +265,8 @@ command_start() {
 
 command_commit() {
   (( $# >= 1 )) || die "usage: sw commit MESSAGE [PATH...]"
-  local message=$1
+  local message
+  message=$(fold_typography "$1")
   shift
   check_text commit-message "$message"
   [[ "$message" =~ ^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9._/-]+\))?!?:\ [[:alnum:]] ]] ||
@@ -272,7 +280,9 @@ command_commit() {
 
 command_pr() {
   (( $# == 2 )) || die "usage: sw pr TITLE BODY"
-  local title=$1 summary=$2 dependency base milestone body
+  local title summary dependency base milestone body
+  title=$(fold_typography "$1")
+  summary=$(fold_typography "$2")
   local -a args
   check_text pr-title "$title"
   require_clean "commit all tracked changes before opening a pull request"
@@ -330,17 +340,36 @@ command_sync() {
 
 command_merge() {
   (( $# <= 1 )) || die "usage: sw merge [PR]"
-  local pr=${1:-} out
+  local pr=${1:-} n base out attempt
+  local -a chain=()
   if [[ -z "$pr" ]]; then
     pr=$(gh pr view --json number --jq .number) || die "current branch has no pull request"
   fi
-  if ! out=$(command_checks "$pr"); then
-    printf '%s\n' "$out"
-    die "not merging #$pr"
-  fi
-  # gh prints worktree cleanup advice when the branch is checked out here; the session keeps its worktree.
-  out=$(gh pr merge "$pr" --merge --delete-branch 2>&1) || { printf '%s\n' "$out" >&2; die "could not merge #$pr"; }
-  printf 'merged #%s\n' "$pr"
+  # A stacked turn targets the previous turn's branch; merge the stack bottom up so every turn lands on main.
+  n=$pr
+  while :; do
+    chain=("$n" "${chain[@]}")
+    base=$(gh pr view "$n" --json baseRefName --jq .baseRefName) || die "could not read pull request #$n"
+    [[ "$base" == main ]] && break
+    n=$(gh pr list --head "$base" --state open --json number --jq '.[0].number // empty')
+    [[ -n "$n" ]] || die "#${chain[0]} targets $base, which has no open pull request; run sw sync"
+  done
+  for n in "${chain[@]}"; do
+    if ! out=$(command_checks "$n"); then
+      printf '%s\n' "$out"
+      die "not merging #$n"
+    fi
+    [[ "$n" == "${chain[0]}" ]] || gh pr edit "$n" --base main >/dev/null
+    # gh prints worktree cleanup advice when the branch is checked out here; the session keeps its worktree.
+    for attempt in 1 2 3; do
+      if out=$(gh pr merge "$n" --merge --delete-branch 2>&1); then
+        break
+      fi
+      (( attempt < 3 )) || { printf '%s\n' "$out" >&2; die "could not merge #$n"; }
+      sleep 10
+    done
+    printf 'merged #%s\n' "$n"
+  done
 }
 
 if (( $# == 0 )); then
@@ -350,6 +379,9 @@ fi
 
 command=$1
 shift
+for arg in "$@"; do
+  [[ "$arg" == -h || "$arg" == --help ]] && { usage; exit; }
+done
 case "$command" in
   help|-h|--help) usage ;;
   turn|task) command_open "$command" "$@" ;;

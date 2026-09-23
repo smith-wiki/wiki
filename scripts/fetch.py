@@ -429,7 +429,10 @@ def record_in_page(worktree: Path, slug: str, capture: Capture) -> str:
         lines += [f"kind: {guess_kind(capture)}", "captures:", *capture_lines(capture, capture.url), "---", ""]
         lines += ["## Overview", "", "", "## Key points", "", ""]
         path.write_text("\n".join(lines))
-        return f"created {path.relative_to(worktree)}; fill summary, empty fields, Overview, and Key points"
+        missing = ["summary", *(field for field in ("title", "author") if not meta.get(field))]
+        if not meta.get("published"):
+            missing.append("published (the date the source states, often on its first page)")
+        return f"created {path.relative_to(worktree)}; fill {', '.join(missing)}, Overview, and Key points"
 
     lines = path.read_text().split("\n")
     end = lines.index("---", 1)

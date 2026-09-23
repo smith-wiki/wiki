@@ -4,18 +4,18 @@ Smith Wiki is a public research wiki. Everything written to this repository or t
 
 ## Messages
 
-- **Research turn:** a message that starts with `/turn` adds knowledge to the wiki. Follow [Research turns](#research-turns).
+- **Research turn:** a message that starts with `/turn` adds knowledge to the wiki. Follow [Research turns](#research-turns), not a generic research skill.
 - **Everything else** is conversation or repository work. Answer questions and discussion in chat. A request to adjust the current turn's pages amends that turn's open pull request.
 
 ## Repository work
 
-Repository work changes tracked files, scripts, CI, the site, or GitHub settings.
+Repository work changes tracked files, scripts, CI, the site, or GitHub settings. `sw` shows the wiki, open threads, Issues, and pull requests; `sw help` lists its commands.
 
 - One coherent outcome is one Issue, one `issue/<number>-<slug>` branch, and one pull request that closes the Issue. Follow-up requests go into that pull request while it is open.
 - Start with `sw task SLUG TITLE REQUEST`. Add `--queue` to record a task for later; start a queued Issue with `sw start ISSUE SLUG`.
 - Commit with `sw commit` using Conventional Commits. Open the pull request with `sw pr TITLE BODY`, where the body says what changed and why. Changes under `wiki/` follow [Wiki content](#wiki-content).
 - GitHub Actions is the only verification environment; watch it with `sw checks` instead of building the site locally.
-- Merge with `sw merge` only after checks pass and the user authorizes that merge in the current conversation.
+- Merge with `sw merge` only after checks pass and the user authorizes that merge in the current conversation. Merging a stacked turn also merges the turns beneath it into `main`.
 
 ## Research turns
 
@@ -36,7 +36,7 @@ A turn is complete when the card answers the question, every claim on the card i
 ## Wiki content
 
 - `wiki/research/`: one card per turn. Front matter has exactly `title`, `rkey`, `date`, `brief`, `turn_url` (the turn Issue URL), and `mode` (`SOURCE_BRIEF`, `QUESTION_ANSWER`, or `NOTE_EXPLORE`). The body starts with `## Source brief`, `## Answer`, or `## Exploration` to match the mode and stays under 200 words: the answer first, then links into the graph.
-- `wiki/sources/`: one annotated card per independently citable source. Front matter holds `title`, `summary`, `url`, `author` (a person, several people, or the responsible organization), optional `publisher`, `published` (YYYY-MM-DD, omitted when the source states no date), `kind` (`article`, `book`, `documentation`, `paper`, `repository`, `specification`, `video`, or `webpage`), and `captures`, which `sw fetch` writes; correct generated fields only when they are wrong. The body has two sections. `## Overview` (80 to 150 words) says what the source is, its central theme and scope, who wrote it for whom and why, how far to trust it and why, and how it relates to other sources. `## Key points` lists the claims the wiki relies on, at most seven, in your own words, each followed by a locator in parentheses: a heading or exact text for a webpage, a page or section for a paper, a file and heading for a repository.
+- `wiki/sources/`: one annotated card per independently citable source. Front matter holds `title`, `summary`, `url`, `author` (a person, several people, or the responsible organization), optional `publisher`, `published` (YYYY-MM-DD, the date the source itself states, such as a paper's venue date on its first page; omitted when it states none), `kind` (`article`, `book`, `documentation`, `paper`, `repository`, `specification`, `video`, or `webpage`), and `captures`, which `sw fetch` writes; correct generated fields only when they are wrong. The body has two sections. `## Overview` (80 to 150 words) says what the source is, its central theme and scope, who wrote it for whom and why, how far to trust it and why, and how it relates to other sources. `## Key points` lists the claims the wiki relies on, at most seven, in your own words, each followed by a locator in parentheses: a heading or exact text for a webpage, a page or section for a paper, a file and heading for a repository.
 - `wiki/entities/`: named people, organizations, projects, products, and places; answers "what is this?"
 - `wiki/concepts/`: recurring terms that need a stable definition; titled with a noun phrase.
 - `wiki/notes/`: one reusable claim, distinction, relationship, or implication per page; titled with a declarative sentence.
