@@ -19,4 +19,8 @@ Cedar's production authorizer is Rust, separate from its Lean model. Its enginee
 
 **Inference:** Choose a narrow security property and explicit model boundary first; reviewers must still decide whether the specification matches the real requirement and whether production behavior matches the model. Compare this semantic boundary with [schema validity does not imply semantic correctness](../../notes/schema-validity-does-not-imply-semantic-correctness/).
 
+## Related system modeling
+
+[TLA+](../tla-plus/) foregrounds sequences of possible states, especially concurrent interleavings. Its TLC checker explores configured finite models, while its proof system can address general specifications; this complements rather than replaces Lean's program-and-theorem workflow. [Lean and TLA+ emphasize different verification questions](../../notes/lean-and-tla-prove-different-claims-about-software/). ([Lamport, 2021](../../sources/lamport-tla-high-level-view/); [Wayne, undated](../../sources/learntla-conceptual-overview/))
+
 [This turn's research card](../../research/lean-software-verification/) gives the short task-oriented answer.
