@@ -10,7 +10,6 @@ templateEngineOverride: md
 
 ## Starting points
 
-- [Lean](./entities/lean/) as a programming language and proof assistant, grounded in the [official homepage](./sources/lean-lang-homepage/)
 - [AX](./entities/google-ax/), [kagent](./entities/kagent/), [Agent Substrate](./entities/agent-substrate/), [a concrete AX repository-maintenance task](./research/ax-isolated-repository-maintenance/), and why [AX separates orchestration from sandbox execution](./notes/ax-separates-orchestration-from-sandbox-execution/)
 - [TypeSafe AI](./entities/typesafe-ai/) and its first public model, [Jev](./entities/jev/)
 - [Cap'n Web](./entities/capn-web/), [object-capability RPC](./concepts/object-capability-rpc/), and why [promise pipelining collapses dependent RPC round trips](./notes/promise-pipelining-collapses-dependent-rpc-round-trips/)
