@@ -42,8 +42,7 @@ function problems(data) {
 }
 
 module.exports = {
-  layout: "layouts/page.njk",
-  eyebrow: "Source",
+  layout: "layouts/source.njk",
   tags: ["source"],
   templateEngineOverride: "md",
   eleventyComputed: {
