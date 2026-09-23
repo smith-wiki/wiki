@@ -17,3 +17,5 @@ templateEngineOverride: md
 - [System One Models](./concepts/system-one-models/)
 - [Schema validity does not imply semantic correctness](./notes/schema-validity-does-not-imply-semantic-correctness/)
 - [Lean](./entities/lean/), a [concrete software-verification task](./research/lean-software-verification/), and why [a proof of a model does not certify separate production code](./notes/a-proof-of-a-model-does-not-certify-separate-production-code/)
+- [TLA+](./entities/tla-plus/) and the [Lean comparison](./research/lean-versus-tla/): why [functional proofs and behavioral models address different questions](./notes/lean-and-tla-prove-different-claims-about-software/)
+- [Infrastructure as code](./concepts/infrastructure-as-code/), [security, performance, and pricing verification](./research/iac-formal-verification/), and why [assurance depends on the model and measurements](./notes/iac-assurance-depends-on-model-and-measurements/)
