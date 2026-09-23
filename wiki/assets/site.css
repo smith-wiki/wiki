@@ -227,6 +227,10 @@
     max-width: 74ch;
   }
 
+  .page-heading {
+    margin-bottom: 2rem;
+  }
+
   .eyebrow {
     margin-bottom: 0.65rem;
     color: var(--accent);
