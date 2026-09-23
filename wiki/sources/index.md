@@ -5,6 +5,7 @@ permalink: /sources/index.html
 eleventyExcludeFromCollections: true
 ---
 
+- [Lean Programming Language homepage](./lean-lang-homepage/) - Lean's official account of its programming, proof, trust, extensibility, and onboarding model.
 - [Kagi API pricing](./kagi-api-pricing/) — Public Search and Extract prices and advertised capabilities.
 - [Kagi API OpenAPI specification](./kagi-openapi-specification/) — Search request controls, result schemas, pagination, and extraction semantics.
 - [Your Privacy and Kagi](./kagi-privacy/) — Query logging, billing metadata, and debugging retention.
