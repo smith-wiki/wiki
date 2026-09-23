@@ -1,0 +1,20 @@
+---
+title: Laya
+summary: ConvAI Innovations' open-weight family of local typed-decision models with multilingual routing.
+---
+
+[Laya](../../sources/laya-repository/) is ConvAI Innovations' Apache-2.0 [System One-style](../../concepts/system-one-models/) family for constrained decisions. Given text or structured state and independent `choice`, ordinal `score`, or boolean `noul` questions, it returns labels and probability distributions rather than generated prose. The upstream Python runtime, training/fine-tuning material, and model weights are public; a self-hosted Jev-shaped HTTP endpoint is available. [Jev](../jev/) offers a similar interface as a proprietary hosted model. ([ConvAI Innovations and Laya contributors, n.d.](../../sources/laya-repository/); [ConvAI Innovations, n.d.](../../sources/laya-model-card/); [TypeSafe AI, n.d.](../../sources/typesafe-models-documentation/))
+
+## Origins
+
+Nandakishor Mukkunnoth's March 2025 [SalesRLAgent preprint](../../sources/sales-rl-agent-paper/) predicts conversion probability across sales-conversation turns. His later [Laya announcement](../../sources/laya-research-announcement/) presents Laya as a general-purpose successor and criticizes Jev's novelty claim. **Inference:** the earlier paper documents a narrower approach before Jev's launch, not that the current Laya weights or typed interface existed then or that TypeSafe copied it. ([Mukkunnoth, 2025](../../sources/sales-rl-agent-paper/); [Mukkunnoth, n.d.](../../sources/laya-research-announcement/))
+
+## Checkpoints and routing
+
+The English ModernBERT checkpoint has 421 million parameters and a 512-token default context; the 322-million-parameter mmBERT multilingual checkpoint has a 1,024-token default context. A third 421-million-parameter checkpoint is fine-tuned for typed-decision workflows. Questions form separate rows in a batch; a shared option-token budget limits wide `choice` sets. `Router` selects a checkpoint from input language and script before inference; the English checkpoint can report high confidence on scripts it handles poorly. "100+ languages" describes intended model coverage, not a 100-language accuracy evaluation: a vendor sweep evaluated 51 MASSIVE languages, with 45 above three times its random baseline on the multilingual checkpoint. ([ConvAI Innovations and Laya contributors, n.d.](../../sources/laya-repository/))
+
+## Evidence and limits
+
+The vendor's 32.8 ms one-question result is local T4 inference for the multilingual checkpoint, not a hosted round trip. Its 0.766 typed-decisions accuracy comes from fine-tuning on that benchmark's training split; untuned checkpoints scored 0.361 and 0.342 against a 0.461 majority-class baseline. The vendor's Laya-Jev table combines different prompts and sample sizes. A separate paired-input [sysone-bench](../../sources/sysone-bench-repository/) finds Jev ahead on most curated, twelve-way intent, ordinal, and small multilingual suites, while Laya leads AG News and MNLI. The benchmark's model versions, labels, and latency conditions limit generalization. ([ConvAI Innovations and Laya contributors, n.d.](../../sources/laya-repository/); [instax-dutta, n.d.](../../sources/sysone-bench-repository/))
+
+**Inference:** Laya is attractive when local processing or task-specific adaptation matters; neither open weights nor a proper-scoring-rule objective guarantees correct or calibrated decisions. Fit and evaluate probabilities on deployment data; account for model loading, memory, and hardware costs rather than treating self-hosting as free. The separate [Laya-MLX](../laya-mlx/) port offers native Apple Silicon inference, not a new checkpoint. See [Calibration depends on the task and checkpoint](../../notes/calibration-depends-on-task-and-checkpoint/) and [Schema validity does not imply semantic correctness](../../notes/schema-validity-does-not-imply-semantic-correctness/). ([ConvAI Innovations and Laya contributors, n.d.](../../sources/laya-repository/); [mizorewww and Laya-MLX contributors, n.d.](../../sources/laya-mlx-repository/))
