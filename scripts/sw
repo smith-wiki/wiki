@@ -237,7 +237,7 @@ command_open() {
 }
 
 command_fetch() {
-  python3 "$repo_root/scripts/fetch.py" "$@"
+  secretspec run --reason "sw fetch: capture a research source into the private R2 store" -- python3 "$repo_root/scripts/fetch.py" "$@"
 }
 
 command_start() {

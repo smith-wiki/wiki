@@ -9,6 +9,9 @@ Originals go to a private Cloudflare R2 bucket under <sha256>/; a local cache
 under raw/captures/ in the primary worktree keeps copies for reading. With
 SOURCE, the capture is recorded in wiki/sources/SOURCE.md, which is created
 with generated front matter when it does not exist yet.
+
+Run it through `sw fetch`, which supplies the credentials declared in
+secretspec.toml to this process only.
 """
 
 from __future__ import annotations
@@ -29,7 +32,6 @@ from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urljoin
 
-USER_AGENT = "Mozilla/5.0 (compatible; SmithWiki/1.0; +https://smith.wiki)"
 EXTENSIONS = {
     "text/html": "html",
     "application/xhtml+xml": "html",
@@ -68,7 +70,7 @@ class Capture:
 
 
 def primary_root() -> Path:
-    """Primary worktree root, so every worktree shares one .env and one cache."""
+    """Primary worktree root, so every worktree shares one capture cache."""
     common = subprocess.run(
         ["git", "rev-parse", "--path-format=absolute", "--git-common-dir"],
         capture_output=True, text=True, check=True,
@@ -76,16 +78,7 @@ def primary_root() -> Path:
     return Path(common).parent
 
 
-def load_env(root: Path) -> None:
-    env_file = root / ".env"
-    if not env_file.exists():
-        return
-    for line in env_file.read_text().splitlines():
-        line = line.strip()
-        if not line or line.startswith("#") or "=" not in line:
-            continue
-        key, value = line.split("=", 1)
-        os.environ.setdefault(key.removeprefix("export ").strip(), value.strip().strip("\"'"))
+CREDENTIALS = ("FIRECRAWL_API_KEY", "R2_ACCOUNT_ID", "R2_BUCKET", "R2_ACCESS_KEY_ID", "R2_SECRET_ACCESS_KEY")
 
 
 def media_type(value: str | None) -> str:
@@ -268,15 +261,6 @@ def html_metadata(original: bytes) -> dict[str, str]:
 # Backends
 
 
-def http_get(url: str) -> tuple[bytes, str, str]:
-    request = urllib.request.Request(url, headers={"User-Agent": USER_AGENT})
-    try:
-        with urllib.request.urlopen(request, timeout=60) as response:
-            return response.read(), media_type(response.headers.get("Content-Type")), response.geturl()
-    except (urllib.error.URLError, TimeoutError) as error:
-        raise FetchError(f"could not fetch {url}: {error}") from error
-
-
 def firecrawl_scrape(url: str, formats: list[str]) -> dict:
     """One uncached Firecrawl scrape of URL in the given formats."""
     api = os.environ.get("FIRECRAWL_API_URL", "https://api.firecrawl.dev/v2").rstrip("/")
@@ -334,21 +318,16 @@ def reading_copy(original: bytes, mime: str, base_url: str) -> str | None:
 class Store:
     def __init__(self, root: Path) -> None:
         self.cache = root / "raw" / "captures"
-        self.bucket = os.environ.get("R2_BUCKET")
-        account = os.environ.get("R2_ACCOUNT_ID")
-        self.endpoint = f"https://{account}.r2.cloudflarestorage.com" if account else None
+        self.bucket = os.environ["R2_BUCKET"]
+        self.endpoint = f"https://{os.environ['R2_ACCOUNT_ID']}.r2.cloudflarestorage.com"
         self.env = os.environ | {
-            "AWS_ACCESS_KEY_ID": os.environ.get("R2_ACCESS_KEY_ID", ""),
-            "AWS_SECRET_ACCESS_KEY": os.environ.get("R2_SECRET_ACCESS_KEY", ""),
+            "AWS_ACCESS_KEY_ID": os.environ["R2_ACCESS_KEY_ID"],
+            "AWS_SECRET_ACCESS_KEY": os.environ["R2_SECRET_ACCESS_KEY"],
             "AWS_DEFAULT_REGION": "auto",
             "AWS_REQUEST_CHECKSUM_CALCULATION": "WHEN_REQUIRED",
             "AWS_RESPONSE_CHECKSUM_VALIDATION": "WHEN_REQUIRED",
             "AWS_PAGER": "",
         }
-
-    @property
-    def remote(self) -> bool:
-        return bool(self.bucket and self.endpoint and os.environ.get("R2_ACCESS_KEY_ID"))
 
     def s3(self, *args: str) -> subprocess.CompletedProcess:
         return subprocess.run(
@@ -373,32 +352,29 @@ class Store:
             record.write_text(json.dumps(asdict(capture), indent=2) + "\n")
         if markdown is not None:
             (folder / files["markdown"]).write_text(markdown)
-        if self.remote:
-            for kind, name in files.items():
-                path = folder / name
-                if not path.exists():
-                    continue
-                key = f"{capture.sha256}/{name}"
-                if self.s3("head-object", "--key", key).returncode == 0:
-                    continue
-                content_type = {"original": capture.type, "markdown": "text/markdown", "record": "application/json"}[kind]
-                result = self.s3("put-object", "--key", key, "--body", str(path), "--content-type", content_type)
-                if result.returncode != 0:
-                    raise FetchError(f"R2 upload failed for {key}: {result.stderr.strip()}")
+        for kind, name in files.items():
+            path = folder / name
+            if not path.exists():
+                continue
+            key = f"{capture.sha256}/{name}"
+            if self.s3("head-object", "--key", key).returncode == 0:
+                continue
+            content_type = {"original": capture.type, "markdown": "text/markdown", "record": "application/json"}[kind]
+            result = self.s3("put-object", "--key", key, "--body", str(path), "--content-type", content_type)
+            if result.returncode != 0:
+                raise FetchError(f"R2 upload failed for {key}: {result.stderr.strip()}")
         return folder / files["markdown"] if markdown is not None else None
 
     def restore(self, sha: str) -> tuple[Capture, Path]:
         folder = self.cache / sha
         record = folder / "capture.json"
         if not record.exists():
-            if not self.remote:
-                raise FetchError(f"{sha} is not in the local cache and R2 is not configured")
             folder.mkdir(parents=True, exist_ok=True)
             self.download(f"{sha}/capture.json", record)
         capture = Capture(**json.loads(record.read_text()))
         for name in self.names(capture).values():
             path = folder / name
-            if not path.exists() and self.remote:
+            if not path.exists():
                 self.download(f"{sha}/{name}", path, optional=name == "content.md")
         return capture, folder / f"original.{extension(capture.type)}"
 
@@ -483,12 +459,9 @@ def capture_url(url: str, file: Path | None) -> tuple[Capture, bytes, str | None
         original = file.read_bytes()
         mime = TYPES_BY_SUFFIX.get(file.suffix.lower(), "application/octet-stream")
         markdown, method = None, "file"
-    elif os.environ.get("FIRECRAWL_API_KEY"):
+    else:
         original, mime, markdown = firecrawl(url)
         method = "firecrawl"
-    else:
-        original, mime, _ = http_get(url)
-        markdown, method = None, "direct (FIRECRAWL_API_KEY is not set)"
     markdown = markdown or reading_copy(original, mime, url)
     meta = html_metadata(original) if extension(mime) == "html" else {}
     capture = Capture(url, retrieved, hashlib.sha256(original).hexdigest(), mime, meta)
@@ -522,10 +495,12 @@ def main() -> int:
     parser.add_argument("--hash", dest="sha", help="restore a stored capture")
     args = parser.parse_args()
 
-    root = primary_root()
-    load_env(root)
-    store = Store(root)
-    stored = f"r2://{store.bucket}/<sha256>/" if store.remote else "local cache only (R2 is not configured)"
+    missing = [name for name in CREDENTIALS if not os.environ.get(name)]
+    if missing:
+        print(f"sw fetch: missing {', '.join(missing)}; run it as sw fetch so secretspec supplies them", file=sys.stderr)
+        return 1
+    store = Store(primary_root())
+    stored = f"r2://{store.bucket}/<sha256>/"
     try:
         if args.sha:
             if args.url or args.file or args.source:
