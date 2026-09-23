@@ -4,6 +4,7 @@ summary: False password hashes make a stolen verifier file risky to exploit, whi
 url: https://people.csail.mit.edu/rivest/pubs/JR13.pdf
 author: "Ari Juels and Ronald L. Rivest"
 publisher: ACM CCS 2013
+published: 2013-11-04
 kind: paper
 captures:
   - retrieved: 2026-09-23T11:32:44Z

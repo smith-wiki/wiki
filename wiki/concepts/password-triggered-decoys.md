@@ -9,7 +9,7 @@ A password-triggered decoy is an alternate view of protected data reached with a
 
 - **Offline encrypted data:** [Honey encryption](../../sources/honey-encryption-juels-ristenpart/) turns wrong-key decryption into a plausible plaintext sampled from a modeled distribution. It cannot promise that every key yields a *unique* output, and useful side information may identify the true one. ([Juels and Ristenpart, n.d.](../../sources/honey-encryption-juels-ristenpart/))
 - **Stolen password vault:** [Kamouflage](../../sources/kamouflage-password-management/) stores one real set among many plausible decoy credential sets. The attacker must test them against sites; the online sites remain correctness oracles. ([Bojinov et al., n.d.](../../sources/kamouflage-password-management/))
-- **Stolen verifier file:** [Honeywords](../../sources/honeywords-juels-rivest/) stores false password hashes with a real hash and uses a separate honeychecker to detect a false candidate's use. Arbitrary wrong strings are still denied. ([Juels and Rivest, n.d.](../../sources/honeywords-juels-rivest/))
+- **Stolen verifier file:** [Honeywords](../../sources/honeywords-juels-rivest/) stores false password hashes with a real hash and uses a separate honeychecker to detect a false candidate's use. Arbitrary wrong strings are still denied. ([Juels and Rivest, 2013](../../sources/honeywords-juels-rivest/))
 - **Duress storage:** [VeraCrypt hidden volumes](../../sources/veracrypt-hidden-volume/) use separate outer and hidden passwords, with real decoy files in the outer volume. These are two intended views, not an unbounded set of worlds. ([VeraCrypt project, n.d.](../../sources/veracrypt-hidden-volume/))
 
 ## Boundary for a live account
