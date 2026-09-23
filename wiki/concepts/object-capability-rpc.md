@@ -16,3 +16,7 @@ In [Cap'n Web](../../entities/capn-web/), authentication can return a new sessio
 ## Boundaries
 
 Capability possession does not make the whole application secure. Transport authentication, resource limits, revocation policy, and runtime validation of values remain separate responsibilities. TypeScript alone cannot validate data from an untrusted peer because its types do not exist at runtime. ([Varda and Faulkner, 2025](../../sources/cloudflare-capnweb-javascript-rpc/))
+
+## Decoy session authority
+
+**Inference:** In a [password-triggered decoy](../password-triggered-decoys/), a synthetic account view must not imply authority over the genuine account. Returning only decoy-scoped references would preserve the distinction this page draws between a visible interface and the operations a session can actually invoke. The [decoy-login oracle](../../notes/decoy-logins-move-the-password-oracle/) is the remaining problem: any observable difference between those scopes can reveal whether the password was genuine. ([Varda and Faulkner, 2025](../../sources/cloudflare-capnweb-javascript-rpc/); [Smith, 2026](../../sources/andy-smith-every-password-correct/))
