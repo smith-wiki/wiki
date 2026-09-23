@@ -24,6 +24,20 @@ module.exports = function (eleventyConfig) {
     }).format(date);
   });
 
+  eleventyConfig.addFilter("byTitle", (items) =>
+    [...items].sort((a, b) => String(a.data.title).localeCompare(String(b.data.title))),
+  );
+
+  eleventyConfig.addFilter("groupByDay", (items) => {
+    const days = new Map();
+    for (const item of [...items].reverse()) {
+      const day = item.date.toISOString().slice(0, 10);
+      if (!days.has(day)) days.set(day, []);
+      days.get(day).push(item);
+    }
+    return [...days].map(([day, dayItems]) => ({ day, items: dayItems }));
+  });
+
   return {
     dir: {
       input: "wiki",

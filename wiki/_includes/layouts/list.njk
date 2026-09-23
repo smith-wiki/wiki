@@ -1,0 +1,9 @@
+---
+layout: layouts/page.njk
+---
+{{ content | safe }}
+<ul>
+{% for item in collections[listTag] | byTitle %}
+  <li><a href="{{ item.url }}">{{ item.data.title | escape }}</a> &mdash; {{ item.data.summary | escape }}</li>
+{% endfor %}
+</ul>

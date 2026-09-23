@@ -1,0 +1,11 @@
+---
+layout: layouts/page.njk
+---
+{% for group in collections.research | groupByDay %}
+<h2>{{ group.day }}</h2>
+<ul>
+{% for turn in group.items %}
+  <li><code>{{ turn.data.mode | escape }}</code> &mdash; <a href="{{ turn.url }}">{{ turn.data.title | escape }}</a></li>
+{% endfor %}
+</ul>
+{% endfor %}

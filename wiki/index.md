@@ -1,5 +1,5 @@
 ---
-layout: layouts/page.njk
+layout: layouts/home.njk
 title: Research index
 summary: Focused answers, their evidence, and the ideas they connect.
 permalink: /index.html
@@ -7,17 +7,6 @@ templateEngineOverride: md
 ---
 
 [Research log](./log/) · [Sources](./sources/) · [Entities](./entities/) · [Concepts](./concepts/) · [Notes](./notes/)
-
-## Recent research
-
-- [Lean joins programming and formal proof in one language](./research/lean-lang-website/) - The official homepage's account of Lean as a language for programs, proofs, and extensible automation.
-- [Is Kagi Search API worth $12 per 1,000 requests?](./research/kagi-ai-value-assessment/) — A costed comparison of Kagi's configurable search results against lower-priced APIs.
-- [Can AX orchestrate an isolated Go dependency upgrade?](./research/ax-isolated-repository-maintenance/) — A concrete answer mapping one coding-agent maintenance job onto AX primitives.
-- [AX and kagent layer declarative agents over Agent Substrate](./research/google-ax-agent-substrate/) — A source brief on two agent-facing systems and their shared sandbox lifecycle foundation.
-- [Goblins presents one object model across local and network boundaries](./research/spritely-goblins-project/) — A source brief on the project page, its implementations, and its advertised operating model.
-- [Spritely composes secure distributed systems from capabilities](./research/spritely-core/) — A source brief on Goblins, transactional vats, and OCapN.
-- [Cap’n Web maps RPC authority onto JavaScript references](./research/cloudflare-capnweb-javascript-rpc/) — A source brief on Cloudflare's JavaScript-native object-capability RPC system.
-- [Jev trades generative freedom for typed decisions](./research/typesafe-system-one-jev/) — A source brief on TypeSafe AI's constrained probabilistic model.
 
 ## Starting points
 
