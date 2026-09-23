@@ -13,7 +13,8 @@ Usage:
                                        Open a research turn: Issue in the thread milestone and branch.
   sw task [--queue] SLUG TITLE REQUEST Open a repository task: Issue and branch.
   sw start ISSUE SLUG                  Start work on a queued Issue.
-  sw commit MESSAGE [PATH...]          Stage paths, check ASCII, and commit (Conventional Commits).
+  sw commit MESSAGE [PATH...]          Stage PATHs (default: every change), tidy wiki pages, check links
+                                       and ASCII, and commit (Conventional Commits).
   sw pr TITLE BODY                     Push and open a pull request that closes the current Issue.
   sw checks [PR]                       Wait for pull request checks; print OK or the failed checks.
   sw sync                              Rebase a stacked turn onto its dependency's current base.
@@ -22,7 +23,7 @@ Usage:
 
 THREAD is a milestone number, title, or URL. --new-thread creates a milestone
 named after TITLE. --queue records the Issue without creating a branch.
-TITLE and REQUEST must be English; typographic quotes and dashes become ASCII.
+Text must be English; typographic quotes and dashes become ASCII.
 FILE is a copy of URL saved from a browser.
 EOF
 }
@@ -35,6 +36,7 @@ die() {
 repo_root=$(git rev-parse --show-toplevel 2>/dev/null) || die "not inside a Git repository"
 cd "$repo_root"
 ascii_checker="$repo_root/scripts/check_ascii.py"
+tidy="$repo_root/scripts/tidy.py"
 [[ -f "$ascii_checker" ]] || die "missing scripts/check_ascii.py"
 
 check_text() {
@@ -45,9 +47,8 @@ require_english() {
   check_text "$1" "$2" || die "$1 must be English; translate the user's words"
 }
 
-# Typographic quotes, dashes, ellipses, and no-break spaces are not a language; fold them to ASCII.
 fold_typography() {
-  python3 -c 'import sys; sys.stdout.write(sys.argv[1].translate({0x2018: "\x27", 0x2019: "\x27", 0x201c: "\"", 0x201d: "\"", 0x2013: "-", 0x2014: "-", 0x2026: "...", 0xa0: " "}))' "$1"
+  python3 "$tidy" --text "$1"
 }
 
 require_clean() {
@@ -271,8 +272,15 @@ command_commit() {
   check_text commit-message "$message"
   [[ "$message" =~ ^(feat|fix|docs|style|refactor|perf|test|build|ci|chore|revert)(\([a-z0-9._/-]+\))?!?:\ [[:alnum:]] ]] ||
     die "commit message must follow Conventional Commits"
-  (( $# == 0 )) || git add -- "$@"
-  ! git diff --cached --quiet || die "no staged changes"
+  if (( $# == 0 )); then git add -A; else git add -- "$@"; fi
+  ! git diff --cached --quiet || die "nothing to commit"
+  local -a pages=()
+  local page
+  while IFS= read -r page; do pages+=("$page"); done < <(git diff --cached --name-only --diff-filter=AMR -- 'wiki/*.md')
+  if (( ${#pages[@]} > 0 )); then
+    python3 "$tidy" "${pages[@]}" || die "fix the links above, then commit again"
+    git add -- "${pages[@]}"
+  fi
   git diff --cached --check
   python3 "$ascii_checker" --staged
   git commit -m "$message"
