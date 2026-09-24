@@ -6,18 +6,13 @@ author: Kenton Varda and Steve Faulkner
 publisher: Cloudflare Blog
 published: 2025-09-22
 kind: article
-captures:
-  - retrieved: 2026-09-21T17:59:09Z
-    sha256: "504f51b74400e2804f20ffacd2a43e75fcd3aff63daafee79dece07c8871aa4c"
-    type: text/markdown
-  - retrieved: 2026-09-23T11:42:06Z
-    sha256: "7a0d5b79c0755fedbb796485736ec6a9d66d3582408ea235e0033fefd2d5ac86"
-    type: text/html
+retrieved: 2026-09-23T11:42:06Z
+sha256: "7a0d5b79c0755fedbb796485736ec6a9d66d3582408ea235e0033fefd2d5ac86"
 ---
 
 ## Overview
 
-Two Cloudflare engineers introduce Cap'n Web, a TypeScript RPC library for browsers and servers that passes functions and objects by reference, lets calls chain on results that have not arrived yet, and runs over WebSocket sessions or HTTP batches with a JSON-based protocol. Written for JavaScript developers at launch, it explains the design and its object-capability security model rather than evaluating them: there is no independent security review or comparative benchmark, and the authors call the library highly experimental. The page was modified in July 2026; the first capture is a Markdown copy, and a later capture preserves the original HTML. Its reference-as-authority model is the one [The Heart of Spritely](../the-heart-of-spritely/) develops for distributed objects.
+Two Cloudflare engineers introduce Cap'n Web, a TypeScript RPC library for browsers and servers that passes functions and objects by reference, lets calls chain on results that have not arrived yet, and runs over WebSocket sessions or HTTP batches with a JSON-based protocol. Written for JavaScript developers at launch, it explains the design and its object-capability security model rather than evaluating them: there is no independent security review or comparative benchmark, and the authors call the library highly experimental. The page was modified in July 2026. Its reference-as-authority model is the one [The Heart of Spritely](../the-heart-of-spritely/) develops for distributed objects.
 
 ## Key points
 

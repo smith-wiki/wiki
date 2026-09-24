@@ -4,10 +4,8 @@ summary: AWS documents policy validation as grammar and best-practice checks, wi
 url: https://docs.aws.amazon.com/IAM/latest/UserGuide/access-analyzer-policy-validation.html
 author: "Amazon Web Services"
 kind: documentation
-captures:
-  - retrieved: 2026-09-23T09:21:33Z
-    sha256: "c191feb140fa4d7b1d2f95aeb66b4c6aaee323985d4c6f805b15cb71c7059d06"
-    type: text/html
+retrieved: 2026-09-23T09:21:33Z
+sha256: "c191feb140fa4d7b1d2f95aeb66b4c6aaee323985d4c6f805b15cb71c7059d06"
 ---
 
 ## Overview

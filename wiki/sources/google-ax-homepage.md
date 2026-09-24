@@ -4,10 +4,8 @@ summary: Official AX product page describing its task model, scale ambition, and
 url: https://agentexecutor.io/
 author: Google
 kind: webpage
-captures:
-  - retrieved: 2026-09-22T06:37:21Z
-    sha256: "804ee320d0ddebc08a82ba6a1145774f6423f521da8213bd56ba0d28001235cf"
-    type: text/html
+retrieved: 2026-09-22T06:37:21Z
+sha256: "804ee320d0ddebc08a82ba6a1145774f6423f521da8213bd56ba0d28001235cf"
 ---
 
 ## Overview

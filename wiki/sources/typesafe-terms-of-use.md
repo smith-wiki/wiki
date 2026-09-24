@@ -5,10 +5,8 @@ url: https://typesafe.ai/legal/terms
 author: TypeSafe AI
 published: 2026-09-19
 kind: webpage
-captures:
-  - retrieved: 2026-09-23T14:57:36Z
-    sha256: "69efcc6bf3e07268f77766c9756dd1ebbb6a6cc7c5c539b1787a020e0ddfd09c"
-    type: text/html
+retrieved: 2026-09-23T14:57:36Z
+sha256: "69efcc6bf3e07268f77766c9756dd1ebbb6a6cc7c5c539b1787a020e0ddfd09c"
 ---
 
 ## Overview

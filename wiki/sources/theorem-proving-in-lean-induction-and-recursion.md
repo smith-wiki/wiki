@@ -5,14 +5,8 @@ url: https://lean-lang.org/theorem_proving_in_lean4/Induction-and-Recursion/
 author: "Jeremy Avigad, Leonardo de Moura, Soonho Kong, and Sebastian Ullrich"
 publisher: "Theorem Proving in Lean 4"
 kind: book
-captures:
-  - retrieved: 2026-09-23T08:46:31Z
-    sha256: "c24e2c141a7ba812602c76a2290f0068c02ddc66c3d479536eba678f3a02ea73"
-    type: text/html
-  - retrieved: 2026-09-23T08:46:39Z
-    sha256: "2f22e8a292535dfec457a0adf2e5e68e4128e4354497c6697a5704f91a3f509f"
-    type: text/html
-    url: https://lean-lang.org/theorem_proving_in_lean4/
+retrieved: 2026-09-23T08:46:31Z
+sha256: "c24e2c141a7ba812602c76a2290f0068c02ddc66c3d479536eba678f3a02ea73"
 ---
 
 ## Overview

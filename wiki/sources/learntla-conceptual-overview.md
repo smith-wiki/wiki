@@ -5,10 +5,8 @@ url: https://learntla.com/intro/conceptual-overview.html
 author: "Hillel Wayne"
 publisher: "Learn TLA+"
 kind: documentation
-captures:
-  - retrieved: 2026-09-23T08:58:58Z
-    sha256: "d9815d46131f3bb9da136101e779b808bd17708a50538fa01178c7b925145cdf"
-    type: text/html
+retrieved: 2026-09-23T08:58:58Z
+sha256: "d9815d46131f3bb9da136101e779b808bd17708a50538fa01178c7b925145cdf"
 ---
 
 ## Overview

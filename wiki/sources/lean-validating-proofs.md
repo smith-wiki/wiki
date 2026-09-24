@@ -5,10 +5,8 @@ url: https://lean-lang.org/doc/reference/latest/ValidatingProofs/
 author: "Lean FRO"
 publisher: "Lean Language Reference"
 kind: documentation
-captures:
-  - retrieved: 2026-09-23T08:43:27Z
-    sha256: "a8d6648cfe53473daae652994ed453de3548b080c84e539e20c475a868cb2fe7"
-    type: text/html
+retrieved: 2026-09-23T08:43:27Z
+sha256: "a8d6648cfe53473daae652994ed453de3548b080c84e539e20c475a868cb2fe7"
 ---
 
 ## Overview

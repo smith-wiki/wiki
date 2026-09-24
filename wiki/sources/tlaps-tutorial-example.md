@@ -4,10 +4,8 @@ summary: Official TLAPS tutorial explains hierarchical proof obligations and a t
 url: https://proofs.tlapl.us/doc/web/content/Documentation/Tutorial/The_example.html
 author: "TLA+ Proof System project"
 kind: documentation
-captures:
-  - retrieved: 2026-09-23T09:00:30Z
-    sha256: "a47a83f7cfe0d08eba4a2405a34eb55e537d15962142c9d363c148da84bf36b1"
-    type: text/html
+retrieved: 2026-09-23T09:00:30Z
+sha256: "a47a83f7cfe0d08eba4a2405a34eb55e537d15962142c9d363c148da84bf36b1"
 ---
 
 ## Overview

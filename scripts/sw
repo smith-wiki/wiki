@@ -7,7 +7,10 @@ Smith Wiki helper
 
 Usage:
   sw                                   Show wiki pages, open threads, Issues, and pull requests.
-  sw fetch URL [SOURCE] [--file FILE]  Capture a source; with SOURCE, record it in wiki/sources/SOURCE.md.
+  sw fetch URL [SOURCE] [--file FILE] [--recapture]
+                                       Capture a source, or return the current capture of an already
+                                       captured URL; --recapture replaces it. With SOURCE, record it in
+                                       wiki/sources/SOURCE.md.
   sw fetch --hash SHA                  Restore a stored capture into the local cache.
   sw turn [--queue] (--new-thread | THREAD) SLUG TITLE REQUEST
                                        Open a research turn: Issue in the thread milestone and branch.

@@ -4,10 +4,8 @@ summary: AWS recommends production-like load tests with observed latency and thr
 url: https://docs.aws.amazon.com/wellarchitected/latest/performance-efficiency-pillar/perf_process_culture_load_test.html
 author: "Amazon Web Services"
 kind: documentation
-captures:
-  - retrieved: 2026-09-23T09:22:59Z
-    sha256: "de22af980ff8ecba01196a8fb67fabdd45b10ca4eac4947d23c951b55df076df"
-    type: text/html
+retrieved: 2026-09-23T09:22:59Z
+sha256: "de22af980ff8ecba01196a8fb67fabdd45b10ca4eac4947d23c951b55df076df"
 ---
 
 ## Overview

@@ -4,10 +4,8 @@ summary: ConvAI founder's account of Laya's architecture, benchmarks, multilingu
 url: https://laya.convaiinnovations.com/
 author: Nandakishor Mukkunnoth
 kind: article
-captures:
-  - retrieved: 2026-09-23T12:51:17Z
-    sha256: "b131c4ac0c667cdd57229706879c1fd2c36aae3f2334ce03a00d7e3bcbb3b4d5"
-    type: text/html
+retrieved: 2026-09-23T12:51:17Z
+sha256: "b131c4ac0c667cdd57229706879c1fd2c36aae3f2334ce03a00d7e3bcbb3b4d5"
 ---
 
 ## Overview

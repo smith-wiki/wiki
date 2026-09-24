@@ -11,7 +11,7 @@ Jev is designed for narrow decisions such as classification, routing, scoring, e
 
 **Uncertainty:** TypeSafe has not published Jev's model architecture, training implementation, weights, or quantitative calibration across deployment domains. Its type-safety claim constrains output shape but does not guarantee a correct decision. See [Schema validity does not imply semantic correctness](../../notes/schema-validity-does-not-imply-semantic-correctness/) and [Calibration depends on the task and checkpoint](../../notes/calibration-depends-on-task-and-checkpoint/). ([Almeida, 2026](../../sources/typesafe-system-one-jev/))
 
-TypeSafe documents Jev's `choice`/`score`/`noul` contract and its RLCD training goal, but not its model backbone or decision-head topology. Laya publishes those internals; matching output types therefore cannot answer whether their neural architectures match. See [A shared decision API does not reveal a shared model](../../notes/a-shared-decision-api-does-not-reveal-a-shared-model/). ([TypeSafe AI, n.d.](../../sources/typesafe-system-one-documentation/); [ConvAI Innovations, n.d.](../../sources/laya-model-card/))
+TypeSafe documents Jev's `choice`/`score`/`noul` contract and its RLCD training goal, but not its model backbone or decision-head topology. Laya publishes those internals; matching output types therefore cannot answer whether their neural architectures match. See [A shared decision API does not reveal a shared model](../../notes/a-shared-decision-api-does-not-reveal-a-shared-model/). ([TypeSafe AI, n.d.](../../sources/typesafe-system-one-documentation/); [TypeSafe AI, n.d.](../../sources/typesafe-machine-learning-primer/); [ConvAI Innovations, n.d.](../../sources/laya-model-card/))
 
 ## Compared with Laya
 

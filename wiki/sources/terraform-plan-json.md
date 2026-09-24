@@ -4,10 +4,8 @@ summary: Machine-readable plans expose proposed resource changes and unknown val
 url: https://developer.hashicorp.com/terraform/internals/json-format
 author: "HashiCorp"
 kind: documentation
-captures:
-  - retrieved: 2026-09-23T09:21:01Z
-    sha256: "a958239b188388d24de4989e4a290300e5a87a0b9269914c7a114e2a1b3427dc"
-    type: text/html
+retrieved: 2026-09-23T09:21:01Z
+sha256: "a958239b188388d24de4989e4a290300e5a87a0b9269914c7a114e2a1b3427dc"
 ---
 
 ## Overview

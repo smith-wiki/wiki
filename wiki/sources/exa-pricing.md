@@ -1,14 +1,11 @@
 ---
 title: Exa pricing
 summary: Exa's official pay-as-you-go prices and included units for Search requests and page contents.
-url: https://exa.ai/pricing
+url: https://exa.ai/pricing.md
 author: Exa
 kind: webpage
-captures:
-  - retrieved: 2026-09-22T09:20:25Z
-    sha256: "11ffe400d1cd3380d33877d1f89864b4d687b18c4c1e41f0179bd100980f2d7f"
-    type: text/markdown
-    url: https://exa.ai/pricing.md
+retrieved: 2026-09-22T09:20:25Z
+sha256: "11ffe400d1cd3380d33877d1f89864b4d687b18c4c1e41f0179bd100980f2d7f"
 ---
 
 ## Overview

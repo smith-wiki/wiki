@@ -6,10 +6,8 @@ author: "Yuan Yu, Panagiotis Manolios, and Leslie Lamport"
 publisher: "CHARME '99, LNCS 1703"
 published: 1999-06-25
 kind: paper
-captures:
-  - retrieved: 2026-09-23T09:00:17Z
-    sha256: "7d8713bb8793f08c9c26b08c3a87535b6c43cfd259295c09a91d01d1f1ba6210"
-    type: application/pdf
+retrieved: 2026-09-23T09:00:17Z
+sha256: "7d8713bb8793f08c9c26b08c3a87535b6c43cfd259295c09a91d01d1f1ba6210"
 ---
 
 ## Overview

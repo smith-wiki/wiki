@@ -5,10 +5,8 @@ url: https://lamport.azurewebsites.net/tla/tools.html
 author: "Leslie Lamport"
 published: 2022-03-18
 kind: webpage
-captures:
-  - retrieved: 2026-09-23T08:59:22Z
-    sha256: "19feb61d50cc027b69e20f01139b16a14afaf9f06e593cf908bb9c897bc08582"
-    type: text/html
+retrieved: 2026-09-23T08:59:22Z
+sha256: "19feb61d50cc027b69e20f01139b16a14afaf9f06e593cf908bb9c897bc08582"
 ---
 
 ## Overview

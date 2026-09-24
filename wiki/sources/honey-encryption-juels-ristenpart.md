@@ -5,10 +5,8 @@ url: https://www.iacr.org/archive/eurocrypt2014/84410181/84410181.pdf
 author: "Ari Juels and Thomas Ristenpart"
 publisher: EUROCRYPT 2014
 kind: paper
-captures:
-  - retrieved: 2026-09-23T11:32:19Z
-    sha256: "1275a60cfec3745d0f7ec237b0b6a8df43d997271e1ab51ea000ab78f189ac47"
-    type: application/pdf
+retrieved: 2026-09-23T11:32:19Z
+sha256: "1275a60cfec3745d0f7ec237b0b6a8df43d997271e1ab51ea000ab78f189ac47"
 ---
 
 ## Overview

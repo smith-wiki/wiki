@@ -1,26 +1,11 @@
 ---
 title: Agent Substrate repository
 summary: Primary documentation for a stateful actor runtime that multiplexes sandboxed workloads over warm workers.
-url: https://github.com/agent-substrate/substrate
+url: https://raw.githubusercontent.com/agent-substrate/substrate/cdac9baef81dd319b46086d695266e6161e9e592/README.md
 author: Agent Substrate contributors
 kind: repository
-captures:
-  - retrieved: 2026-09-22T06:22:30Z
-    sha256: "7e0a509b8f54933cf3313210c0132388a040252537f2f55a5ca06fe12769bbfb"
-    type: text/markdown
-    url: https://raw.githubusercontent.com/agent-substrate/substrate/cdac9baef81dd319b46086d695266e6161e9e592/README.md
-  - retrieved: 2026-09-22T06:22:30Z
-    sha256: "6e933104b0df4a53242728be70f8ada54711d4a4598e7190714287d322a8192d"
-    type: text/markdown
-    url: https://raw.githubusercontent.com/agent-substrate/substrate/cdac9baef81dd319b46086d695266e6161e9e592/docs/architecture.md
-  - retrieved: 2026-09-22T06:22:30Z
-    sha256: "46e2ffd885a31c48db6c8b22deb0cf86a077fcec750db1d395efccdc03cabeb8"
-    type: text/markdown
-    url: https://raw.githubusercontent.com/agent-substrate/substrate/cdac9baef81dd319b46086d695266e6161e9e592/docs/glossary.md
-  - retrieved: 2026-09-22T06:22:30Z
-    sha256: "d481f97914bcbd97019ca72146178e51d673020111dcb54b0cfa510050dc17af"
-    type: text/markdown
-    url: https://raw.githubusercontent.com/agent-substrate/substrate/cdac9baef81dd319b46086d695266e6161e9e592/docs/threat-model.md
+retrieved: 2026-09-22T06:22:30Z
+sha256: "7e0a509b8f54933cf3313210c0132388a040252537f2f55a5ca06fe12769bbfb"
 ---
 
 ## Overview

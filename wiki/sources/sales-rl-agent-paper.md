@@ -6,10 +6,8 @@ author: Nandakishor Mukkunnoth
 publisher: arXiv
 published: 2025-03-30
 kind: paper
-captures:
-  - retrieved: 2026-09-23T13:01:06Z
-    sha256: "1349f2ce85e0153d2216323ccbe0d854d43326619955751e11173529493eb56f"
-    type: text/html
+retrieved: 2026-09-23T13:01:06Z
+sha256: "1349f2ce85e0153d2216323ccbe0d854d43326619955751e11173529493eb56f"
 ---
 
 ## Overview

@@ -6,10 +6,8 @@ author: Diogo Almeida
 publisher: TypeSafe AI
 published: 2026-09-15
 kind: article
-captures:
-  - retrieved: 2026-09-21T16:26:00Z
-    sha256: "8af0f9569aa95e8e217bf571fdff9adb79c45f7a03778234afb563e1c438f8f6"
-    type: text/html
+retrieved: 2026-09-21T16:26:00Z
+sha256: "8af0f9569aa95e8e217bf571fdff9adb79c45f7a03778234afb563e1c438f8f6"
 ---
 
 ## Overview

@@ -4,10 +4,8 @@ summary: AWS pricing catalogs expose SKU-level rates but omit some offer types a
 url: https://docs.aws.amazon.com/awsaccountbilling/latest/aboutv2/price-changes.html
 author: "Amazon Web Services"
 kind: documentation
-captures:
-  - retrieved: 2026-09-23T09:21:02Z
-    sha256: "5ce3083f8d4eaae0bbae481d740e59d01deac9d01c01f1c47c8094a15f85f106"
-    type: text/html
+retrieved: 2026-09-23T09:21:02Z
+sha256: "5ce3083f8d4eaae0bbae481d740e59d01deac9d01c01f1c47c8094a15f85f106"
 ---
 
 ## Overview

@@ -4,10 +4,8 @@ summary: AWS request-time authorization depends on request context and multiple 
 url: https://docs.aws.amazon.com/IAM/latest/UserGuide/reference_policies_evaluation-logic.html
 author: "Amazon Web Services"
 kind: documentation
-captures:
-  - retrieved: 2026-09-23T09:25:35Z
-    sha256: "c89f839064a26a0832b99613f691ef312edd02778f951ff24e577766cb822b2f"
-    type: text/html
+retrieved: 2026-09-23T09:25:35Z
+sha256: "c89f839064a26a0832b99613f691ef312edd02778f951ff24e577766cb822b2f"
 ---
 
 ## Overview

@@ -6,10 +6,8 @@ author: "jamilxt"
 publisher: "DEV Community"
 published: 2026-09-22
 kind: article
-captures:
-  - retrieved: 2026-09-23T12:51:38Z
-    sha256: "6f5177740fc30fbefcfaf6230da30b6d08a17c1a3ba384671f14532c4ecd005e"
-    type: text/html
+retrieved: 2026-09-23T12:51:38Z
+sha256: "6f5177740fc30fbefcfaf6230da30b6d08a17c1a3ba384671f14532c4ecd005e"
 ---
 
 ## Overview

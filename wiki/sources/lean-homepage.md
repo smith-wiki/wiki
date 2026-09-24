@@ -4,10 +4,8 @@ summary: Lean FRO's overview of Lean's language, proof checker, automation, and 
 url: https://lean-lang.org/
 author: "Lean FRO"
 kind: webpage
-captures:
-  - retrieved: 2026-09-23T08:39:50Z
-    sha256: "ee25ff6f7a28270a2e4020200d31a3ab5d415d5306d569478a84bf38fe53c16c"
-    type: text/html
+retrieved: 2026-09-23T08:39:50Z
+sha256: "ee25ff6f7a28270a2e4020200d31a3ab5d415d5306d569478a84bf38fe53c16c"
 ---
 
 ## Overview
