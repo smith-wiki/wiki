@@ -3,12 +3,18 @@
 
 Usage:
   search_eval.py [--chunkers NAME,...] [--models MODEL,...]
+  search_eval.py --passages DIR [--per-doc N] [--chunkers NAME,...] [--models MODEL,...]
 
 Every Key point on a source page becomes a query whose answer is that page's
 current capture; every current capture with a Markdown copy is in the corpus.
 For each chunker and model the script ranks captures by their best chunk and
 reports hit@1, hit@5, and mean reciprocal rank for dense, BM25, and fused
-(reciprocal rank fusion) retrieval. Embeddings are cached under raw/index/.
+(reciprocal rank fusion) retrieval. With --passages, the corpus is the Markdown
+files in DIR, an LLM writes one question per sampled paragraph, and a hit is a
+chunk that holds at least half of that paragraph: this measures chunking itself,
+not just finding the right document. Models run through OpenRouter, except the
+local ModernBERT embedder, which late chunking also uses for its pooled vectors.
+Embeddings and chunk spans are cached under raw/index/.
 Run it through `sw search-eval`; rerun it whenever the Markdown copies, the
 chunker candidates, or the embedding models change.
 """
@@ -16,29 +22,45 @@ chunker candidates, or the embedding models change.
 from __future__ import annotations
 
 import argparse
+import functools
 import hashlib
 import json
 import math
 import os
+import random
 import re
 import sqlite3
 import sys
 import threading
+import urllib.request
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 from pathlib import Path
 from types import SimpleNamespace
 
 import numpy as np
-from chonkie import OpenAIGenie, SemanticChunker, SentenceChunker, SlumberChunker, TokenChunker
-from chonkie.embeddings import BaseEmbeddings
+from chonkie import LateChunker, NeuralChunker, SemanticChunker, SentenceChunker, TokenChunker
 
 from fetch import Store, primary_root
 from search import CREDENTIALS, embed, embedding_text, first_heading, markdown_chunker, split
 
 DB_LOCK = threading.Lock()  # one sqlite connection serves every worker thread
-MODELS = ["qwen/qwen3-embedding-8b", "voyageai/voyage-4-lite", "voyageai/voyage-4"]
-SLUMBER_MODEL = "google/gemini-2.5-flash-lite"
+LOCAL = "local:nomic-ai/modernbert-embed-base"  # also the late-chunking model; 8192-token context
+LOCAL_PREFIX = {True: "search_query: ", False: "search_document: "}
+MODELS = ["qwen/qwen3-embedding-8b", "voyageai/voyage-4-lite", "voyageai/voyage-4", LOCAL]
+SEQUENTIAL = {"semantic-1600", "neural", "late-400"}  # torch models run one text at a time
+QUESTION_MODEL = "google/gemini-2.5-flash-lite"
+QUESTION_PROMPT = (
+    "Write one specific question that a researcher could ask and that the passage below answers. "
+    "Use your own words: do not copy distinctive phrases, names of sections, or numbers unless the question "
+    "cannot be asked without them. Reply with the question only.\n\nPassage:\n"
+)
+
+
+@functools.cache
+def local_model():
+    from chonkie.embeddings import SentenceTransformerEmbeddings
+    return SentenceTransformerEmbeddings(LOCAL.removeprefix("local:"))
 
 
 class Cache:
@@ -61,9 +83,12 @@ class Cache:
             known.update({key: np.frombuffer(blob, dtype=np.float32) for key, blob in rows})
         missing = [(key, text) for key, text in dict(zip(keys, texts)).items() if key not in known]
         batches = [missing[start:start + 32] for start in range(0, len(missing), 32)]
-        with ThreadPoolExecutor(max_workers=6) as pool:
-            results = pool.map(lambda batch: embed([text for _, text in batch], model, query), batches)
-            for batch, vectors in zip(batches, results):
+        if model == LOCAL:
+            work = lambda batch: local_model().embed_batch([LOCAL_PREFIX[query] + text for _, text in batch])
+        else:
+            work = lambda batch: embed([text for _, text in batch], model, query)
+        with ThreadPoolExecutor(max_workers=1 if model == LOCAL else 6) as pool:
+            for batch, vectors in zip(batches, pool.map(work, batches)):
                 for (key, _), vector in zip(batch, vectors):
                     known[key] = np.asarray(vector, dtype=np.float32)
                 with DB_LOCK:
@@ -74,30 +99,26 @@ class Cache:
         return matrix / np.linalg.norm(matrix, axis=1, keepdims=True)
 
 
-class OpenRouterEmbeddings(BaseEmbeddings):
-    """Chonkie embeddings backed by the cache, for the semantic chunker."""
+class Capped:
+    """A chunker whose chunks longer than LIMIT characters are split again by the Markdown rules."""
 
-    def __init__(self, cache: Cache, model: str) -> None:
-        super().__init__()
-        self.cache, self.model = cache, model
+    def __init__(self, inner, limit: int = 3200) -> None:
+        self.inner, self.limit, self.splitter = inner, limit, markdown_chunker()
 
-    def embed(self, text: str) -> np.ndarray:
-        return self.cache.vectors(self.model, [text])[0]
-
-    def embed_batch(self, texts: list[str]) -> list[np.ndarray]:
-        return list(self.cache.vectors(self.model, texts)) if texts else []
-
-    @property
-    def dimension(self) -> int:
-        return len(self.embed("dimension"))
-
-    def get_tokenizer(self):
-        return "character"
+    def chunk(self, text: str) -> list[SimpleNamespace]:
+        found = []
+        for chunk in self.inner.chunk(text):
+            if len(chunk.text) <= self.limit:
+                found.append(chunk)
+                continue
+            for part in self.splitter.chunk(chunk.text):
+                found.append(SimpleNamespace(text=part.text, start_index=chunk.start_index + part.start_index,
+                                             end_index=chunk.start_index + part.end_index))
+        return found
 
 
-def chunkers(cache: Cache) -> dict:
-    genie = lambda: OpenAIGenie(model=SLUMBER_MODEL, base_url="https://openrouter.ai/api/v1",
-                                api_key=os.environ["OPENROUTER_API_KEY"])
+def chunkers() -> dict:
+    """Candidate chunkers; all run on this machine, so choosing one costs no model calls."""
     return {
         "token-1000": lambda: TokenChunker(tokenizer="character", chunk_size=1000),
         "sentence-1600": lambda: SentenceChunker(tokenizer="character", chunk_size=1600),
@@ -105,10 +126,15 @@ def chunkers(cache: Cache) -> dict:
         "recursive-md-1600": lambda: markdown_chunker(1600),
         "recursive-md-3200": lambda: markdown_chunker(3200),
         # 0.3 is the loosest threshold that still splits; higher ones leave chunks of 300 to 500 characters.
-        "semantic-1600": lambda: SemanticChunker(embedding_model=OpenRouterEmbeddings(cache, MODELS[0]),
-                                                 chunk_size=1600, threshold=0.3),
-        "slumber-1600": lambda: SlumberChunker(genie=genie(), tokenizer="character", chunk_size=1600,
-                                               candidate_size=256, verbose=False),
+        "semantic-1600": functools.cache(lambda: SemanticChunker(embedding_model=local_model(), chunk_size=1600,
+                                                                 threshold=0.3)),
+        # Torch chunkers load their model once and run one text at a time.
+        # The neural chunker sets no maximum; pieces over 3200 characters are split by the recursive rules.
+        "neural": functools.cache(lambda: Capped(NeuralChunker(model="mirth/chonky_modernbert_base_1",
+                                                               min_characters_per_chunk=24))),
+        # About 1600 characters; boundaries follow the Markdown rules, vectors are pooled from the whole text.
+        "late-400": functools.cache(lambda: LateChunker(embedding_model=local_model(), chunk_size=400,
+                                                        rules=markdown_chunker().rules, min_characters_per_chunk=24)),
     }
 
 
@@ -164,6 +190,66 @@ def doc_ranks(scores: np.ndarray, owners: np.ndarray, gold: list[str], shas: lis
     return ranks
 
 
+def passages(text: str) -> list[tuple[int, int]]:
+    """Prose paragraphs of 300 to 1500 characters before any References section: the spans questions are asked about."""
+    end = re.search(r"^#+\s*(\d+\.?\s*)?(references|bibliography)\b", text, re.I | re.M)
+    found = []
+    for match in re.finditer(r"[^\n](?:.|\n(?!\s*\n))*", text[:end.start() if end else len(text)]):
+        block = match.group(0).strip()
+        if 300 <= len(block) <= 1500 and not block.startswith(("|", "```", "![", "#", "<", "$$")):
+            found.append((match.start(), match.end()))
+    return found
+
+
+def ask(prompt: str) -> str:
+    """One answer from QUESTION_MODEL through OpenRouter."""
+    body = {"model": QUESTION_MODEL, "temperature": 0, "max_tokens": 200, "messages": [{"role": "user", "content": prompt}]}
+    request = urllib.request.Request(
+        "https://openrouter.ai/api/v1/chat/completions", data=json.dumps(body).encode(),
+        headers={"Authorization": f"Bearer {os.environ['OPENROUTER_API_KEY']}", "Content-Type": "application/json"})
+    with urllib.request.urlopen(request, timeout=120) as response:
+        return json.load(response)["choices"][0]["message"]["content"].strip()
+
+
+def passage_queries(db: sqlite3.Connection, docs: dict, per_doc: int) -> list[tuple[str, int, int, int]]:
+    """(question, document position, start, end): questions an LLM wrote for sampled paragraphs, cached."""
+    with DB_LOCK:
+        db.execute("create table if not exists questions (model text, key text, question text, primary key (model, key))")
+    wanted = []
+    for position, (name, (_, text)) in enumerate(docs.items()):
+        spans = passages(text)
+        for start, end in random.Random(name).sample(spans, min(per_doc, len(spans))):
+            wanted.append((position, start, end, text[start:end]))
+
+    def question(item):
+        key = hashlib.sha256(item[3].encode()).hexdigest()
+        with DB_LOCK:
+            row = db.execute("select question from questions where model = ? and key = ?", (QUESTION_MODEL, key)).fetchone()
+        if row:
+            return row[0]
+        text = ask(QUESTION_PROMPT + item[3])
+        with DB_LOCK:
+            db.execute("insert or replace into questions values (?, ?, ?)", (QUESTION_MODEL, key, text))
+            db.commit()
+        return text
+
+    with ThreadPoolExecutor(max_workers=8) as pool:
+        return [(text, position, start, end) for text, (position, start, end, _) in zip(pool.map(question, wanted), wanted)]
+
+
+def passage_ranks(scores: np.ndarray, owners: np.ndarray, spans: np.ndarray, gold: list[tuple[int, int, int]]) -> list[float]:
+    """Rank of the first chunk that holds at least half of the gold paragraph (or is half made of it); inf if none."""
+    ranks = []
+    for row, (position, start, end) in enumerate(gold):
+        overlap = np.clip(np.minimum(spans[:, 1], end) - np.maximum(spans[:, 0], start), 0, None)
+        smaller = np.minimum(spans[:, 1] - spans[:, 0], end - start)
+        hit = (owners == position) & (overlap >= 0.5 * smaller)
+        order = np.argsort(-scores[row])
+        found = np.nonzero(hit[order])[0]
+        ranks.append(float(found[0] + 1) if len(found) else math.inf)
+    return ranks
+
+
 def fused(*rankings: np.ndarray, k: int = 60) -> np.ndarray:
     """Reciprocal rank fusion of chunk scores, per query."""
     total = np.zeros_like(rankings[0])
@@ -207,7 +293,10 @@ class CachedChunker:
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument("--chunkers", help="comma-separated chunker names")
-    parser.add_argument("--models", help="comma-separated OpenRouter embedding models")
+    parser.add_argument("--models", help=f"comma-separated OpenRouter embedding models, or {LOCAL}")
+    parser.add_argument("--passages", type=Path, metavar="DIR",
+                        help="score passage retrieval on the Markdown files in DIR with LLM-written questions")
+    parser.add_argument("--per-doc", type=int, default=8, help="questions per document with --passages")
     args = parser.parse_args()
     missing = [name for name in CREDENTIALS if not os.environ.get(name)]
     if missing:
@@ -216,31 +305,49 @@ def main() -> int:
 
     root = primary_root()
     cache = Cache(root / "raw" / "index" / "eval-embeddings.sqlite")
-    available = chunkers(cache)
+    available = chunkers()
     names = args.chunkers.split(",") if args.chunkers else list(available)
     models = args.models.split(",") if args.models else MODELS
-    worktree = Path(__file__).resolve().parent.parent
-    docs, queries = corpus(Store(root), worktree)
-    shas = list(docs)
-    print(f"{len(docs)} captures, {len(queries)} Key point queries")
-    query_texts, gold = [text for text, _ in queries], [sha for _, sha in queries]
+    if args.passages:
+        docs = {path.stem: (first_heading(path.read_text()) or path.stem, path.read_text())
+                for path in sorted(args.passages.glob("*.md"))}
+        queries = passage_queries(cache.db, docs, args.per_doc)
+        query_texts, gold = [text for text, *_ in queries], [tuple(where) for _, *where in queries]
+        print(f"{len(docs)} documents, {len(queries)} questions about single paragraphs ({QUESTION_MODEL})")
+    else:
+        docs, queries = corpus(Store(root), Path(__file__).resolve().parent.parent)
+        query_texts, gold = [text for text, _ in queries], [sha for _, sha in queries]
+        print(f"{len(docs)} captures, {len(queries)} Key point queries")
+    keys = list(docs)
 
     for name in names:
         chunker = CachedChunker(cache.db, name, available[name])
-        with ThreadPoolExecutor(max_workers=8) as pool:
-            split_docs = list(pool.map(lambda sha: split(docs[sha][1], chunker), shas))
-        texts, owners = [], []
-        for position, (sha, pieces) in enumerate(zip(shas, split_docs)):
-            texts += [embedding_text(docs[sha][0], piece) for piece in pieces]
+        with ThreadPoolExecutor(max_workers=1 if name in SEQUENTIAL else 8) as pool:
+            split_docs = list(pool.map(lambda key: split(docs[key][1], chunker), keys))
+        texts, owners, spans = [], [], []
+        for position, (key, pieces) in enumerate(zip(keys, split_docs)):
+            texts += [embedding_text(docs[key][0], piece) for piece in pieces]
             owners += [position] * len(pieces)
-        owners = np.array(owners)
+            spans += [(piece.start, piece.end) for piece in pieces]
+        owners, spans = np.array(owners), np.array(spans)
+        if args.passages:
+            rank = lambda scores: passage_ranks(scores, owners, spans, gold)
+        else:
+            rank = lambda scores: doc_ranks(scores, owners, gold, keys)
         lexical = bm25(texts, query_texts)
         print(f"\n{name}: {len(texts)} chunks, {sum(map(len, texts)) / len(texts):.0f} characters on average")
-        print(f"  bm25                     {summary(doc_ranks(lexical, owners, gold, shas))}")
+        print(f"  {'bm25':30} {summary(rank(lexical))}")
         for model in models:
             dense = cache.vectors(model, query_texts, query=True) @ cache.vectors(model, texts).T
-            print(f"  {model:24} {summary(doc_ranks(dense, owners, gold, shas))}")
-            print(f"  {model + ' + bm25':24} {summary(doc_ranks(fused(dense, lexical), owners, gold, shas))}")
+            print(f"  {model:30} {summary(rank(dense))}")
+            print(f"  {model + ' + bm25':30} {summary(rank(fused(dense, lexical)))}")
+        if name.startswith("late"):
+            # Late chunking's point is its vectors: chunk embeddings pooled from the whole text in context.
+            late = available[name]()
+            pooled = np.stack([chunk.embedding for key in keys for chunk in late.chunk(docs[key][1]) if chunk.text.strip()])
+            dense = cache.vectors(LOCAL, query_texts, query=True) @ (pooled / np.linalg.norm(pooled, axis=1, keepdims=True)).T
+            print(f"  {'late pooled':30} {summary(rank(dense))}")
+            print(f"  {'late pooled + bm25':30} {summary(rank(fused(dense, lexical)))}")
     return 0
 
 
