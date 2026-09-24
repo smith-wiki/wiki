@@ -35,6 +35,7 @@ from pathlib import Path
 from chonkie import RecursiveChunker, RecursiveLevel, RecursiveRules
 from qdrant_client import QdrantClient, models
 
+from convert import NETWORK_ERRORS, send
 from fetch import FetchError, Store, primary_root
 
 # The pipeline: how text becomes chunks and vectors. Changing any of it needs a
@@ -165,16 +166,10 @@ def embed(texts: list[str], model: str = MODEL, query: bool = False, batch: int 
             data=json.dumps(body).encode(),
             headers={"Authorization": f"Bearer {os.environ['OPENROUTER_API_KEY']}", "Content-Type": "application/json"},
         )
-        for attempt in range(4):
-            try:
-                with urllib.request.urlopen(request, timeout=120) as response:
-                    data = json.load(response)["data"]
-                break
-            except (urllib.error.URLError, TimeoutError, KeyError) as error:
-                retryable = not isinstance(error, urllib.error.HTTPError) or error.code in (408, 429) or error.code >= 500
-                if attempt == 3 or not retryable:
-                    raise BackendError("embeddings", error_class(error)) from error
-                time.sleep(2 ** attempt * 2)
+        try:
+            data = json.loads(send(request, 120)[0])["data"]
+        except (*NETWORK_ERRORS, KeyError) as error:
+            raise BackendError("embeddings", error_class(error)) from error
         vectors += [item["embedding"] for item in sorted(data, key=lambda item: item["index"])]
     return vectors
 
