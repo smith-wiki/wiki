@@ -20,6 +20,10 @@ _Avoid_: Download, snapshot, version
 A Capture kept in the store but never searched: one replaced by a recapture, or one withdrawn, such as the captures of a rejected turn.
 _Avoid_: Deleted capture, old version
 
+**Figure description**:
+Text a vision model wrote about one figure of a Capture, placed under the figure in its Markdown copy and marked as generated, so search can find the figure. Never evidence: claims cite the figure itself.
+_Avoid_: Caption, alt text
+
 **Original**:
 The exact bytes a URL returned when it was captured; never modified.
 _Avoid_: Raw file
