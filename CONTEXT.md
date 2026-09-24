@@ -16,6 +16,10 @@ _Avoid_: Source card
 The stored copy of a Source at one moment: its Original and a Markdown version of it. A Source has one current Capture; recapturing replaces it, and the earlier one stays only in the archive.
 _Avoid_: Download, snapshot, version
 
+**Archived capture**:
+A Capture kept in the store but never searched: one replaced by a recapture, or one withdrawn, such as the captures of a rejected turn.
+_Avoid_: Deleted capture, old version
+
 **Original**:
 The exact bytes a URL returned when it was captured; never modified.
 _Avoid_: Raw file
