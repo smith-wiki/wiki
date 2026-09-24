@@ -1,0 +1,10 @@
+---
+title: Page retrieval does not localize a figure
+summary: Page relevance, figure-asset ranking, and exact source-region citation are separate tasks with different evidence requirements.
+---
+
+A retrieved page is a *candidate evidence container*, not a figure identifier. ViDoRe v1 and v2 score relevant **pages**, even for scientific-figure queries; Jina and Voyage multimodal embeddings, ColPali, and ColQwen likewise rank the unit submitted for embedding. A patch-similarity visualization may suggest where to inspect but does not certify an object boundary or its author caption ([Faysse et al., 2025](../../sources/colpali-study/); [Mace et al., 2025](../../sources/vidore-two-study/); [Gunther et al., 2025](../../sources/jina-embeddings-four-study/)).
+
+Figure-crop ranking addresses the *asset* unit: Voyage's figure/table suite indexes extracted images and therefore measures a closer match to the question. But an extracted image score does not certify the PDF page/box or the web `figure`/`figcaption` from which it came ([Voyage AI, 2024](../../sources/voyage-multimodal-three-release/); [WHATWG, n.d.](../../sources/html-figure-specification/)). ViDoRe v3 measures bounding-box grounding separately from page retrieval; its substantial human/model agreement gap cautions against inferring precise citations from rank alone ([Loison et al., 2026](../../sources/vidore-three-study/)). The analogous [PDF benchmark limitation](../pdf-benchmark-scores-do-not-certify-structure/) applies to parsing.
+
+**Inference:** Index page and figure crops with immutable source-to-crop relationships, preserve authored captions apart from generated descriptions or Mermaid, and verify the figure rectangle before returning a citation. If only the page is known, cite the page without claiming to have located its diagram. The full retrieval, cost, and provenance comparison is in [visual evidence retrieval](../../concepts/visual-evidence-retrieval/), which extends [web capture fidelity](../../concepts/web-capture-fidelity/) and [scientific PDF structure extraction](../../concepts/scientific-pdf-structure-extraction/).

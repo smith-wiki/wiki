@@ -11,6 +11,8 @@ A web page's *capture* is the evidence obtained at a particular URL and time; it
 
 The same original-versus-reading-copy distinction applies to [scientific PDF structure extraction](../scientific-pdf-structure-extraction/): keep the PDF and page/asset provenance, not just the converted Markdown. PDF-specific benchmarks measure different fragments of headings, formulas, tables, and order, while leaving code and caption attachment uncertain ([Li et al., 2025](../../sources/readoc-study/); [Ouyang et al., 2025](../../sources/omnidocbench-study/)).
 
+The [visual evidence retrieval](../visual-evidence-retrieval/) layer uses captured image assets and the rendered `figure`/`figcaption` association to make a diagram searchable without mistaking generated prose or Mermaid for an author caption. A correct page hit is not necessarily a [citable figure location](../../notes/page-retrieval-does-not-localize-a-figure/) ([WHATWG, n.d.](../../sources/html-figure-specification/); [Loison et al., 2026](../../sources/vidore-three-study/)).
+
 ## Tool tradeoffs in September 2026
 
 | Tool | Main-content evidence | Structure in Markdown | JavaScript and local operation | Nixpkgs unstable |
