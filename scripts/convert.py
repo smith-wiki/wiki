@@ -92,6 +92,9 @@ def chat(model: str, prompt: str, image: tuple[str, bytes] | None = None, max_to
 
 # Figures
 
+# Chosen by `sw search-eval --figures`: on 56 questions written from the figures of 11 papers, descriptions raised
+# figure retrieval from MRR 0.52 to 0.74 (+/- 0.09); gemini-3.1-flash-lite scored the same (0.72) at 1.8x the cost.
+# About $0.0003 a figure.
 VISION_MODEL = "google/gemini-2.5-flash-lite"
 FIGURE = re.compile(r"!\[[^\]]*\]\(assets/([^)\s]+)\)")
 SKIPPED_KINDS = {"formula", "logo", "decoration"}
