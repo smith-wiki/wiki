@@ -5,10 +5,8 @@ url: https://learntla.com/
 author: "Hillel Wayne"
 publisher: "Learn TLA+"
 kind: webpage
-captures:
-  - retrieved: 2026-09-23T08:58:32Z
-    sha256: "f13eb55b5eb71189e6b0ad072fbe01ec563f488d7df186e4eabedccc37d32653"
-    type: text/html
+retrieved: 2026-09-23T08:58:32Z
+sha256: "f13eb55b5eb71189e6b0ad072fbe01ec563f488d7df186e4eabedccc37d32653"
 ---
 
 ## Overview

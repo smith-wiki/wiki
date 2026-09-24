@@ -1,21 +1,11 @@
 ---
 title: jevbench repository and 500-example comparison
 summary: Seeded public-dataset comparison of Jev and Laya with aggregate accuracy and calibration results, but no committed raw predictions.
-url: https://raw.githubusercontent.com/dhruvmehra/jevbench/c983cc4a7dd9fc142ca3b6c7a813cae0e963c902/docs/results/2026-09-22-n500-summary.md
+url: https://raw.githubusercontent.com/dhruvmehra/jevbench/c983cc4a7dd9fc142ca3b6c7a813cae0e963c902/README.md
 author: dhruvmehra
 kind: repository
-captures:
-  - retrieved: 2026-09-23T15:02:27Z
-    sha256: "d7a5786f41ffa4a28759b78e03ec5af07bf9d531d7d0e3bcb321cd8c7eba9089"
-    type: text/plain
-  - retrieved: 2026-09-23T15:02:47Z
-    sha256: "d421ece0fcf3e1cb178d2a9d6fcd565d8620663a72cbcba90bd380c862f1f114"
-    type: text/plain
-    url: https://raw.githubusercontent.com/dhruvmehra/jevbench/c983cc4a7dd9fc142ca3b6c7a813cae0e963c902/README.md
-  - retrieved: 2026-09-23T15:02:59Z
-    sha256: "56866ad4055009ece50014b3d7c20b3952b7e4acd748da1d3571983095985a31"
-    type: text/plain
-    url: https://raw.githubusercontent.com/dhruvmehra/jevbench/c983cc4a7dd9fc142ca3b6c7a813cae0e963c902/src/jevbench/datasets.py
+retrieved: 2026-09-23T15:02:47Z
+sha256: "d421ece0fcf3e1cb178d2a9d6fcd565d8620663a72cbcba90bd380c862f1f114"
 ---
 
 ## Overview

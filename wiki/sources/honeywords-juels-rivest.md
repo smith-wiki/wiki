@@ -6,10 +6,8 @@ author: "Ari Juels and Ronald L. Rivest"
 publisher: ACM CCS 2013
 published: 2013-11-04
 kind: paper
-captures:
-  - retrieved: 2026-09-23T11:32:44Z
-    sha256: "e0eb92c0373abb3f0d747efc2cc5b73c145e0f49abe3fbf00a61f83605d11f42"
-    type: application/pdf
+retrieved: 2026-09-23T11:32:44Z
+sha256: "e0eb92c0373abb3f0d747efc2cc5b73c145e0f49abe3fbf00a61f83605d11f42"
 ---
 
 ## Overview

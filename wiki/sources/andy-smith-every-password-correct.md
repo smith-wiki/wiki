@@ -5,10 +5,8 @@ url: https://andysmith.ai/2026/Sep/23/what-if-every-password-were-correct/
 author: "Andy Smith"
 published: 2026-09-23
 kind: webpage
-captures:
-  - retrieved: 2026-09-23T11:29:22Z
-    sha256: "8c458e25f2a2dfd81cc62d2de77ebdfd1b763069ab35e046eb922c566412fce7"
-    type: text/html
+retrieved: 2026-09-23T11:09:01Z
+sha256: "8c458e25f2a2dfd81cc62d2de77ebdfd1b763069ab35e046eb922c566412fce7"
 ---
 
 ## Overview

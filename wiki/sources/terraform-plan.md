@@ -4,10 +4,8 @@ summary: Terraform previews proposed changes but warns about stale speculative p
 url: https://developer.hashicorp.com/terraform/cli/commands/plan
 author: "HashiCorp"
 kind: documentation
-captures:
-  - retrieved: 2026-09-23T09:21:01Z
-    sha256: "84cd587d73db2da34cc62085119a1c77e7be8f6e5219b7d960805342ec7df90f"
-    type: text/html
+retrieved: 2026-09-23T09:21:01Z
+sha256: "84cd587d73db2da34cc62085119a1c77e7be8f6e5219b7d960805342ec7df90f"
 ---
 
 ## Overview

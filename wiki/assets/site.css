@@ -270,8 +270,7 @@
     font-size: 1.1rem;
   }
 
-  .source-cited-by ul,
-  .source-provenance ul {
+  .source-cited-by ul {
     margin: 0;
     padding-left: 1.1rem;
   }
@@ -282,15 +281,13 @@
     font-weight: 700;
   }
 
-  .source-provenance p,
-  .source-provenance li {
+  .source-provenance p {
     margin-top: 0.6rem;
     color: var(--muted);
     font-size: 0.9rem;
   }
 
-  .source-provenance code,
-  .source-capture-url {
+  .source-provenance code {
     overflow-wrap: anywhere;
   }
 

@@ -5,10 +5,8 @@ url: https://pages.nist.gov/800-63-4/sp800-63b/authenticators/
 author: "National Institute of Standards and Technology"
 published: 2025-07-31
 kind: specification
-captures:
-  - retrieved: 2026-09-23T11:34:11Z
-    sha256: "dc1d7071d2e305ea1fee14d7bf75de5eb6bcbd3d9d9bcb19d78adf7ae6f7de75"
-    type: text/html
+retrieved: 2026-09-23T11:34:11Z
+sha256: "dc1d7071d2e305ea1fee14d7bf75de5eb6bcbd3d9d9bcb19d78adf7ae6f7de75"
 ---
 
 ## Overview

@@ -5,10 +5,8 @@ url: https://lamport.azurewebsites.net/tla/tla.html
 author: "Leslie Lamport"
 published: 2025-10-13
 kind: webpage
-captures:
-  - retrieved: 2026-09-23T08:58:32Z
-    sha256: "a410ef399887c05ac183aa41ef6850cbd4bb779d7dd5e4019d46d57a17ddbf13"
-    type: text/html
+retrieved: 2026-09-23T10:23:56Z
+sha256: "a410ef399887c05ac183aa41ef6850cbd4bb779d7dd5e4019d46d57a17ddbf13"
 ---
 
 ## Overview

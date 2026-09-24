@@ -4,10 +4,8 @@ summary: Generic errors, similar response timing, throttling, and MFA reduce onl
 url: https://cheatsheetseries.owasp.org/cheatsheets/Authentication_Cheat_Sheet.html
 author: "OWASP Cheat Sheet Series"
 kind: documentation
-captures:
-  - retrieved: 2026-09-23T11:38:24Z
-    sha256: "afab72f685555b72b1fadf6da034d07258a9f01d0c0272d01b0cb1991caa49cb"
-    type: text/html
+retrieved: 2026-09-23T11:38:24Z
+sha256: "afab72f685555b72b1fadf6da034d07258a9f01d0c0272d01b0cb1991caa49cb"
 ---
 
 ## Overview

@@ -5,10 +5,8 @@ url: https://docs.typesafe.ai/models
 author: TypeSafe AI
 publisher: TypeSafe AI
 kind: documentation
-captures:
-  - retrieved: 2026-09-23T12:58:27Z
-    sha256: "3a1e2c0927cae38c2d019a94a61bd0675c4bf4593629b89ad511899efa683253"
-    type: text/html
+retrieved: 2026-09-23T12:58:27Z
+sha256: "3a1e2c0927cae38c2d019a94a61bd0675c4bf4593629b89ad511899efa683253"
 ---
 
 ## Overview

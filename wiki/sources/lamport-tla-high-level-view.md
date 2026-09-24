@@ -5,10 +5,8 @@ url: https://lamport.azurewebsites.net/tla/high-level-view.html
 author: "Leslie Lamport"
 published: 2021-08-10
 kind: article
-captures:
-  - retrieved: 2026-09-23T08:58:58Z
-    sha256: "d8cc04b089ced4b2755ab0b55b372fe23be8750b1aa74e365b24818511c92bc1"
-    type: text/html
+retrieved: 2026-09-23T08:58:58Z
+sha256: "d8cc04b089ced4b2755ab0b55b372fe23be8750b1aa74e365b24818511c92bc1"
 ---
 
 ## Overview

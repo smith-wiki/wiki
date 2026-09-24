@@ -6,10 +6,8 @@ author: "Kesha Hietala and Emina Torlak"
 publisher: "AWS Open Source Blog"
 published: 2024-04-08
 kind: article
-captures:
-  - retrieved: 2026-09-23T08:40:52Z
-    sha256: "51b24c2135d6f4c501a104b047914e9bc603bf711041dd9d92e9580c957458c8"
-    type: text/html
+retrieved: 2026-09-23T08:40:52Z
+sha256: "51b24c2135d6f4c501a104b047914e9bc603bf711041dd9d92e9580c957458c8"
 ---
 
 ## Overview

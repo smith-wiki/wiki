@@ -5,10 +5,8 @@ url: https://crypto.stanford.edu/~dabo/pubs/papers/passwordmgr.pdf
 author: "Hristo Bojinov, Elie Bursztein, Xavier Boyen, and Dan Boneh"
 publisher: ESORICS 2010
 kind: paper
-captures:
-  - retrieved: 2026-09-23T11:33:24Z
-    sha256: "758e7dc8ed3c573518b92d1ed3208314265ce977bf0e39a0c56a8cfdfa42fee9"
-    type: application/pdf
+retrieved: 2026-09-23T11:33:24Z
+sha256: "758e7dc8ed3c573518b92d1ed3208314265ce977bf0e39a0c56a8cfdfa42fee9"
 ---
 
 ## Overview

@@ -4,10 +4,8 @@ summary: AWS separates policy validation from scoped analysis of external, inter
 url: https://docs.aws.amazon.com/IAM/latest/UserGuide/what-is-access-analyzer.html
 author: "Amazon Web Services"
 kind: documentation
-captures:
-  - retrieved: 2026-09-23T09:22:59Z
-    sha256: "9f0b1f221c6a9c9033937f6879ebc8cbcf4d724200d89ebe78ed061e76f215aa"
-    type: text/html
+retrieved: 2026-09-23T09:22:59Z
+sha256: "9f0b1f221c6a9c9033937f6879ebc8cbcf4d724200d89ebe78ed061e76f215aa"
 ---
 
 ## Overview

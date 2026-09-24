@@ -4,26 +4,8 @@ summary: Independent paired-input Laya-Jev runs and reproducible comparisons wit
 url: https://raw.githubusercontent.com/instax-dutta/sysone-bench/1ac3650a65e3783ac9615f26b02bc7c1d5ad3b23/README.md
 author: instax-dutta
 kind: repository
-captures:
-  - retrieved: 2026-09-23T12:52:52Z
-    sha256: "1af63fa865685ef50618fb22b155db226668fed42a55601be11373ca15cec2aa"
-    type: text/plain
-  - retrieved: 2026-09-23T12:53:12Z
-    sha256: "41c094af185be5a6d2ea3e117aa5ddbaa6fb761ea8ec96a358f2da322a0069cf"
-    type: text/plain
-    url: https://raw.githubusercontent.com/instax-dutta/sysone-bench/1ac3650a65e3783ac9615f26b02bc7c1d5ad3b23/REPORT.md
-  - retrieved: 2026-09-23T12:54:21Z
-    sha256: "31a54c8237629cbc0c0e2581cd6ec423bcd545d206563a74bc50ff58f03decbf"
-    type: text/plain
-    url: https://raw.githubusercontent.com/instax-dutta/sysone-bench/1ac3650a65e3783ac9615f26b02bc7c1d5ad3b23/results/compare_laya-router_vs_jev-1.13.0.json
-  - retrieved: 2026-09-23T12:57:48Z
-    sha256: "4b08c73d69d07199ab215a8a780432aeca14d85d27e2aa0d4ca3f2dd7ef9f8dc"
-    type: text/plain
-    url: https://raw.githubusercontent.com/instax-dutta/sysone-bench/1ac3650a65e3783ac9615f26b02bc7c1d5ad3b23/run.py
-  - retrieved: 2026-09-23T12:58:11Z
-    sha256: "d2b62d6af19de96ec30c422571081f2b60156a68d93f9b4044e4a7fe3529ac13"
-    type: text/plain
-    url: https://raw.githubusercontent.com/instax-dutta/sysone-bench/1ac3650a65e3783ac9615f26b02bc7c1d5ad3b23/compare.py
+retrieved: 2026-09-23T12:52:52Z
+sha256: "1af63fa865685ef50618fb22b155db226668fed42a55601be11373ca15cec2aa"
 ---
 
 ## Overview

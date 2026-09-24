@@ -28,17 +28,11 @@ layout: layouts/base.njk
   </section>
   {% endif %}
   <details class="source-provenance">
-    <summary>Citation and captures</summary>
+    <summary>Citation and capture</summary>
     <p class="source-citation">{{ author | escape }} ({% if published %}{{ published | year }}{% else %}n.d.{% endif %}). <cite>{{ title | escape }}</cite>.{% if publisher %} {{ publisher | escape }}.{% endif %} {{ url | escape }}</p>
-    <ul>
-    {% for capture in captures %}
-      <li>
-        <time datetime="{{ capture.retrieved | machineDate | escape }}">{{ capture.retrieved | utcTime | escape }}</time>
-        &middot; {{ capture.type | escape }}
-        {% if capture.url %}&middot; <span class="source-capture-url">{{ capture.url | escape }}</span>{% endif %}
-        <br><code>sha256:{{ capture.sha256 | escape }}</code>
-      </li>
-    {% endfor %}
-    </ul>
+    <p>
+      Retrieved <time datetime="{{ retrieved | machineDate | escape }}">{{ retrieved | utcTime | escape }}</time>
+      <br><code>sha256:{{ sha256 | escape }}</code>
+    </p>
   </details>
 </article>

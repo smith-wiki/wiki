@@ -1,14 +1,11 @@
 ---
 title: Tavily credits and pricing
 summary: Tavily's official credit prices and credit consumption rules for basic and advanced Search requests.
-url: https://docs.tavily.com/documentation/api-credits
+url: https://docs.tavily.com/documentation/api-credits.md
 author: Tavily
 kind: documentation
-captures:
-  - retrieved: 2026-09-22T09:20:23Z
-    sha256: "33e39e70fe99098f09de88cc74f40dca8d0dcf6a57f05c199dfdded2a42b38da"
-    type: text/markdown
-    url: https://docs.tavily.com/documentation/api-credits.md
+retrieved: 2026-09-22T09:20:23Z
+sha256: "33e39e70fe99098f09de88cc74f40dca8d0dcf6a57f05c199dfdded2a42b38da"
 ---
 
 ## Overview

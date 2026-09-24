@@ -5,10 +5,8 @@ url: https://kagent.dev/blog/the-future-of-kagent
 author: Eitan Yarmush
 publisher: kagent
 kind: article
-captures:
-  - retrieved: 2026-09-22T06:34:58Z
-    sha256: "16498947fa776d9f3f74d48fc18f17b5241be3e0b353151a337c118ad12a5d0b"
-    type: text/html
+retrieved: 2026-09-22T06:34:58Z
+sha256: "16498947fa776d9f3f74d48fc18f17b5241be3e0b353151a337c118ad12a5d0b"
 ---
 
 ## Overview

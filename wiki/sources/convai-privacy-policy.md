@@ -5,10 +5,8 @@ url: https://genai.convaiinnovations.com/privacy-policy
 author: Convai Innovations Pvt. Ltd.
 published: 2026-09-23
 kind: webpage
-captures:
-  - retrieved: 2026-09-23T14:57:52Z
-    sha256: "9ed19b9d4bf2fc390b173827ebbe25dedfb2c6289875a0de394d3feda05dc837"
-    type: text/html
+retrieved: 2026-09-23T14:57:52Z
+sha256: "9ed19b9d4bf2fc390b173827ebbe25dedfb2c6289875a0de394d3feda05dc837"
 ---
 
 ## Overview

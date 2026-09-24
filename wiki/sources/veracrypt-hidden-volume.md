@@ -4,10 +4,8 @@ summary: Two passwords reveal an outer decoy volume or a hidden sensitive volume
 url: https://veracrypt.io/en/Hidden%20Volume.html
 author: "VeraCrypt project"
 kind: documentation
-captures:
-  - retrieved: 2026-09-23T11:36:21Z
-    sha256: "625866a496b91c10f9ad2779925ccd2b7468ec36bc7f9cbfef827ce8cdc8ded7"
-    type: text/html
+retrieved: 2026-09-23T11:36:21Z
+sha256: "625866a496b91c10f9ad2779925ccd2b7468ec36bc7f9cbfef827ce8cdc8ded7"
 ---
 
 ## Overview

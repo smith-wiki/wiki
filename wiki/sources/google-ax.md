@@ -1,22 +1,11 @@
 ---
 title: Google AX repository
 summary: Primary repository documentation for AX, a declarative agent-workload orchestrator built on Agent Substrate.
-url: https://github.com/google/ax
+url: https://raw.githubusercontent.com/google/ax/d8ed0fe38bceb7842d3c47817d53d16ccdfcb601/README.md
 author: Google
 kind: repository
-captures:
-  - retrieved: 2026-09-22T06:22:30Z
-    sha256: "95d27df32ff26887224cdde472b890952b192ae1fb169f40963c3feefb679db1"
-    type: text/markdown
-    url: https://raw.githubusercontent.com/google/ax/d8ed0fe38bceb7842d3c47817d53d16ccdfcb601/README.md
-  - retrieved: 2026-09-22T06:22:30Z
-    sha256: "34239d8cf86d167069c6dba77ad0c4463e64366002abf8424b145802775fde70"
-    type: text/markdown
-    url: https://raw.githubusercontent.com/google/ax/d8ed0fe38bceb7842d3c47817d53d16ccdfcb601/DESIGN.md
-  - retrieved: 2026-09-22T06:22:30Z
-    sha256: "34c884e16717952427691b24decd6c4ce5dc5015abeba3603b608ff958f713df"
-    type: text/markdown
-    url: https://raw.githubusercontent.com/google/ax/d8ed0fe38bceb7842d3c47817d53d16ccdfcb601/docs/concepts.md
+retrieved: 2026-09-22T06:22:30Z
+sha256: "95d27df32ff26887224cdde472b890952b192ae1fb169f40963c3feefb679db1"
 ---
 
 ## Overview

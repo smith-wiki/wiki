@@ -4,10 +4,8 @@ summary: ConvAI's published Laya checkpoint metadata, intended use, benchmark cl
 url: https://huggingface.co/convaiinnovations/laya/raw/main/README.md
 author: ConvAI Innovations
 kind: documentation
-captures:
-  - retrieved: 2026-09-23T12:55:13Z
-    sha256: "65f2960bb1aba9e1764d4e8c45e9843e69dc4c3c4878b2b55baa2fdad49a0ed1"
-    type: text/plain
+retrieved: 2026-09-23T12:55:13Z
+sha256: "65f2960bb1aba9e1764d4e8c45e9843e69dc4c3c4878b2b55baa2fdad49a0ed1"
 ---
 
 ## Overview

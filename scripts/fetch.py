@@ -2,13 +2,17 @@
 """Capture a source: store the original and a Markdown reading copy by SHA-256.
 
 Usage:
-  fetch.py URL [SOURCE] [--file FILE]   capture URL (or a copy of it saved from a browser)
-  fetch.py --hash SHA                   restore a stored capture into the local cache
+  fetch.py URL [SOURCE] [--file FILE] [--recapture]   capture URL, or return its current capture
+  fetch.py --hash SHA                                 restore a stored capture into the local cache
 
-Originals go to a private Cloudflare R2 bucket under <sha256>/; a local cache
-under raw/captures/ in the primary worktree keeps copies for reading. With
-SOURCE, the capture is recorded in wiki/sources/SOURCE.md, which is created
-with generated front matter when it does not exist yet.
+A source is one URL with one current capture. Originals go to a private
+Cloudflare R2 bucket under <sha256>/, and urls/<sha256 of the URL>.json points
+at the current capture of each URL; a local cache under raw/captures/ in the
+primary worktree keeps copies for reading. A URL that is already captured is
+not fetched again unless --recapture is given; the replaced capture stays in
+R2 as an archive. With SOURCE, the capture is recorded in
+wiki/sources/SOURCE.md, which is created with generated front matter when it
+does not exist yet.
 
 Run it through `sw fetch`, which supplies the credentials declared in
 secretspec.toml to this process only.
@@ -25,6 +29,7 @@ import os
 import re
 import subprocess
 import sys
+import tempfile
 import urllib.error
 import urllib.request
 from dataclasses import asdict, dataclass, field
@@ -385,6 +390,31 @@ class Store:
         if result.returncode != 0 and not optional:
             raise FetchError(f"R2 download failed for {key}: {result.stderr.strip()}")
 
+    @staticmethod
+    def pointer_key(url: str) -> str:
+        return f"urls/{hashlib.sha256(url.encode()).hexdigest()}.json"
+
+    def current(self, url: str) -> str | None:
+        """SHA-256 of the current capture of URL, or None when URL was never captured."""
+        with tempfile.TemporaryDirectory() as scratch:
+            path = Path(scratch) / "pointer.json"
+            result = self.s3("get-object", "--key", self.pointer_key(url), str(path))
+            if result.returncode != 0:
+                if "NoSuchKey" in result.stderr:
+                    return None
+                raise FetchError(f"R2 lookup failed for {url}: {result.stderr.strip()}")
+            return json.loads(path.read_text())["sha256"]
+
+    def point(self, url: str, sha: str) -> None:
+        """Make SHA the current capture of URL; the capture it replaces stays in R2."""
+        with tempfile.TemporaryDirectory() as scratch:
+            path = Path(scratch) / "pointer.json"
+            path.write_text(json.dumps({"url": url, "sha256": sha}) + "\n")
+            key = self.pointer_key(url)
+            result = self.s3("put-object", "--key", key, "--body", str(path), "--content-type", "application/json")
+            if result.returncode != 0:
+                raise FetchError(f"R2 upload failed for {key}: {result.stderr.strip()}")
+
 
 # Source pages
 
@@ -393,27 +423,35 @@ def scalar(value: str) -> str:
 
 
 def guess_kind(capture: Capture) -> str:
-    if re.match(r"https?://(www\.)?(github|gitlab|codeberg)\.(com|org)/", capture.url):
+    if re.match(r"https?://((www\.)?(github|gitlab|codeberg)\.(com|org)|raw\.githubusercontent\.com)/", capture.url):
         return "repository"
     if capture.type == "application/pdf":
         return "paper"
     return "webpage"
 
 
-def capture_lines(capture: Capture, page_url: str) -> list[str]:
-    lines = [
-        f"  - retrieved: {capture.retrieved}",
-        f"    sha256: {scalar(capture.sha256)}",
-        f"    type: {capture.type}",
-    ]
-    if capture.url != page_url:
-        lines.append(f"    url: {capture.url}")
-    return lines
+def front_matter(path: Path) -> tuple[list[str], int]:
+    """The page's lines and the index of the line that closes its front matter."""
+    lines = path.read_text().split("\n")
+    return lines, lines.index("---", 1)
+
+
+def page_url(path: Path) -> str:
+    lines, end = front_matter(path)
+    return next((line.split(":", 1)[1].strip() for line in lines[1:end] if line.startswith("url:")), "")
+
+
+def check_page(worktree: Path, slug: str, url: str) -> None:
+    """A source is one URL: refuse to record URL on a page that describes another."""
+    path = worktree / "wiki" / "sources" / f"{slug}.md"
+    if path.exists() and page_url(path) != url:
+        raise FetchError(f"{path.relative_to(worktree)} describes {page_url(path)}; a source is one URL")
 
 
 def record_in_page(worktree: Path, slug: str, capture: Capture) -> str:
-    """Create the source page, or append the capture to it; return what happened."""
+    """Create the source page, or make CAPTURE its current capture; return what happened."""
     path = worktree / "wiki" / "sources" / f"{slug}.md"
+    stamp = [f"retrieved: {capture.retrieved}", f"sha256: {scalar(capture.sha256)}"]
     if not path.exists():
         meta = capture.meta
         lines = ["---", f"title: {scalar(meta.get('title', ''))}", 'summary: ""', f"url: {capture.url}"]
@@ -422,7 +460,7 @@ def record_in_page(worktree: Path, slug: str, capture: Capture) -> str:
             lines.append(f"publisher: {scalar(meta['publisher'])}")
         if meta.get("published"):
             lines.append(f"published: {meta['published']}")
-        lines += [f"kind: {guess_kind(capture)}", "captures:", *capture_lines(capture, capture.url), "---", ""]
+        lines += [f"kind: {guess_kind(capture)}", *stamp, "---", ""]
         lines += ["## Overview", "", "", "## Key points", ""]
         path.write_text("\n".join(lines))
         missing = ["summary", *(field for field in ("title", "author") if not meta.get(field))]
@@ -430,23 +468,12 @@ def record_in_page(worktree: Path, slug: str, capture: Capture) -> str:
             missing.append("published (the date the source states, often on its first page)")
         return f"created {path.relative_to(worktree)}; fill {', '.join(missing)}, Overview, and Key points"
 
-    lines = path.read_text().split("\n")
-    end = lines.index("---", 1)
-    front = lines[1:end]
-    if any(capture.sha256 in line for line in front):
+    lines, end = front_matter(path)
+    if any(capture.sha256 in line for line in lines[1:end]):
         return f"{path.relative_to(worktree)} already records this capture"
-    page_url = next((line.split(":", 1)[1].strip() for line in front if line.startswith("url:")), "")
-    start = next((i for i, line in enumerate(front) if line.startswith("captures:")), None)
-    if start is None:
-        insert, new = end, ["captures:", *capture_lines(capture, page_url)]
-    else:
-        last = start
-        while last + 1 < len(front) and front[last + 1].startswith(" "):
-            last += 1
-        insert, new = last + 2, capture_lines(capture, page_url)
-    lines[insert:insert] = new
-    path.write_text("\n".join(lines))
-    return f"added the capture to {path.relative_to(worktree)}"
+    kept = [line for line in lines[1:end] if not line.startswith(("retrieved:", "sha256:"))]
+    path.write_text("\n".join(["---", *kept, *stamp, *lines[end:]]))
+    return f"replaced the capture in {path.relative_to(worktree)}; recheck its Key points against the new capture"
 
 
 # Commands
@@ -492,6 +519,7 @@ def main() -> int:
     parser.add_argument("source", nargs="?", help="source page slug under wiki/sources/")
     parser.add_argument("--file", type=Path, help="copy of URL saved from a browser")
     parser.add_argument("--hash", dest="sha", help="restore a stored capture")
+    parser.add_argument("--recapture", action="store_true", help="replace the current capture of URL")
     args = parser.parse_args()
 
     missing = [name for name in CREDENTIALS if not os.environ.get(name)]
@@ -502,8 +530,8 @@ def main() -> int:
     stored = f"r2://{store.bucket}/<sha256>/"
     try:
         if args.sha:
-            if args.url or args.file or args.source:
-                parser.error("--hash takes no URL, SOURCE, or --file")
+            if args.url or args.file or args.source or args.recapture:
+                parser.error("--hash takes no URL, SOURCE, --file, or --recapture")
             if not re.fullmatch(r"[0-9a-f]{64}", args.sha):
                 parser.error("--hash needs a 64-character hex SHA-256")
             capture, original = store.restore(args.sha)
@@ -519,13 +547,25 @@ def main() -> int:
             parser.error("SOURCE must use lowercase ASCII words and hyphens")
         if args.source and re.search(r"-\d{4}-\d{2}-\d{2}$", args.source):
             parser.error("SOURCE names the source, not the capture; drop the date")
-        capture, original, markdown_text, method = capture_url(args.url, args.file)
-        markdown = store.save(capture, original, markdown_text)
-        print_capture(capture, markdown, stored.replace("<sha256>", capture.sha256), method)
+        worktree = Path(subprocess.run(
+            ["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True, check=True,
+        ).stdout.strip())
         if args.source:
-            worktree = Path(subprocess.run(
-                ["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True, check=True,
-            ).stdout.strip())
+            check_page(worktree, args.source, args.url)
+        current = None if args.recapture else store.current(args.url)
+        if current:
+            if args.file:
+                raise FetchError(f"{args.url} is already captured; add --recapture to replace it with {args.file}")
+            capture, original = store.restore(current)
+            markdown = original.with_name("content.md")
+            method = "current capture (add --recapture to replace it)"
+        else:
+            capture, original_bytes, markdown_text, method = capture_url(args.url, args.file)
+            markdown = store.save(capture, original_bytes, markdown_text)
+            store.point(capture.url, capture.sha256)
+        print_capture(capture, markdown if markdown and markdown.exists() else None,
+                      stored.replace("<sha256>", capture.sha256), method)
+        if args.source:
             print(f"page: {record_in_page(worktree, args.source, capture)}")
         return 0
     except FetchError as error:

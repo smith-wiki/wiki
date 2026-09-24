@@ -6,10 +6,8 @@ author: Brave Software
 publisher: Brave Blog
 published: 2026-02-12
 kind: article
-captures:
-  - retrieved: 2026-09-22T09:20:22Z
-    sha256: "38e40320eae2f8ceab61e7e1110acde27bd5cc35e45fbdca969ad51f86109f10"
-    type: text/html
+retrieved: 2026-09-22T09:20:22Z
+sha256: "38e40320eae2f8ceab61e7e1110acde27bd5cc35e45fbdca969ad51f86109f10"
 ---
 
 ## Overview

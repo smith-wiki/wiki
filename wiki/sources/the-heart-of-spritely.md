@@ -6,10 +6,8 @@ author: Christine Lemmer-Webber, Randy Farmer, and Juliana Sims
 publisher: Spritely Institute
 published: 2025-05-21
 kind: paper
-captures:
-  - retrieved: 2026-09-21T19:11:20Z
-    sha256: "b41043b3c8cdf977d404fc2eeb7792c587e70d355ea13c4ec5588f3f27b44c5c"
-    type: text/html
+retrieved: 2026-09-21T19:11:20Z
+sha256: "b41043b3c8cdf977d404fc2eeb7792c587e70d355ea13c4ec5588f3f27b44c5c"
 ---
 
 ## Overview

@@ -4,10 +4,8 @@ summary: The TLAPS project states its proof-checking role and captured release's
 url: https://proofs.tlapl.us/doc/web/content/Home.html
 author: "TLA+ Proof System project"
 kind: webpage
-captures:
-  - retrieved: 2026-09-23T09:01:15Z
-    sha256: "15c347b3eb1c6caa80a5f552995de813d18e667cc22429bb16d976c770c5bc55"
-    type: text/html
+retrieved: 2026-09-23T09:01:15Z
+sha256: "15c347b3eb1c6caa80a5f552995de813d18e667cc22429bb16d976c770c5bc55"
 ---
 
 ## Overview

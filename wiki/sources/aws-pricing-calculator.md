@@ -4,10 +4,8 @@ summary: AWS describes cost estimates derived from specified usage inputs and Pr
 url: https://docs.aws.amazon.com/pricing-calculator/latest/userguide/what-is-pricing-calculator.html
 author: "Amazon Web Services"
 kind: documentation
-captures:
-  - retrieved: 2026-09-23T09:21:09Z
-    sha256: "dae8fe5ebf33dfa402361f6edc8c32d9400256ab5978dd6fa0c7f0133a6a34c1"
-    type: text/html
+retrieved: 2026-09-23T09:21:09Z
+sha256: "dae8fe5ebf33dfa402361f6edc8c32d9400256ab5978dd6fa0c7f0133a6a34c1"
 ---
 
 ## Overview

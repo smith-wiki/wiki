@@ -4,10 +4,8 @@ summary: Lean FRO's account of Cedar's executable models, proofs, and differenti
 url: https://lean-lang.org/use-cases/cedar/
 author: "Lean FRO"
 kind: webpage
-captures:
-  - retrieved: 2026-09-23T08:40:36Z
-    sha256: "87e57374dc192669709940486100b44e500ebaa7af0b18cc2fe10d642bc976e7"
-    type: text/html
+retrieved: 2026-09-23T08:40:36Z
+sha256: "87e57374dc192669709940486100b44e500ebaa7af0b18cc2fe10d642bc976e7"
 ---
 
 ## Overview

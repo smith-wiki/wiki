@@ -4,10 +4,8 @@ summary: Kagi's machine-readable API contract for Search request controls, resul
 url: https://kagi.com/api/docs/_spec/openapi.yaml
 author: Kagi
 kind: specification
-captures:
-  - retrieved: 2026-09-22T09:20:23Z
-    sha256: "6b438426481d385b6e29d027d4252fe516683e81acce336a2f8d0f04e3d63bdf"
-    type: application/yaml
+retrieved: 2026-09-22T09:20:23Z
+sha256: "6b438426481d385b6e29d027d4252fe516683e81acce336a2f8d0f04e3d63bdf"
 ---
 
 ## Overview

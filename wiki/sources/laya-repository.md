@@ -4,14 +4,8 @@ summary: Pinned ConvAI code and benchmark documentation for typed decisions, rou
 url: https://raw.githubusercontent.com/NandhaKishorM/laya/010bacef009c855ccba814b51f7c8e1d38ab5e3f/README.md
 author: ConvAI Innovations and Laya contributors
 kind: repository
-captures:
-  - retrieved: 2026-09-23T12:51:56Z
-    sha256: "24971edc9322807240370d0e53d043b0043530aa64a02bb93c9c96ba6d10748d"
-    type: text/plain
-  - retrieved: 2026-09-23T12:52:13Z
-    sha256: "63ebb7fd3e8751d6d516aca36d20ad5dd29ca3225361c3926d18eca3069c1699"
-    type: text/plain
-    url: https://raw.githubusercontent.com/NandhaKishorM/laya/010bacef009c855ccba814b51f7c8e1d38ab5e3f/BENCHMARKS.md
+retrieved: 2026-09-23T12:51:56Z
+sha256: "24971edc9322807240370d0e53d043b0043530aa64a02bb93c9c96ba6d10748d"
 ---
 
 ## Overview

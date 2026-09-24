@@ -4,14 +4,8 @@ summary: Independent Apple Silicon MLX inference port with local parity checks a
 url: https://raw.githubusercontent.com/mizorewww/laya-mlx/0a859518634112655cb97c745dbf04f5191aaf13/README.md
 author: mizorewww and Laya-MLX contributors
 kind: repository
-captures:
-  - retrieved: 2026-09-23T12:53:31Z
-    sha256: "e09c88ac8f49dac2d8305bac7ec124266d466c969a40d0e0e3e76c10fd65feed"
-    type: text/plain
-  - retrieved: 2026-09-23T12:53:47Z
-    sha256: "af468244a62d940abe822afe6a9ddb824fe0207ea65df426c829e372aebfee05"
-    type: text/plain
-    url: https://raw.githubusercontent.com/mizorewww/laya-mlx/0a859518634112655cb97c745dbf04f5191aaf13/BENCHMARKS.md
+retrieved: 2026-09-23T12:53:31Z
+sha256: "e09c88ac8f49dac2d8305bac7ec124266d466c969a40d0e0e3e76c10fd65feed"
 ---
 
 ## Overview

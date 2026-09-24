@@ -4,10 +4,8 @@ summary: Hidden-volume deniability depends on snapshot, write, metadata, and net
 url: https://veracrypt.io/en/Security%20Requirements%20for%20Hidden%20Volumes.html
 author: "VeraCrypt project"
 kind: documentation
-captures:
-  - retrieved: 2026-09-23T11:36:48Z
-    sha256: "247374cc90bbe7a7d85a438d29ce0b02f8ced4397d3f5ca18a5ea2af54232132"
-    type: text/html
+retrieved: 2026-09-23T11:36:48Z
+sha256: "247374cc90bbe7a7d85a438d29ce0b02f8ced4397d3f5ca18a5ea2af54232132"
 ---
 
 ## Overview

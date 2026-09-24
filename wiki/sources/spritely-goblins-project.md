@@ -4,10 +4,8 @@ summary: Official project page for Spritely Goblins and its Guile and Racket imp
 url: https://spritely.institute/goblins/
 author: Spritely Institute
 kind: webpage
-captures:
-  - retrieved: 2026-09-21T19:36:40Z
-    sha256: "35e19c830faad24eaf9c59bb49ff8a980ee3bad4e8accbec71b550209fed8080"
-    type: text/html
+retrieved: 2026-09-21T19:36:40Z
+sha256: "35e19c830faad24eaf9c59bb49ff8a980ee3bad4e8accbec71b550209fed8080"
 ---
 
 ## Overview
