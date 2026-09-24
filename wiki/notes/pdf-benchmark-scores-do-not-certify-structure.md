@@ -1,0 +1,10 @@
+---
+title: PDF benchmark scores do not certify scientific structure
+summary: Aggregate PDF-to-Markdown results omit or normalize headings, code, captions, and sometimes reading order.
+---
+
+A PDF parser can lead one leaderboard yet lose relationships that a research archive needs. AI2's **olmOCR-Bench** uses binary checks for selected text, relative order of two spans, neighboring table cells, and rendered mathematical symbols across 1,403 PDFs. It does not separately score section hierarchy, fenced code, or figure-caption links. Its overall macro-averages source categories with different test counts, rather than measuring every element in every document ([Allen Institute for AI, n.d.](../../sources/olmocr-bench-dataset/); [Poznanski et al., 2025](../../sources/olmocr-two-study/)).
+
+**OmniDocBench** annotates more block types, but the original protocol merges code into text, normalizes inline math as text, and excludes figure/table captions from metric calculation. The current v1.6 overall averages text, formula, and table measures, **not** its separately shown reading-order error. Its original 981-page paper, v1.5, and v1.6 have changed corpora and matching rules, so scores across versions are not a trend line ([Ouyang et al., 2025](../../sources/omnidocbench-study/); [OpenDataLab, n.d.](../../sources/omnidocbench-repository/)). **READoc-arXiv** adds complete papers and explicit heading-tree and order metrics, yet derives ground truth from successfully converted source LaTeX and does not separately certify code or caption attachment ([Li et al., 2025](../../sources/readoc-study/)).
+
+**Inference:** Choose a parser with the [PDF structure comparison](../../concepts/scientific-pdf-structure-extraction/), then inspect representative multi-column pages, equations, continued tables, fenced code, and figure-caption pairs against the stored PDF. Retain the parser version, model, inference mode, ordered blocks or JSON/TEI, and assets. This is the PDF-specific case of [main-content accuracy not certifying archival fidelity](../main-content-accuracy-does-not-measure-archive-fidelity/): textual presence is not the preservation of structure.

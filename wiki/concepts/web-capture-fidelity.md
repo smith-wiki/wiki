@@ -9,6 +9,8 @@ A web page's *capture* is the evidence obtained at a particular URL and time; it
 
 **Inference:** For a research archive, store the original HTTP response (or a browser-rendered snapshot where necessary), retrieval URL/time and content hash, relevant image files, and a separate Markdown reading copy. Record the converter and options. Treat generated image descriptions as annotations, not source captions. This preserves a way to repair or audit a lossy conversion; it does not make a dynamic page perfectly reproducible ([Firecrawl, n.d.](../../sources/firecrawl-scrape-documentation/); [Jina AI, n.d.](../../sources/jina-reader-repository/)). This extends the wiki's [Kagi extraction distinction](../../sources/kagi-api-pricing/): a promise of "clean Markdown" is not proof of fidelity.
 
+The same original-versus-reading-copy distinction applies to [scientific PDF structure extraction](../scientific-pdf-structure-extraction/): keep the PDF and page/asset provenance, not just the converted Markdown. PDF-specific benchmarks measure different fragments of headings, formulas, tables, and order, while leaving code and caption attachment uncertain ([Li et al., 2025](../../sources/readoc-study/); [Ouyang et al., 2025](../../sources/omnidocbench-study/)).
+
 ## Tool tradeoffs in September 2026
 
 | Tool | Main-content evidence | Structure in Markdown | JavaScript and local operation | Nixpkgs unstable |
