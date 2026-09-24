@@ -39,15 +39,18 @@ from fetch import FetchError, Store, primary_root
 
 # The pipeline: how text becomes chunks and vectors. Changing any of it needs a
 # new PIPELINE name and `search.py --sync`, which builds the new collection and
-# moves the alias to it. search_eval.py chose it: on 196 Key point queries every
-# chunker and model scored within the margin of error once fused with BM25
-# (MRR 0.81 to 0.85, +/- 0.04), fusion beat dense search alone, and LLM chunking
-# (Slumber) was no better while costing minutes and model calls per capture.
+# moves the alias to it. search_eval.py chose it. Finding the right source for
+# 196 Key points, every chunker and model scored within the margin of error once
+# fused with BM25 (MRR 0.81 to 0.85, +/- 0.04). Finding the right paragraph for
+# 104 questions about 13 papers, Markdown-recursive chunks of 600 to 800
+# characters led (MRR 0.78) over 1600 (0.72), 3200 (0.70), 400 (0.72), and the
+# local token, sentence, semantic, neural, and late chunkers (0.66 to 0.73).
+# Fusion with BM25 beat dense search alone in nearly every case.
 MODEL = "voyageai/voyage-4"
 DIMENSION = 1024
 QUERY_PREFIX = "Instruct: Given a research question, retrieve passages that answer it\nQuery: "  # Qwen3 embeddings
-CHUNK_SIZE = 1600
-PIPELINE = "v1-voyage-4-recursive-md-1600"
+CHUNK_SIZE = 800
+PIPELINE = "v2-voyage-4-recursive-md-800"
 ALIAS = "smith-wiki"
 COLLECTION = f"{ALIAS}-{PIPELINE}"
 BM25 = "qdrant/bm25"

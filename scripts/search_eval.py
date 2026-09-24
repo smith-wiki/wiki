@@ -122,6 +122,8 @@ def chunkers() -> dict:
     return {
         "token-1000": lambda: TokenChunker(tokenizer="character", chunk_size=1000),
         "sentence-1600": lambda: SentenceChunker(tokenizer="character", chunk_size=1600),
+        "recursive-md-400": lambda: markdown_chunker(400),
+        "recursive-md-600": lambda: markdown_chunker(600),
         "recursive-md-800": lambda: markdown_chunker(800),
         "recursive-md-1600": lambda: markdown_chunker(1600),
         "recursive-md-3200": lambda: markdown_chunker(3200),
