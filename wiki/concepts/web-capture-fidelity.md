@@ -13,6 +13,8 @@ The same original-versus-reading-copy distinction applies to [scientific PDF str
 
 The [visual evidence retrieval](../visual-evidence-retrieval/) layer uses captured image assets and the rendered `figure`/`figcaption` association to make a diagram searchable without mistaking generated prose or Mermaid for an author caption. A correct page hit is not necessarily a [citable figure location](../../notes/page-retrieval-does-not-localize-a-figure/) ([WHATWG, n.d.](../../sources/html-figure-specification/); [Loison et al., 2026](../../sources/vidore-three-study/)).
 
+The reading copy also supplies text and provenance for [evidence-aware retrieval chunking](../evidence-aware-retrieval-chunking/). Its source spans must still resolve to the captured page; a context prefix or LLM-selected boundary cannot repair omitted text or mistaken structure. Published contextual-retrieval code examples demonstrate disambiguating prefixes but do not validate web extraction, and Chonkie's boundary selectors have no comparable passage benchmark ([Ford, 2024](../../sources/anthropic-contextual-retrieval/); [Anthropic, n.d.](../../sources/anthropic-contextual-appendix/); [Chonkie contributors, n.d.](../../sources/chonkie-chunkers-repository/)).
+
 ## Tool tradeoffs in September 2026
 
 | Tool | Main-content evidence | Structure in Markdown | JavaScript and local operation | Nixpkgs unstable |
