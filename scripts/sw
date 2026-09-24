@@ -371,7 +371,7 @@ command_sync() {
 
 command_merge() {
   (( $# <= 1 )) || die "usage: sw merge [PR]"
-  local pr=${1:-} n base out attempt
+  local pr=${1:-} n base out attempt i
   local -a chain=()
   if [[ -z "$pr" ]]; then
     pr=$(gh pr view --json number --jq .number) || die "current branch has no pull request"
@@ -385,12 +385,14 @@ command_merge() {
     n=$(gh pr list --head "$base" --state open --json number --jq '.[0].number // empty')
     [[ -n "$n" ]] || die "#${chain[0]} targets $base, which has no open pull request; run sw sync"
   done
-  for n in "${chain[@]}"; do
+  for ((i = 0; i < ${#chain[@]}; i++)); do
+    n=${chain[i]}
     if ! out=$(command_checks "$n"); then
       printf '%s\n' "$out"
       die "not merging #$n"
     fi
-    [[ "$n" == "${chain[0]}" ]] || gh pr edit "$n" --base main >/dev/null
+    # Deleting the merged branch closes every pull request based on it, so the next one moves to main first.
+    (( i + 1 == ${#chain[@]} )) || gh pr edit "${chain[i + 1]}" --base main >/dev/null
     # gh prints worktree cleanup advice when the branch is checked out here; the session keeps its worktree.
     for attempt in 1 2 3; do
       if out=$(gh pr merge "$n" --merge --delete-branch 2>&1); then
