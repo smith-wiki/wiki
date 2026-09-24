@@ -1,9 +1,11 @@
 const fs = require("node:fs");
 const markdownIt = require("markdown-it");
 
-module.exports = function (eleventyConfig) {
+module.exports = async function (eleventyConfig) {
+  const { HtmlBasePlugin } = await import("@11ty/eleventy");
+  // Root-absolute URLs in templates are rewritten under the Pages base path, such as /wiki/.
+  eleventyConfig.addPlugin(HtmlBasePlugin);
   eleventyConfig.addPassthroughCopy({ "wiki/assets": "assets" });
-  eleventyConfig.addPassthroughCopy("CNAME");
   eleventyConfig.setLibrary(
     "md",
     markdownIt({ html: false, linkify: false, typographer: true }),
@@ -69,6 +71,7 @@ module.exports = function (eleventyConfig) {
       includes: "_includes",
       output: "_site",
     },
+    pathPrefix: process.env.PATH_PREFIX || "/",
     htmlTemplateEngine: "njk",
     markdownTemplateEngine: false,
     templateFormats: ["md", "njk"],

@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import argparse
 import sys
 from html.parser import HTMLParser
 from pathlib import Path, PurePosixPath
@@ -25,17 +26,19 @@ class LinkParser(HTMLParser):
                 return
 
 
-def page_url(site_root: Path, page: Path) -> str:
+def page_url(site_root: Path, page: Path, prefix: str) -> str:
     relative = page.relative_to(site_root).as_posix()
     if relative == "index.html":
-        return "/"
+        return prefix
     if relative.endswith("/index.html"):
-        return f"/{relative[:-10]}"
-    return f"/{relative}"
+        return f"{prefix}{relative[:-10]}"
+    return f"{prefix}{relative}"
 
 
-def target_candidates(site_root: Path, url_path: str) -> tuple[Path, ...]:
-    relative = PurePosixPath(unquote(url_path).lstrip("/"))
+def target_candidates(site_root: Path, url_path: str, prefix: str) -> tuple[Path, ...]:
+    if not url_path.startswith(prefix):
+        return ()
+    relative = PurePosixPath(unquote(url_path[len(prefix):]))
     target = site_root.joinpath(*relative.parts)
     if url_path.endswith("/"):
         return (target / "index.html",)
@@ -45,7 +48,16 @@ def target_candidates(site_root: Path, url_path: str) -> tuple[Path, ...]:
 
 
 def main() -> int:
-    site_root = Path(sys.argv[1] if len(sys.argv) > 1 else "_site").resolve()
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("site", nargs="?", default="_site", type=Path)
+    parser.add_argument(
+        "--prefix",
+        default="/",
+        help="URL path the site is served under, such as /wiki/ (default: /)",
+    )
+    args = parser.parse_args()
+    prefix = "/" + args.prefix.strip("/") + "/" if args.prefix.strip("/") else "/"
+    site_root = args.site.resolve()
     if not site_root.is_dir():
         print(f"Generated site directory does not exist: {site_root}", file=sys.stderr)
         return 2
@@ -61,7 +73,7 @@ def main() -> int:
     for page in pages:
         parser = LinkParser()
         parser.feed(page.read_text(encoding="utf-8"))
-        source_url = page_url(site_root, page)
+        source_url = page_url(site_root, page, prefix)
 
         for href in parser.links:
             if not href or href.startswith("#") or href.startswith("//"):
@@ -71,13 +83,13 @@ def main() -> int:
                 continue
 
             resolved = urlsplit(urljoin(source_url, href))
-            candidates = target_candidates(site_root, resolved.path)
+            candidates = target_candidates(site_root, resolved.path, prefix)
             checked += 1
             if not any(candidate.exists() for candidate in candidates):
                 expected = ", ".join(
                     candidate.relative_to(site_root).as_posix()
                     for candidate in candidates
-                )
+                ) or f"a path under {prefix}"
                 failures.append(
                     f"{source_url}: {href!r} resolves to missing {resolved.path!r} "
                     f"(expected {expected})"
