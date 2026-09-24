@@ -80,8 +80,9 @@ def chat(model: str, prompt: str, image: tuple[str, bytes] | None = None, max_to
         kind = mimetypes.guess_type(image[0])[0] or "image/png"
         data = base64.b64encode(image[1]).decode()
         content.append({"type": "image_url", "image_url": {"url": f"data:{kind};base64,{data}"}})
+    # Reasoning models (DeepSeek V4) otherwise spend the whole token budget thinking and return no content.
     body = {"model": model, "temperature": 0, "max_tokens": max_tokens, "usage": {"include": True},
-            "messages": [{"role": "user", "content": content}]}
+            "reasoning": {"enabled": False}, "messages": [{"role": "user", "content": content}]}
     request = urllib.request.Request(
         "https://openrouter.ai/api/v1/chat/completions", data=json.dumps(body).encode(),
         headers={"Authorization": f"Bearer {os.environ['OPENROUTER_API_KEY']}", "Content-Type": "application/json"})
@@ -93,8 +94,8 @@ def chat(model: str, prompt: str, image: tuple[str, bytes] | None = None, max_to
 # Figures
 
 # Chosen by `sw search-eval --figures`: on 56 questions written from the figures of 11 papers, descriptions raised
-# figure retrieval from MRR 0.52 to 0.74 (+/- 0.09); gemini-3.1-flash-lite scored the same (0.72) at 1.8x the cost.
-# About $0.0003 a figure.
+# figure retrieval from MRR 0.52 to 0.74 (+/- 0.09) at about $0.0003 a figure. Within the same margin and at higher
+# OpenRouter prices: gemini-3.1-flash-lite 0.72, deepseek-v4-flash-vision-exp 0.69, deepseek-v4.1-flash 0.64.
 VISION_MODEL = "google/gemini-2.5-flash-lite"
 FIGURE = re.compile(r"!\[[^\]]*\]\(assets/([^)\s]+)\)")
 SKIPPED_KINDS = {"formula", "logo", "decoration"}

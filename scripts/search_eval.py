@@ -51,7 +51,8 @@ LOCAL_PREFIX = {True: "search_query: ", False: "search_document: "}
 MODELS = ["qwen/qwen3-embedding-8b", "voyageai/voyage-4-lite", "voyageai/voyage-4", LOCAL]
 SEQUENTIAL = {"semantic-1600", "neural", "late-400"}  # torch models run one text at a time
 QUESTION_MODEL = "google/gemini-2.5-flash-lite"
-VISION_CANDIDATES = ["google/gemini-2.5-flash-lite", "google/gemini-3.1-flash-lite"]
+VISION_CANDIDATES = ["google/gemini-2.5-flash-lite", "google/gemini-3.1-flash-lite",
+                     "deepseek/deepseek-v4-flash-vision-exp", "deepseek/deepseek-v4.1-flash"]
 FIGURE_QUESTION_MODEL = "openai/gpt-4.1-mini"  # another family than the describers, so questions do not echo them
 FIGURE_QUESTION_PROMPT = (
     "The image below is a figure from a research document; nearby text is given for context. Write one question a "
