@@ -11,7 +11,8 @@ Usage:
                                        Capture and index a source, or return the current capture of an
                                        already captured URL; --recapture replaces it. With SOURCE, record
                                        it in wiki/sources/SOURCE.md.
-  sw fetch --hash SHA                  Restore a stored capture into the local cache.
+  sw fetch --hash SHA [--reparse]      Restore a stored capture into the local cache; --reparse rebuilds
+                                       its Markdown copy and figures with the current converters.
   sw search QUERY [--in sources|wiki] [--limit N]
                                        Search current captures and wiki pages on origin/main.
   sw search --sync                     Maintenance: index every current capture and wiki page and drop

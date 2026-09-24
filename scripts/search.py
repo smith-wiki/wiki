@@ -19,6 +19,7 @@ from __future__ import annotations
 import argparse
 import bisect
 import datetime as dt
+import hashlib
 import json
 import os
 import re
@@ -100,7 +101,8 @@ def headings(text: str) -> list[tuple[int, int, str]]:
     for match in HEADING.finditer(text):
         if bisect.bisect_left(fences, match.start()) % 2:
             continue
-        title = re.sub(r"\s+", " ", LINK.sub(r"\1", match.group(2)).replace("\U0001f517", "")).strip()
+        title = LINK.sub(r"\1", match.group(2)).replace("\U0001f517", "")
+        title = re.sub(r"\s+", " ", re.sub(r"\*\*|__|</?\w+>", "", title)).strip()
         found.append((match.start(), len(match.group(1)), title))
     return found
 
@@ -284,7 +286,8 @@ def index_capture(index: Index, store: Store, sha: str, replaces: str | None = N
     text = markdown.read_text()
     pieces = split(text)
     title = capture.meta.get("title") or first_heading(text) or capture.url
-    index.put("sources", sha, title, pieces, {"url": capture.url})
+    copy = hashlib.sha256(markdown.read_bytes()).hexdigest()
+    index.put("sources", sha, title, pieces, {"url": capture.url, "copy": copy})
     return f"indexed {len(pieces)} chunks"
 
 
@@ -330,13 +333,23 @@ def sync_wiki(index: Index) -> str:
     return f"wiki: {len(changed)} pages indexed, {removed} removed" if changed or removed else ""
 
 
+def copy_hash(store: Store, sha: str) -> str | None:
+    """SHA-256 of a capture's current Markdown copy, or None without one."""
+    _, original = store.restore(sha)
+    markdown = original.with_name("content.md")
+    return hashlib.sha256(markdown.read_bytes()).hexdigest() if markdown.exists() else None
+
+
 def sync_sources(index: Index, store: Store) -> str:
     current = set(store.pointers().values())
-    indexed = set(index.docs("sources"))
-    for sha in indexed - current:
+    indexed = index.docs("sources")
+    for sha in indexed.keys() - current:
         index.drop(sha)
-    notes = [f"{sha[:12]}: {index_capture(index, store, sha)}" for sha in sorted(current - indexed)]
-    return "\n".join([*notes, f"sources: {len(current - indexed)} indexed, {len(indexed - current)} removed"])
+    stale = {sha for sha in current & indexed.keys() if indexed[sha].get("copy") != copy_hash(store, sha)}
+    todo = sorted((current - indexed.keys()) | stale)
+    notes = [f"{sha[:12]}: {index_capture(index, store, sha)}" for sha in todo]
+    removed = len(indexed.keys() - current)
+    return "\n".join([*notes, f"sources: {len(todo)} indexed ({len(stale)} with a new Markdown copy), {removed} removed"])
 
 
 # Pending captures and failure reports

@@ -46,12 +46,26 @@
       packagesFor = system:
         let
           pkgs = nixpkgs.legacyPackages.${system};
+          # pymupdf-layout's extension expects libmupdf beside it, as a single pip site-packages would have it;
+          # in Nix each wheel is its own store path, so point it at pymupdf's copy.
+          mupdfOverrides = final: prev: {
+            pymupdf-layout = prev.pymupdf-layout.overrideAttrs (old: {
+              preFixup = (old.preFixup or "") + pkgs.lib.optionalString pkgs.stdenv.isLinux ''
+                addAutoPatchelfSearchPath ${final.pymupdf}/${final.python.sitePackages}/pymupdf
+              '';
+              postFixup = (old.postFixup or "") + pkgs.lib.optionalString pkgs.stdenv.isDarwin ''
+                find $out -name '*.so' -exec install_name_tool \
+                  -add_rpath ${final.pymupdf}/${final.python.sitePackages}/pymupdf {} \;
+              '';
+            });
+          };
           pythonSet = (pkgs.callPackage pyproject-nix.build.packages {
             python = pkgs.python3;
           }).overrideScope
             (nixpkgs.lib.composeManyExtensions [
               pyproject-build-systems.overlays.wheel
               overlay
+              mupdfOverrides
             ]);
           pythonEnv = pythonSet.mkVirtualEnv "smith-wiki-env" workspace.deps.default;
           sw = pkgs.writeShellApplication {
@@ -85,6 +99,7 @@
             packages = [
               p.sw
               p.pythonEnv
+              p.pkgs.awscli2
               p.pkgs.secretspec
               p.pkgs.uv
             ];

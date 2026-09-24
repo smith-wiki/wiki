@@ -3,10 +3,14 @@ name = "smith-wiki-scripts"
 version = "0"
 requires-python = ">=3.13"
 dependencies = [
-  "chonkie[openai,neural,st]==1.7.0",
-  "torch",
-  "qdrant-client>=1.15",
+  "beautifulsoup4>=4.12",
+  "chonkie[neural,st]==1.7.0",
+  "lxml>=5",
+  "markdownify>=1.2",
   "numpy>=2",
+  "pymupdf4llm==1.28.2",
+  "qdrant-client>=1.15",
+  "torch",
 ]
 
 [tool.uv]

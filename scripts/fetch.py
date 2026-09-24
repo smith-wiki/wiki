@@ -3,7 +3,8 @@
 
 Usage:
   fetch.py URL [SOURCE] [--file FILE] [--recapture]   capture URL, or return its current capture
-  fetch.py --hash SHA                                 restore a stored capture into the local cache
+  fetch.py --hash SHA [--reparse]                     restore a stored capture into the local cache;
+                                                      --reparse rebuilds its Markdown copy and reindexes it
 
 A source is one URL with one current capture. Originals go to a private
 Cloudflare R2 bucket under <sha256>/, and urls/<sha256 of the URL>.json points
@@ -13,6 +14,12 @@ not fetched again unless --recapture is given; the replaced capture stays in
 R2 as an archive. With SOURCE, the capture is recorded in
 wiki/sources/SOURCE.md, which is created with generated front matter when it
 does not exist yet.
+
+Web pages come through Firecrawl. A PDF's Markdown copy is made on this
+machine by pymupdf4llm, with its figures stored beside it under assets/. Any
+arXiv link becomes the paper's versioned PDF (arxiv.org/pdf/<id>v<n>), read
+from arXiv's HTML rendering of its LaTeX when there is one, with title,
+authors, and date from the arXiv API.
 
 Run it through `sw fetch`, which supplies the credentials declared in
 secretspec.toml to this process only.
@@ -25,8 +32,10 @@ import base64
 import datetime as dt
 import hashlib
 import json
+import mimetypes
 import os
 import re
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -37,6 +46,7 @@ from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urljoin
 
+from convert import Assets, ConvertError, Paper, arxiv_markdown, arxiv_paper, get, pdf_markdown
 from tidy import FOLD
 
 EXTENSIONS = {
@@ -306,24 +316,32 @@ def firecrawl_scrape(url: str, formats: list[str]) -> dict:
 
 
 def firecrawl(url: str) -> tuple[bytes, str, str | None]:
-    """Return (original bytes, media type, Markdown) scraped by Firecrawl.
+    """Return (original bytes, media type, Markdown) scraped by Firecrawl; no Markdown for a PDF.
 
     Firecrawl returns the original response body (rawBase64) only on its own,
-    so the original and the Markdown reading copy take two requests.
+    so the original and the Markdown reading copy take two requests. A PDF's
+    Markdown copy is made locally instead, which keeps its headings and figures.
     """
     raw = firecrawl_scrape(url, ["rawBase64"])
     original = base64.b64decode(raw["rawBase64"])
     mime = media_type((raw.get("metadata") or {}).get("contentType"))
-    markdown = firecrawl_scrape(url, ["markdown"]).get("markdown")
-    return original, mime, markdown
+    if mime == "application/pdf" or original.startswith(b"%PDF-"):
+        return original, "application/pdf", None
+    return original, mime, firecrawl_scrape(url, ["markdown"]).get("markdown")
 
 
-def reading_copy(original: bytes, mime: str, base_url: str) -> str | None:
+TEXT_TYPES = {"application/json", "application/yaml", "application/x-yaml", "application/xml"}
+
+
+def reading_copy(original: bytes, mime: str, base_url: str) -> tuple[str | None, Assets]:
+    """A Markdown copy of ORIGINAL made on this machine, and the figure images it links as assets/NAME."""
+    if mime == "application/pdf":
+        return pdf_markdown(original)
     if extension(mime) == "html":
-        return html_to_markdown(original, base_url)
-    if mime.startswith("text/") or mime == "application/json":
-        return original.decode("utf-8", errors="replace")
-    return None
+        return html_to_markdown(original, base_url), {}
+    if mime.startswith("text/") or mime in TEXT_TYPES:
+        return original.decode("utf-8", errors="replace"), {}
+    return None, {}
 
 
 # Storage
@@ -356,7 +374,12 @@ class Store:
             "record": "capture.json",
         }
 
-    def save(self, capture: Capture, original: bytes, markdown: str | None) -> Path | None:
+    def put(self, key: str, path: Path, content_type: str) -> None:
+        result = self.s3("put-object", "--key", key, "--body", str(path), "--content-type", content_type)
+        if result.returncode != 0:
+            raise FetchError(f"R2 upload failed for {key}: {result.stderr.strip()}", "r2", "upload failed")
+
+    def save(self, capture: Capture, original: bytes, markdown: str | None, assets: Assets) -> Path | None:
         folder = self.cache / capture.sha256
         folder.mkdir(parents=True, exist_ok=True)
         files = self.names(capture)
@@ -373,13 +396,34 @@ class Store:
             key = f"{capture.sha256}/{name}"
             if self.s3("head-object", "--key", key).returncode == 0:
                 continue
-            content_type = {"original": capture.type, "markdown": "text/markdown", "record": "application/json"}[kind]
-            result = self.s3("put-object", "--key", key, "--body", str(path), "--content-type", content_type)
-            if result.returncode != 0:
-                raise FetchError(f"R2 upload failed for {key}: {result.stderr.strip()}", "r2", "upload failed")
+            self.put(key, path, {"original": capture.type, "markdown": "text/markdown", "record": "application/json"}[kind])
+        self.save_assets(capture.sha256, assets)
         return folder / files["markdown"] if markdown is not None else None
 
+    def save_assets(self, sha: str, assets: Assets) -> None:
+        folder = self.cache / sha / "assets"
+        for name, data in assets.items():
+            folder.mkdir(parents=True, exist_ok=True)
+            (folder / name).write_bytes(data)
+            self.put(f"{sha}/assets/{name}", folder / name, mimetypes.guess_type(name)[0] or "application/octet-stream")
+
+    def replace_copy(self, capture: Capture, markdown: str, assets: Assets) -> Path:
+        """Make MARKDOWN the capture's Markdown copy; the copy it replaces stays in R2 under archive/."""
+        sha, folder = capture.sha256, self.cache / capture.sha256
+        stamp = dt.datetime.now(dt.timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+        if self.s3("head-object", "--key", f"{sha}/content.md").returncode == 0:
+            result = self.s3("copy-object", "--copy-source", f"{self.bucket}/{sha}/content.md",
+                             "--key", f"{sha}/archive/content-{stamp}.md")
+            if result.returncode != 0:
+                raise FetchError(f"R2 archive failed for {sha}: {result.stderr.strip()}", "r2", "upload failed")
+        shutil.rmtree(folder / "assets", ignore_errors=True)
+        (folder / "content.md").write_text(markdown)
+        self.put(f"{sha}/content.md", folder / "content.md", "text/markdown")
+        self.save_assets(sha, assets)
+        return folder / "content.md"
+
     def restore(self, sha: str) -> tuple[Capture, Path]:
+        """The capture and its original in the local cache, downloading what is missing, figures included."""
         folder = self.cache / sha
         record = folder / "capture.json"
         if not record.exists():
@@ -390,6 +434,12 @@ class Store:
             path = folder / name
             if not path.exists():
                 self.download(f"{sha}/{name}", path, optional=name == "content.md")
+        markdown = folder / "content.md"
+        for name in re.findall(r"\]\(assets/([^)\s]+)\)", markdown.read_text() if markdown.exists() else ""):
+            path = folder / "assets" / name
+            if not path.exists():
+                path.parent.mkdir(exist_ok=True)
+                self.download(f"{sha}/assets/{name}", path, optional=True)
         return capture, folder / f"original.{extension(capture.type)}"
 
     def download(self, key: str, path: Path, optional: bool = False) -> None:
@@ -500,19 +550,43 @@ def record_in_page(worktree: Path, slug: str, capture: Capture) -> str:
 # Commands
 
 
-def capture_url(url: str, file: Path | None) -> tuple[Capture, bytes, str | None, str]:
+def capture_url(url: str, file: Path | None, paper: Paper | None) -> tuple[Capture, bytes, str | None, Assets, str]:
+    """Capture URL (an arXiv paper's versioned PDF when PAPER is given); return its Markdown copy and figures."""
     retrieved = dt.datetime.now(dt.timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ")
+    markdown, assets = None, {}
     if file:
         original = file.read_bytes()
         mime = TYPES_BY_SUFFIX.get(file.suffix.lower(), "application/octet-stream")
-        markdown, method = None, "file"
+        method = "file"
+    elif paper:
+        try:
+            original, mime, _ = get(paper.pdf)
+        except (urllib.error.URLError, TimeoutError) as error:
+            raise FetchError(f"could not download {paper.pdf}: {error}", "arxiv", "download failed") from error
+        method = "arXiv PDF"
     else:
         original, mime, markdown = firecrawl(url)
         method = "firecrawl"
-    markdown = markdown or reading_copy(original, mime, url)
-    meta = html_metadata(original) if extension(mime) == "html" else {}
+    if paper and (converted := arxiv_markdown(paper)):
+        (markdown, assets), method = converted, f"{method}; Markdown from arXiv's HTML rendering"
+    if markdown is None:
+        markdown, assets = reading_copy(original, mime, url)
+        if mime == "application/pdf":
+            method += "; Markdown by pymupdf4llm"
+    meta = paper.meta if paper else html_metadata(original) if extension(mime) == "html" else {}
     capture = Capture(url, retrieved, hashlib.sha256(original).hexdigest(), mime, meta)
-    return capture, original, markdown, method
+    return capture, original, markdown, assets, method
+
+
+def reparse(store: Store, sha: str) -> tuple[Capture, Path]:
+    """Rebuild a stored capture's Markdown copy and figures with the current converters."""
+    capture, original = store.restore(sha)
+    paper = arxiv_paper(capture.url)
+    converted = arxiv_markdown(paper) if paper else None
+    markdown, assets = converted or reading_copy(original.read_bytes(), capture.type, capture.url)
+    if markdown is None:
+        raise FetchError(f"no Markdown copy can be made from {capture.type}")
+    return capture, store.replace_copy(capture, markdown, assets)
 
 
 def print_capture(capture: Capture, markdown: Path | None, stored: str, method: str | None = None) -> None:
@@ -526,7 +600,8 @@ def print_capture(capture: Capture, markdown: Path | None, stored: str, method: 
             print(f"{key}: {json.dumps(capture.meta[key], ensure_ascii=False)}")
     if markdown:
         text = markdown.read_text()
-        print(f"markdown: {markdown} ({len(text.splitlines())} lines, {len(text.split())} words)")
+        figures = len(re.findall(r"\]\(assets/", text))
+        print(f"markdown: {markdown} ({len(text.splitlines())} lines, {len(text.split())} words, {figures} figures)")
     else:
         print("markdown: none; read the original")
     if method:
@@ -541,6 +616,8 @@ def main() -> int:
     parser.add_argument("--file", type=Path, help="copy of URL saved from a browser")
     parser.add_argument("--hash", dest="sha", help="restore a stored capture")
     parser.add_argument("--recapture", action="store_true", help="replace the current capture of URL")
+    parser.add_argument("--reparse", action="store_true",
+                        help="with --hash: rebuild the capture's Markdown copy and figures, and reindex it")
     args = parser.parse_args()
 
     missing = [name for name in CREDENTIALS if not os.environ.get(name)]
@@ -555,11 +632,22 @@ def main() -> int:
                 parser.error("--hash takes no URL, SOURCE, --file, or --recapture")
             if not re.fullmatch(r"[0-9a-f]{64}", args.sha):
                 parser.error("--hash needs a 64-character hex SHA-256")
+            if args.reparse:
+                capture, markdown = reparse(store, args.sha)
+                print_capture(capture, markdown, stored.replace("<sha256>", capture.sha256), "Markdown copy rebuilt")
+                if store.current(capture.url) == capture.sha256:
+                    from search import index_new_capture  # search imports this module
+                    print(f"index: {index_new_capture(store, capture.sha256, None)}")
+                else:
+                    print("index: not indexed, the capture is archived")
+                return 0
             capture, original = store.restore(args.sha)
             markdown = original.with_name("content.md")
             print_capture(capture, markdown if markdown.exists() else None, stored.replace("<sha256>", capture.sha256))
             print(f"original: {original}")
             return 0
+        if args.reparse:
+            parser.error("--reparse needs --hash SHA")
         if not args.url or not re.match(r"https?://", args.url):
             parser.error("give an http(s) URL or --hash SHA")
         if args.file and not args.file.is_file():
@@ -571,19 +659,23 @@ def main() -> int:
         worktree = Path(subprocess.run(
             ["git", "rev-parse", "--show-toplevel"], capture_output=True, text=True, check=True,
         ).stdout.strip())
+        paper = arxiv_paper(args.url)
+        url = paper.pdf if paper else args.url
+        if paper:
+            print(f"arXiv {paper.id}: the source is its {paper.version} PDF, {url}")
         if args.source:
-            check_page(worktree, args.source, args.url)
-        previous = store.current(args.url)
+            check_page(worktree, args.source, url)
+        previous = store.current(url)
         current = None if args.recapture else previous
         if current:
             if args.file:
-                raise FetchError(f"{args.url} is already captured; add --recapture to replace it with {args.file}")
+                raise FetchError(f"{url} is already captured; add --recapture to replace it with {args.file}")
             capture, original = store.restore(current)
             markdown = original.with_name("content.md")
             method = "current capture (add --recapture to replace it)"
         else:
-            capture, original_bytes, markdown_text, method = capture_url(args.url, args.file)
-            markdown = store.save(capture, original_bytes, markdown_text)
+            capture, original_bytes, markdown_text, assets, method = capture_url(url, args.file, paper)
+            markdown = store.save(capture, original_bytes, markdown_text, assets)
             store.point(capture.url, capture.sha256)
         print_capture(capture, markdown if markdown and markdown.exists() else None,
                       stored.replace("<sha256>", capture.sha256), method)
@@ -593,9 +685,9 @@ def main() -> int:
         if args.source:
             print(f"page: {record_in_page(worktree, args.source, capture)}")
         return 0
-    except FetchError as error:
+    except (FetchError, ConvertError) as error:
         print(f"sw fetch: {error}", file=sys.stderr)
-        if error.kind:
+        if getattr(error, "kind", None):
             from search import Health
             Health(primary_root()).report(error.kind, error.detail or "failed")
         return 1
