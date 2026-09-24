@@ -17,6 +17,8 @@ captures:
 
 Kagi's public price list for its commercial APIs covers Search, Extract, and enterprise offerings together with the features each includes. It is mutable first-party sales material: authoritative for the prices advertised at capture time, but it keeps no price history, leaves billing edge cases undefined, and says nothing independent about result quality. The request and response contract behind the listed features is in the [Kagi OpenAPI specification](../kagi-openapi-specification/). The first capture is a Markdown extraction; a later capture preserves the original HTML with the same prices.
 
+Its clean-Markdown promise does not establish [web capture fidelity](../../concepts/web-capture-fidelity/) for technical structures or retained source evidence; the extraction score and structural-fidelity distinction is documented [separately](../../notes/main-content-accuracy-does-not-measure-archive-fidelity/).
+
 ## Key points
 
 - Search costs $12 per 1,000 requests, billed by use. (Search price card: "$12 /1k requests")
