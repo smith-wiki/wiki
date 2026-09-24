@@ -61,7 +61,12 @@ TYPES_BY_SUFFIX = {
 
 
 class FetchError(Exception):
-    pass
+    """A failure to report to the user; KIND names a failing backend, DETAIL describes it without URLs."""
+
+    def __init__(self, message: str, kind: str | None = None, detail: str | None = None) -> None:
+        super().__init__(message)
+        self.kind = kind
+        self.detail = detail
 
 
 @dataclass
@@ -285,9 +290,11 @@ def firecrawl_scrape(url: str, formats: list[str]) -> dict:
             payload = json.load(response)
     except urllib.error.HTTPError as error:
         detail = error.read().decode("utf-8", errors="replace")[:500]
-        raise FetchError(f"Firecrawl returned {error.code} for {url}: {detail}") from error
+        service = error.code >= 500 or error.code in (401, 402, 429)
+        raise FetchError(f"Firecrawl returned {error.code} for {url}: {detail}",
+                         "firecrawl" if service else None, f"HTTP {error.code}") from error
     except (urllib.error.URLError, TimeoutError) as error:
-        raise FetchError(f"could not reach Firecrawl: {error}") from error
+        raise FetchError(f"could not reach Firecrawl: {error}", "firecrawl", "unreachable") from error
 
     data = payload.get("data") or {}
     status = (data.get("metadata") or {}).get("statusCode")
@@ -369,7 +376,7 @@ class Store:
             content_type = {"original": capture.type, "markdown": "text/markdown", "record": "application/json"}[kind]
             result = self.s3("put-object", "--key", key, "--body", str(path), "--content-type", content_type)
             if result.returncode != 0:
-                raise FetchError(f"R2 upload failed for {key}: {result.stderr.strip()}")
+                raise FetchError(f"R2 upload failed for {key}: {result.stderr.strip()}", "r2", "upload failed")
         return folder / files["markdown"] if markdown is not None else None
 
     def restore(self, sha: str) -> tuple[Capture, Path]:
@@ -388,7 +395,7 @@ class Store:
     def download(self, key: str, path: Path, optional: bool = False) -> None:
         result = self.s3("get-object", "--key", key, str(path))
         if result.returncode != 0 and not optional:
-            raise FetchError(f"R2 download failed for {key}: {result.stderr.strip()}")
+            raise FetchError(f"R2 download failed for {key}: {result.stderr.strip()}", "r2", "download failed")
 
     @staticmethod
     def pointer_key(url: str) -> str:
@@ -402,7 +409,7 @@ class Store:
             if result.returncode != 0:
                 if "NoSuchKey" in result.stderr:
                     return None
-                raise FetchError(f"R2 lookup failed for {url}: {result.stderr.strip()}")
+                raise FetchError(f"R2 lookup failed for {url}: {result.stderr.strip()}", "r2", "lookup failed")
             return json.loads(path.read_text())["sha256"]
 
     def point(self, url: str, sha: str) -> None:
@@ -413,7 +420,21 @@ class Store:
             key = self.pointer_key(url)
             result = self.s3("put-object", "--key", key, "--body", str(path), "--content-type", "application/json")
             if result.returncode != 0:
-                raise FetchError(f"R2 upload failed for {key}: {result.stderr.strip()}")
+                raise FetchError(f"R2 upload failed for {key}: {result.stderr.strip()}", "r2", "upload failed")
+
+    def pointers(self) -> dict[str, str]:
+        """URL -> SHA-256 of its current capture, for every captured URL that is not archived."""
+        listing = self.s3("list-objects-v2", "--prefix", "urls/", "--query", "Contents[].Key", "--output", "json")
+        if listing.returncode != 0:
+            raise FetchError(f"R2 listing failed: {listing.stderr.strip()}", "r2", "listing failed")
+        found = {}
+        with tempfile.TemporaryDirectory() as scratch:
+            path = Path(scratch) / "pointer.json"
+            for key in json.loads(listing.stdout) or []:
+                self.download(key, path)
+                pointer = json.loads(path.read_text())
+                found[pointer["url"]] = pointer["sha256"]
+        return found
 
 
 # Source pages
@@ -552,7 +573,8 @@ def main() -> int:
         ).stdout.strip())
         if args.source:
             check_page(worktree, args.source, args.url)
-        current = None if args.recapture else store.current(args.url)
+        previous = store.current(args.url)
+        current = None if args.recapture else previous
         if current:
             if args.file:
                 raise FetchError(f"{args.url} is already captured; add --recapture to replace it with {args.file}")
@@ -565,11 +587,17 @@ def main() -> int:
             store.point(capture.url, capture.sha256)
         print_capture(capture, markdown if markdown and markdown.exists() else None,
                       stored.replace("<sha256>", capture.sha256), method)
+        if not current:
+            from search import index_new_capture  # search imports this module
+            print(f"index: {index_new_capture(store, capture.sha256, previous)}")
         if args.source:
             print(f"page: {record_in_page(worktree, args.source, capture)}")
         return 0
     except FetchError as error:
         print(f"sw fetch: {error}", file=sys.stderr)
+        if error.kind:
+            from search import Health
+            Health(primary_root()).report(error.kind, error.detail or "failed")
         return 1
 
 

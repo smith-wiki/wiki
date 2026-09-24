@@ -8,10 +8,16 @@ Smith Wiki helper
 Usage:
   sw                                   Show wiki pages, open threads, Issues, and pull requests.
   sw fetch URL [SOURCE] [--file FILE] [--recapture]
-                                       Capture a source, or return the current capture of an already
-                                       captured URL; --recapture replaces it. With SOURCE, record it in
-                                       wiki/sources/SOURCE.md.
+                                       Capture and index a source, or return the current capture of an
+                                       already captured URL; --recapture replaces it. With SOURCE, record
+                                       it in wiki/sources/SOURCE.md.
   sw fetch --hash SHA                  Restore a stored capture into the local cache.
+  sw search QUERY [--in sources|wiki] [--limit N]
+                                       Search current captures and wiki pages on origin/main.
+  sw search --sync                     Maintenance: index every current capture and wiki page and drop
+                                       everything else; needed after the chunking or model changes.
+  sw search-eval [--chunkers A,B] [--models M,N]
+                                       Maintenance: measure chunkers and embedding models on Key points.
   sw turn [--queue] (--new-thread | THREAD) SLUG TITLE REQUEST
                                        Open a research turn: Issue in the thread milestone and branch.
   sw task [--queue] SLUG TITLE REQUEST Open a repository task: Issue and branch.
@@ -247,13 +253,27 @@ command_open() {
   [[ "$queue" == true ]] || switch_to_issue_branch "${issue_url##*/}" "$slug" "$base"
 }
 
-command_fetch() {
-  # Every worktree reads the .env of the primary worktree.
-  local primary
+# Every worktree reads the .env of the primary worktree.
+with_secrets() {
+  local reason=$1 primary
+  shift
   primary=$(git rev-parse --path-format=absolute --git-common-dir) || die "could not locate the primary worktree"
-  secretspec run --provider "dotenv:${primary%/.git}/.env" \
-    --reason "sw fetch: capture a research source into the private R2 store" \
-    -- python3 "$repo_root/scripts/fetch.py" "$@"
+  secretspec run --provider "dotenv:${primary%/.git}/.env" --reason "$reason" -- "$@"
+}
+
+command_fetch() {
+  with_secrets "sw fetch: capture a research source into the private R2 store and index it" \
+    python3 "$repo_root/scripts/fetch.py" "$@"
+}
+
+command_search() {
+  with_secrets "sw search: search captured sources and wiki pages" \
+    python3 "$repo_root/scripts/search.py" "$@"
+}
+
+command_search_eval() {
+  with_secrets "sw search-eval: measure chunkers and embedding models on the wiki's Key points" \
+    python3 "$repo_root/scripts/search_eval.py" "$@"
 }
 
 command_start() {
@@ -397,6 +417,8 @@ case "$command" in
   help|-h|--help) usage ;;
   turn|task) command_open "$command" "$@" ;;
   fetch) command_fetch "$@" ;;
+  search) command_search "$@" ;;
+  search-eval) command_search_eval "$@" ;;
   start) command_start "$@" ;;
   commit) command_commit "$@" ;;
   pr) command_pr "$@" ;;
